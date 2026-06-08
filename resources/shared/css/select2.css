@@ -1,0 +1,156 @@
+.select2-container--default .select2-selection--single {
+    --tw-border-opacity: 1;
+    @apply flex items-center;
+}
+
+.select2-container--default .select2-selection--multiple {
+    @apply dark:border-neutral-500 text-neutral-0 !border-neutral-500;
+    border-radius: 8px !important;
+    padding: 6px 10px 4px 10px !important;
+    min-height: 45px !important;
+    background-color: unset !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Multiple selection choice pills */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: transparent !important;
+    border: 0.5px solid rgb(0 0 0 / 50%) !important;
+    padding: 2px 8px !important;
+    margin: 2px 4px 2px 0 !important;
+    border-radius: 4px !important;
+    font-size: 0.875rem;
+}
+
+/* Choice text color */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    color: black !important;
+}
+
+/* Dark mode styling for multiple */
+
+.select2-container--default .select2-selection--multiple{
+    border-color: var(--color-neutral-30) !important;
+}
+.dark .select2-container--default .select2-selection--multiple{
+    border-color: var(--color-neutral-500) !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice{
+    padding-left: 20px !important;
+    border-color: var(--color-neutral-30) !important;
+}
+.dark .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    color: white !important;
+}
+
+.select2-container .select2-search--inline .select2-search__field {
+    box-sizing: border-box;
+    border: none;
+    font-size: 100%;
+    margin-top: 0px !important;
+    margin-left: 5px;
+    padding: 0;
+    max-width: 100%;
+    resize: none;
+    height: 20px !important;
+    vertical-align: bottom;
+    font-family: sans-serif;
+    overflow: hidden;
+    word-break: keep-all;
+}
+
+.wrapper .select2-container {
+    width: 100% !important;
+    background-color: unset !important;
+    border-radius: 8px !important;
+}
+
+#users-wrapper .select2-container {
+    width: 100% !important;
+}
+
+/* Already included above, kept for compatibility */
+.select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice__display {
+    color: black !important;
+}
+.select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice {
+    background: transparent !important;
+    border: 0.3px solid #000000 !important;
+}
+
+.dark
+    .select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice__display {
+    color: white !important;
+}
+.dark
+    .select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice {
+    background: transparent !important;
+    border: 0.3px solid #ffffff10 !important;
+}
+
+.select2-container .select2-selection--single {
+    background-color: unset !important;
+    height: 45px !important;
+    line-height: 45px !important;
+    border-radius: 8px !important;
+    /* border: 1px solid rgb(235 236 239) !important; */
+}
+
+.select2-selection--single .select2-selection__rendered {
+    line-height: 45px !important;
+    padding: 0 20px !important;
+}
+.select2-selection--single .select2-selection__arrow {
+    top: 10px !important;
+    right: 10px !important;
+}
+
+.select2 .selection .select2-selection__clear {
+    position: absolute;
+    top: 1px;
+    right: 15px;
+}
+
+.select2-container--default .select2-selection--single {
+    @apply dark:border-neutral-500 text-neutral-0 !border-neutral-30;
+}
+
+.select2-container--open .select2-dropdown--below {
+    @apply rounded-md border border-neutral-30 top-1;
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        @apply rounded-lg;
+    }
+}
+
+.dark {
+    .select2-results__option--selectable {
+        @apply text-neutral-0;
+    }
+
+    .select2-container--default .select2-results__option--selected {
+        @apply bg-neutral-700;
+    }
+
+    .select2-selection--single .select2-selection__rendered {
+        color: rgb(var(--neutral-20)) !important;
+    }
+
+    .select2-container--open .select2-dropdown--below {
+        @apply border-neutral-500 bg-neutral-904;
+
+        .select2-search--dropdown .select2-search__field {
+            @apply border-neutral-500 text-neutral-0;
+        }
+    }
+}

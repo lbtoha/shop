@@ -1,0 +1,19 @@
+meta {
+  name: getWithdrawList
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/profile/withdraws
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

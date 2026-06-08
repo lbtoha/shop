@@ -1,0 +1,26 @@
+meta {
+  name: verifyOtp
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/auth/verify-email-or-phone
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+body:json {
+  {
+    "type": "email",
+    "otp": 92036,
+      "email": "test@gmail.com"
+  //     "phone": "+8801676413971"
+  }
+}

@@ -1,0 +1,25 @@
+meta {
+  name: favorite-add-remove
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/profile/favorites
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  favorable_type: quiz
+  slug: {{quiz_slug}}
+  type: add
+}

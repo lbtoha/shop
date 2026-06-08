@@ -1,0 +1,27 @@
+meta {
+  name: UpdateTicket
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/profile/support-tickets/3
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  subject: Test Subject updated
+  message: Test messge sended
+  priority: high
+  _method: put
+  ~attachments[0]: @file(/home/safiul/Desktop/laravel-projects/rifa/public/assets/images/lucky-winner.jpg)
+}

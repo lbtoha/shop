@@ -1,0 +1,20 @@
+meta {
+  name: Quiz Details
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/quiz-details/{{quiz_slug}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

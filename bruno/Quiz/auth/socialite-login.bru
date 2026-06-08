@@ -1,0 +1,16 @@
+meta {
+  name: socialite-login
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/auth//login/google
+  body: none
+  auth: none
+}
+
+headers {
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}

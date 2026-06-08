@@ -1,0 +1,20 @@
+meta {
+  name: GetAllAnswers
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/contest-result/{{contest_slug}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,49 @@
+.icon-picker {
+    position: relative;
+}
+
+.icon-picker-modal {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.icon-picker-modal {
+    padding: 0.625rem; /* p-2.5 */
+    border-radius: 0.125rem; /* rounded-sm */
+    min-width: 320px; /* min-w-[320px] */
+    width: 100%; /* w-full */
+    transform: translateX(-50%); /* -translate-x-1/2 */
+}
+
+@media (min-width: 768px) {
+    .icon-picker-modal {
+        min-width: 350px; /* md:min-w-[350px] */
+    }
+}
+
+.icon-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 5px;
+    overflow-y: auto;
+}
+
+/* Optional: Customize Tippy theme */
+.tippy-box[data-theme~="light"] {
+    background-color: white;
+    color: #333;
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Quizzes By Category
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/quizzes?category={{category_slug}}&search=Networking Hardware
+  body: none
+  auth: bearer
+}
+
+params:query {
+  category: {{category_slug}}
+  search: Networking Hardware
+}
+
+headers {
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

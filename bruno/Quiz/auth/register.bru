@@ -1,0 +1,37 @@
+meta {
+  name: register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/auth/sign-up
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Content-Type: multipart/form-data
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+body:multipart-form {
+  first_name: test
+  last_name: testd
+  email: test2@gmail.com
+  country_code: BD
+  phone: +8801676413971
+  password: 12345678
+  password_confirmation: 12345678
+  referer: 
+  agree: 1
+}
+
+script:post-response {
+  test("token set", function () {
+      var jsonData = res.getBody();
+     bru.setEnvVar("token", jsonData?.data?.token);
+  });
+  
+}

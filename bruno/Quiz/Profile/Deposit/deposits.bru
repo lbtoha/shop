@@ -1,0 +1,25 @@
+meta {
+  name: deposits
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/profile/deposits
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  amount: 200
+  currency: USD
+  gateway: razorpay
+}

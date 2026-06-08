@@ -1,0 +1,19 @@
+meta {
+  name: userInfoUpdate
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{url}}/profile/update-profile
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  avatar: @file(/home/safiul007/Pictures/Screenshots/Screenshot from 2025-01-15 14-22-25.png)
+}

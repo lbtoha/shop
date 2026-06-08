@@ -1,0 +1,140 @@
+@layer base {
+    /* color variables */
+    :root {
+        /* --primary-color: 44 123 229; */
+        --primary-color: #6366f1;
+        --secondary-color: 142 51 255;
+        --info-color: 0 184 217;
+        --success-color: 34 197 94;
+        --warning-color: 257 171 0;
+        --error-color: 255 86 48;
+    }
+
+    /* disable number input arrow */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
+@layer utilities {
+    .container {
+        @apply mx-auto px-3 sm:max-w-[96%] md:max-w-[95%] xxl:max-w-[1140px] 3xl:max-w-[1296px];
+    }
+    .display-1 {
+        @apply text-4xl font-semibold leading-tight lg:text-6xl xxl:text-[70px] 3xl:text-[80px];
+    }
+    .display-2 {
+        @apply text-3xl font-semibold leading-tight md:text-[52px] xxl:text-[60px] 3xl:text-[72px];
+    }
+    .display-3 {
+        @apply text-3xl font-semibold leading-tight lg:text-5xl xxl:text-[56px] 3xl:text-[64px];
+    }
+    .display-4 {
+        @apply text-3xl font-semibold leading-tight lg:text-4xl xxl:text-[48px] 3xl:text-[56px];
+    }
+    .pt-120 {
+        @apply pt-14 xxl:pt-[120px];
+    }
+    .pb-120 {
+        @apply pb-14 xxl:pb-[120px];
+    }
+
+    body {
+        @apply relative bg-neutral-0 text-neutral-700 dark:bg-neutral-904 dark:text-neutral-10;
+    }
+    a,
+    p,
+    span,
+    td {
+        @apply text-sm;
+    }
+
+    p {
+        @apply text-neutral-500 dark:text-neutral-30;
+    }
+
+    h1,
+    .h1 {
+        @apply text-[30px] font-semibold leading-tight  md:text-[36px] xl:text-[48px];
+    }
+    h2,
+    .h2 {
+        @apply text-[20px] font-semibold leading-[125%] sm:text-[24px] lg:text-[30px] 3xl:text-[40px];
+    }
+    h3,
+    .h3 {
+        @apply text-[20px] font-medium leading-tight sm:font-semibold lg:text-[24px] 3xl:text-[32px];
+    }
+    h4,
+    .h4 {
+        @apply text-[18px] leading-tight font-medium md:text-[20px] md:font-semibold 3xl:text-[24px];
+    }
+    h5,
+    .h5 {
+        @apply text-[16px] leading-normal font-medium md:text-[20px] md:font-semibold;
+    }
+    h6,
+    .h6 {
+        @apply text-sm lg:text-base font-medium shadow-none;
+    }
+    .lead-text {
+        @apply text-2xl;
+    }
+    .xl-text {
+        @apply text-xl;
+    }
+    .l-text {
+        @apply text-lg;
+    }
+    .m-text {
+        @apply text-base;
+    }
+    .s-text {
+        @apply text-sm;
+    }
+
+    .f-center {
+        @apply flex justify-center items-center;
+    }
+    .inf-center {
+        @apply inline-flex justify-center items-center;
+    }
+
+    input:focus,
+    textarea:focus {
+        @apply outline-none;
+    }
+}
+
+.main-content {
+    @apply bg-neutral-20 dark:bg-neutral-903 text-neutral-700 min-h-screen dark:text-neutral-20 pt-[60px] md:pt-[66px] duration-300 w-full ltr:xl:ml-[280px] rtl:xl:mr-[280px] xl:w-[calc(100%-280px)];
+    &.closed {
+        @apply xl:ml-0 w-full rtl:mr-0;
+    }
+}
+.topbar {
+    @apply w-full xl:ml-[280px] xl:w-[calc(100%-280px)] ltr:xl:ml-[280px] rtl:xl:mr-[280px] right-0 fixed top-0 p-3  duration-300 z-10 bg-neutral-0 dark:bg-neutral-904;
+    &.closed {
+        @apply xl:ml-0 w-full rtl:mr-0;
+    }
+}
+
+/* sidebar */
+.sidebar {
+    @apply fixed top-0 z-[12] h-full w-[280px] bg-neutral-0 duration-300 dark:bg-neutral-904 left-0 rtl:right-0 -translate-x-full rtl:translate-x-full;
+    &.opened {
+        @apply translate-x-0;
+    }
+}
+
+.tab-link.active {
+    @apply bg-primary text-neutral-0;
+}
+.swal2-actions {
+    @apply flex gap-2 xl:gap-3;
+    .swal2-cancel {
+        @apply bg-error text-neutral-0;
+    }
+}

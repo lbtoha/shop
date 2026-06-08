@@ -1,0 +1,14 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#facc15" stop-opacity="0.1"></stop>
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"></feTurbulence>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="#0a0a0a"></rect>
+  <circle cx="960" cy="540" r="400" fill="url(#grad)"></circle>
+  <rect width="1920" height="1080" filter="url(#noise)" opacity="0.05"></rect>
+</svg>

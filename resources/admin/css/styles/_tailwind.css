@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+    /* Colors */
+    --text-neutral-0: red;
+    --color-transparent: transparent;
+    --color-primary: var(--primary-color);
+    --color-blue: var(--primary-color);
+    --color-secondary: rgb(var(--secondary-color));
+    --color-info: rgb(var(--info-color));
+    --color-success: rgb(var(--success-color));
+    --color-warning: rgb(var(--warning-color));
+    --color-error: rgb(var(--error-color));
+    --color-neutral-0: #ffffff;
+    --color-neutral-10: #fafafb;
+    --color-neutral-20: #f5f6f6;
+    --color-neutral-30: #ebeced;
+    --color-neutral-40: #dfe0e2;
+    --color-neutral-50: #c2c4c8;
+    --color-neutral-60: #b3b6bb;
+    --color-neutral-70: #a7aab0;
+    --color-neutral-80: #999ca3;
+    --color-neutral-90: #8a8e95;
+    --color-neutral-100: #7b8088;
+    --color-neutral-200: #6d717b;
+    --color-neutral-300: #5e636e;
+    --color-neutral-400: #525763;
+    --color-neutral-500: #434956;
+    --color-neutral-600: #373d4b;
+    --color-neutral-700: #262d3b;
+    --color-neutral-800: #171f2e;
+    --color-neutral-900: #0b1323;
+    --color-neutral-903: #23262b;
+    --color-neutral-904: #1d1e24;
+
+    /* breakpoints */
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-xxl: 1400px;
+    --breakpoint-3xl: 1600px;
+    --breakpoint-4xl: 1800px;
+
+    /* Animation */
+    --animation-spin-slow: spin 7s linear infinite;
+}
+
+@source "../../../views/admin";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.input-error {
+    @apply bg-red-200 border !border-red-600 text-red-800 ;
+}
+
+.input-text-error {
+    @apply text-sm text-red-600 dark:text-red-500 block mt-1;
+}

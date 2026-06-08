@@ -1,0 +1,7 @@
+
+@import "./styles/_tailwind.css";
+@import "./styles/_misc.css";
+@import "./styles/_utilities.css";
+@import "./styles/_components.css";
+@import "../../shared/css/select2.css";
+@import "../../../node_modules/intl-tel-input/build/css/intlTelInput.css";

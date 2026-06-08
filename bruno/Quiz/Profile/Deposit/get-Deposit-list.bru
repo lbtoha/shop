@@ -1,0 +1,19 @@
+meta {
+  name: get-Deposit-list
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/profile/deposits
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

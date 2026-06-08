@@ -1,0 +1,26 @@
+meta {
+  name: CreateTicket
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/profile/support-tickets
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  message: Test messge sended
+  priority: high
+  subject: Test Subject
+  ~attachments[0]: @file()
+}

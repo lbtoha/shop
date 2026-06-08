@@ -1,0 +1,20 @@
+meta {
+  name: getKycForms
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{url}}/auth/kyc-forms
+  body: none
+  auth: bearer
+}
+
+headers {
+  User-Agent: insomnia/9.3.3
+  accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}

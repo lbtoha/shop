@@ -1,0 +1,12 @@
+User-agent: *
+                    Disallow: /admin/
+                    Disallow: /login/
+                    Disallow: /register/
+                    Disallow: /dashboard/
+                    Disallow: /cart/
+                    Disallow: /checkout/
+                    Disallow: /profile/
+
+                    Allow: /
+
+                    Sitemap: https://yourdomain.com/sitemap.xml

@@ -1,0 +1,11 @@
+meta {
+  name: change-two-factore-auth
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{url}}/profile/2fa/toggle
+  body: json
+  auth: inherit
+}
