@@ -7,6 +7,10 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
+                // storefront (public shop)
+                "resources/shop/css/app.css",
+                "resources/shop/js/app.js",
+
                 // admin
                 "resources/admin/css/app.css",
                 "resources/shared/css/icon-picker.css",

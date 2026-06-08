@@ -4,90 +4,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Laravel 12 (PHP 8.2+) backend for a quiz/contest/lottery platform. It serves two distinct surfaces from one codebase:
+Laravel 12 (PHP 8.2+) **cash-on-delivery (COD) e-commerce** app, converted from a quiz/lottery platform: the quiz/contest/games/payment-gateway/client-API modules were stripped out, and a products/categories/orders backend plus a public Blade storefront were built on the surviving admin shell. There is **no payment gateway** (orders are paid on delivery) and **no client REST API**.
 
-- **Admin dashboard** — server-rendered Blade + Alpine.js, session-authenticated, under the `/admin` prefix.
-- **Client API** — JSON REST API for the mobile/PWA frontend, Sanctum token-authenticated, under the `/api/v1` prefix.
+Two server-rendered surfaces, both Blade + Tailwind v4 (separate Vite entries):
+- **Storefront** — public shop at the root (`/`, `/shop`, `/product/{slug}`, `/cart`, `/checkout`), guest checkout, no auth. Routes in [routes/shop.php](routes/shop.php).
+- **Admin dashboard** — session-authenticated, under `/admin`. Routes in [routes/admin.php](routes/admin.php).
 
 ## Commands
 
 ```bash
-# Run everything (server + queue worker + log tail + vite) concurrently
-composer dev
-
-# Individual processes
+composer dev                 # server + queue worker + log tail (pail) + vite, concurrently
 php artisan serve
-php artisan queue:listen --tries=1
-php artisan pail            # live log tail
-npm run dev                 # vite dev server
-npm run build               # production asset build
+npm run dev                  # vite dev server
+npm run build                # production assets (required: public/index.php redirects to /installer until built + storage/installed marker exists)
 
 # Database
-php artisan migrate
-php artisan migrate:fresh --seed
+php artisan migrate:fresh --seed     # rebuilds schema + sample admin/menu/catalog data
 
 # Tests (Pest)
-php artisan test                              # all
-php artisan test --testsuite=Unit            # one suite (Unit | Feature)
-php artisan test --filter=SomeTestName       # single test
-vendor/bin/pest tests/Feature/ExampleTest.php
+php artisan test
+php artisan test --filter=SomeTestName
 
-# Lint / format (Laravel Pint)
-vendor/bin/pint            # fix
-vendor/bin/pint --test     # check only
+# Lint / format
+vendor/bin/pint              # fix
+vendor/bin/pint --test       # check only
 ```
 
-The scheduler runs `run-task-schedule` every minute (see [routes/console.php](routes/console.php)); ensure `schedule:work` or a cron entry is active in environments that depend on scheduled tasks.
+**Install gate:** `public/index.php` redirects to `/installer/index.php` unless `storage/installed` exists. Create that file (and built Vite assets) to run the app directly outside the installer flow.
 
-## Routing architecture
+The scheduler runs `run-task-schedule` every minute ([routes/console.php](routes/console.php)).
 
-Routes are wired in [bootstrap/app.php](bootstrap/app.php) (not the default Laravel convention), which mounts four groups:
+## Routing & request flow
 
-- `/admin` → [routes/admin.php](routes/admin.php) — `web` + `SetAppLocal` middleware, `admin.` name prefix.
-- `/api/v1` → [routes/api/v1/client.php](routes/api/v1/client.php) — `api` + `SetAppLocal`, `api.v1.` name prefix.
-- `/payment` → [routes/payment.php](routes/payment.php) — CSRF excluded (gateway callbacks/webhooks).
-- Root `/` redirects to the admin dashboard.
+Routes are wired in [bootstrap/app.php](bootstrap/app.php) (not Laravel's default convention): the `/admin` group → [routes/admin.php](routes/admin.php) (`web` + `SetAppLocal`, `admin.` name prefix), plus root redirect and a `not-found` route. The former `/api/v1` and `/payment` groups were removed.
 
-API exceptions are normalized to JSON in `bootstrap/app.php`'s `withExceptions` block: validation errors → `422` with `{statusCode, message, errors}`, missing records → `404`, maintenance mode → `503` with payload. When adding API error handling, follow this existing shape rather than throwing raw exceptions.
+E-commerce admin routes live in [routes/admin.php](routes/admin.php) inside the `DemoMiddleware` group: `admin.categories.*` and `admin.products.*` (resource, no `show`), and `admin.orders.{index,show,update-status,destroy}` (orders are created by checkout, so no create/edit).
 
-## Authentication (multi-guard)
+## Authentication
 
-Defined in [config/auth.php](config/auth.php). The two guards that matter:
+The `admin` guard ([config/auth.php](config/auth.php)) is session-based on the `Admin` model. `AdminAuthMiddleware` enforces **per-route menu permissions**: an admin's `role->module_caps` is checked against [config/menu.php](config/menu.php) via `getMenuCaps()`/`isCurrentUrlMatched()`. Admins with `admin_role_id === null` are superusers. The `client` Sanctum guard still exists in config but the customer-facing API was removed; the `User` model now represents storefront customers for admin management only.
 
-- **`admin`** — session driver, `admins` provider (the `Admin` model). Protected by `AdminAuthMiddleware`, which additionally enforces **per-route menu permissions**: an admin's `role->module_caps` is checked against the menu config in [config/menu.php](config/menu.php) via `getMenuCaps()`/`isCurrentUrlMatched()`. Admins without a role (`admin_role_id === null`) are superusers.
-- **`client`** — Sanctum driver for the API (`auth:client` / `guest:client` middleware on client routes). Social login via Socialite, plus OTP and 2FA flows in `Api/V1/Client/Auth/AuthenticationController`.
+## E-commerce domain
 
-## Code organization
+Models ([app/Models/](app/Models/)): `Category` (self-nesting via `parent_id`, Sluggable), `Product` (Sluggable, `category()`, `images()`, scopes `active()`/`inStock()`, `isInStock()`), `ProductImage`, `Order`, `OrderItem`. Order state is enum-cast: `OrderStatusEnum` (pending→confirmed→processing→shipped→delivered / cancelled) and `OrderPaymentStatusEnum` (unpaid/paid/refunded), each with `label()`/`color()`/`values()`.
 
-Controllers mirror the two surfaces:
+**Checkout (COD)** lives in [app/Services/Ecommerce/](app/Services/Ecommerce/):
+- `Cart` — session-backed cart keyed by product id; product price/stock are always read fresh from the DB (never trusted from session).
+- `CheckoutService::placeOrder()` — runs in a `DB::transaction` with `lockForUpdate()` on each product so concurrent checkouts can't oversell; decrements stock, snapshots product name/price into `OrderItem`, generates the order number via `UniqueCodeGenerator::make(Order::class, 'order_number', 6, 'ORD')`, records the order as `cash_on_delivery`/`unpaid`/`pending`, and clears the cart. Throws `CustomWebException` (422) on empty cart or out-of-stock.
 
-- `app/Http/Controllers/Admin/**` — feature-grouped (Quiz, Contest, Article, Deposit, Withdraw, Settings, etc.).
-- `app/Http/Controllers/Api/V1/Client/**` — the client API, grouped by domain (Auth, Quiz, Contest, Profile, games, Article).
+## Storefront (public shop)
 
-Business logic lives in `app/Services/**`, not controllers. Key service areas: `Payment`, `Quiz`, `Contest`, `Ai`, `Sms`, `Firebase`, `Coin`, `Bonus`, `Games`. Service providers in `app/Providers` bind these (e.g. `PaymentServiceProvider`, `SmsServiceProvider`, `AiServiceProvider`, `NotificationServiceProvider`).
+Controllers in [app/Http/Controllers/Shop/](app/Http/Controllers/Shop/): `HomeController` (hero + New Collection/Hot Sale/Featured sections, all derived from product data — no banner admin module), `ShopController` (listing with category/search/sort filter + product detail, increments `views`), `CartController` (add is JSON for AJAX; update/remove redirect; `count` feeds the header badge), `CheckoutController` (guest COD: form → `CheckoutService::placeOrder()` → confirmation by order number).
 
-## Key patterns
+Views in [resources/views/shop/](resources/views/shop/) extend `shop.layouts.app` (header with cart badge + category nav, footer). The product card is an **anonymous component** registered via `Blade::anonymousComponentNamespace('shop.components', 'shop')` in `AppServiceProvider` — use it as `<x-shop::product-card :product="$p" />` (double-colon namespace syntax, matching admin's `<x-admin::...>`; the dot form `<x-shop.product-card>` will NOT resolve). Assets: `resources/shop/css/app.css` (Tailwind v4, warm-neutral theme via `@theme` CSS vars) and `resources/shop/js/app.js` (vanilla: AJAX add-to-cart, cart badge, hero carousel, mobile menu) — both registered as Vite inputs in [vite.config.js](vite.config.js). Note: many dead admin JS files (quiz/contest/firebase/etc.) remain referenced in the Vite input list — harmless, left from the strip.
 
-**Payment gateways** — Each gateway is a class in [app/Services/Payment/Methods/](app/Services/Payment/Methods/) extending `AbstractPayment` (implements `pay()`, `handleSuccess()`, `handleFailed()`). Gateways are discovered/configured through `PaymentInterface` and seeded defaults live in `PaymentMethodReserve::make()`. To add a gateway, create a `*Service` class following the existing ones and register its config there. Payments flow through `Payable` / `PaymentTypeEnum` (DEPOSIT, etc.).
+The root `/` serves the storefront home (was the admin-dashboard redirect before the conversion).
 
-**AI providers** — [app/Services/Ai/](app/Services/Ai/) has interchangeable providers (`OpenAiService`, `GeminiService`, `DeepSeekService`) sharing `BaseService`, used for question generation; token usage tracked via `AiTokenLog`.
+## Admin controller & view conventions
 
-**Translations / i18n** — Localizable models use a paired `*Translation` model (e.g. `Article` + `ArticleTranslation`, `Contest` + `ContestTranslation`, `Question` + `QuestionTranslation`) with a `translation` attribute appended to the model's `$appends`. Locale is set per-request by `SetAppLocal` from `session('locale')`. Use the `getTranslations()` / `translateText()` helpers.
+Follow the existing dashboard idiom (see [UserController](app/Http/Controllers/Admin/User/UserController.php) / [RoleController](app/Http/Controllers/Admin/AdminUser/RoleController.php) / the e-commerce controllers as templates):
 
-**Options / settings** — Global key-value settings are stored via the `Option` model and accessed through global helpers `getOption()`, `getOptionWithJsonDecode()`, `storeOption()`. Many runtime settings (currencies, maintenance mode, payment config) flow through this rather than `.env`.
+- Every action starts with `adminUserHasPermission(permission: 'read'|'create'|'edit'|'delete')` (global helper, authorizes by admin role).
+- Lists go through `App\Services\ModalIndexQuey::get($query, $with)` — returns a paginator and auto-applies search (via the model's `getSearchAttribute()`), sort, and date filters. Views receive a `$columns` array (`['label', 'key'?, 'header_class'?, 'render' => fn($row) => html]`) plus `$buttons`/`$tab_buttons`.
+- Action columns build `$action_buttons` and `return view('admin.components.table-action', compact('action_buttons'))->render();`.
+- `store`/`update`/`destroy` return **JSON** `['message' => __('...'), 'redirect' => route('admin....index')]`; validation via a FormRequest in `app/Http/Requests/Admin/<Module>/`. The global `app.js` submits forms with class `form-submit-edit` over AJAX and follows the `redirect`.
+- Money is rendered with the `amountWithSymbol()` helper; status badges use `<span class="status {enum->color()} capitalize">{{ $enum->label() }}</span>`.
 
-**Enums** — Domain status/type values are PHP enums in [app/Enums/](app/Enums/) with `label()` methods, cast on models (e.g. `'status' => ArticleStatusEnum::class`) and surfaced via `*_name` accessor attributes.
+Blade: wrap pages in `<x-admin-app-layout>` → `<div class="white-box">`; use `<x-admin::page-header>`, `<x-admin::table>`, and form components `<x-admin::text-input-group>`, `<x-admin::textarea-group>`, `<x-admin::editor>`, `<x-admin::number-input-group>` (currency symbol on by default; pass `:with_currencySymbol="false"` for non-money), `<x-admin::select-option>` (options are passed as `<option>` slot children, **not** an `:options` prop), `<x-admin::switch>` (uses `:value` 0/1 + a `:types` array, not a boolean `:checked`), and `<x-admin::file-uploader>` (stores a file-manager path string in a text input — controllers just save the string, no manual upload). **Read the component file in [resources/views/admin/components/](resources/views/admin/components/) before using it** — prop names vary.
 
-**Global helpers** — [app/Helpers/functions.php](app/Helpers/functions.php) is autoloaded (composer `files`) and defines many globals used throughout Blade and controllers: `convertCurrency()`, `amountWithSymbol()`, `adminUserHasPermission()`, `authorizedMenus()`, `placeImage()`/`placeAvatar()`, `inputSanitize()`, `protectOnDemo()`, etc. Check here before writing new utility logic.
+Product gallery images are submitted as an `images[]` array of path strings; `ProductController` creates one `ProductImage` per non-empty path, and `update()` uses delete-and-recreate to sync.
 
-**Reusable traits** — [app/Traits/](app/Traits/) holds cross-cutting model/controller behavior: `MediaUploader`, `Formatter`, `PaymentHelper`, `NotificationHelper`, `EmailAndPhoneOTPVerification`, `QuestionTrait`. Prefer composing these.
+## Settings, currency, helpers
 
-**Demo mode** — `DemoMiddleware` and the `protectOnDemo()` helper block mutating actions when the app runs as a demo. Respect this when adding admin write operations.
-
-## Frontend assets
-
-Admin UI is Blade + Alpine.js + Tailwind v4, bundled with Vite ([vite.config.js](vite.config.js)). jQuery, Quill, ApexCharts, SweetAlert2, Select2, and Firebase JS SDK are in the mix. This repo is the backend/dashboard; the client-facing app consumes the `/api/v1` API separately.
+- **Options/settings** are key-value rows on the `Option` model via `getOption()`/`getOptionWithJsonDecode()`/`storeOption()`. Many runtime values (company info, theme, currency symbol) flow through here rather than `.env`; `FlyServiceProvider` loads them into config at boot.
+- **Currency is single/fixed** — the multi-currency `Currency` model was removed. `convertCurrency()` is identity, `currencyRate()` returns 1, and `currencySymbol()`/`amountWithSymbol()` read a `currency_symbol` option.
+- [app/Helpers/functions.php](app/Helpers/functions.php) is autoloaded and holds globals used across Blade/controllers: `amountWithSymbol()`, `adminUserHasPermission()`, `authorizedMenus()`, `placeImage()`/`placeAvatar()`, `inputSanitize()`, `protectOnDemo()` (a display value-masker for demo mode — it does **not** block actions), etc. Check here before writing utility logic.
 
 ## Notifications
 
-Multi-channel: email (`MailServiceProvider`), SMS (`Sms` services + `SmsServiceProvider`, multiple providers via Twilio/Vonage), and push via Firebase (`Firebase` services + `kreait/laravel-firebase`). Templates are data-driven through `NotificationTemplate` / `NotificationTemplateBody` models; logs in `NotificationLog`.
+Email-only (SMS/Firebase push were removed). Templates are data-driven via `NotificationTemplate`/`NotificationTemplateBody`; `UserAutoNotification` resolves to the `mail` channel. Media library is `unisharp/laravel-filemanager` (wired in admin routes; used for product/category images).

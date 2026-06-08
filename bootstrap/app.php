@@ -14,11 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         using: function () {
             /**
-             * Root route
+             * storefront (public shop) routes — home, shop, product, cart, checkout
              */
-            Route::get('/', function () {
-                return redirect(route('admin.dashboard'));
-            });
+            Route::middleware(['web', SetAppLocal::class])
+                ->group(base_path('routes/shop.php'));
             /**
              * admin route
              */

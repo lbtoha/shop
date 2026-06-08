@@ -79,6 +79,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \Illuminate\Support\Facades\Blade::anonymousComponentNamespace('admin.components', 'admin');
+        \Illuminate\Support\Facades\Blade::anonymousComponentNamespace('shop.components', 'shop');
 
         /**
          * Prefetch Vite assets

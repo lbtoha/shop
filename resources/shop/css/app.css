@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "@phosphor-icons/web/regular";
+
+/*
+ * Storefront theme — clean, modern fashion store inspired by loombymegh.com:
+ * warm neutral palette, square cards with subtle shadows, generous whitespace.
+ */
+@theme {
+    --color-brand: #8a5a44;
+    --color-brand-dark: #6f4636;
+    --color-brand-light: #b08968;
+    --color-ink: #2b2b2b;
+    --color-muted: #6b6b6b;
+    --color-sand: #faf7f2;
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+}
+
+/* Hide scrollbar on the horizontal category strip while keeping it scrollable */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Product card image hover swap */
+.product-card .img-secondary {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.product-card:hover .img-secondary {
+    opacity: 1;
+}
