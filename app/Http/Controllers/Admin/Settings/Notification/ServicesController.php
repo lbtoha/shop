@@ -3,18 +3,13 @@
 namespace App\Http\Controllers\Admin\Settings\Notification;
 
 use App\Enums\NotificationType;
-use App\Enums\NotifyEventType;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\NotificationTemplate;
 use App\Models\User;
-use App\Services\Firebase\FirebaseNotificationService;
-use App\Services\Helper\JsonHelper;
 use App\Services\ModalIndexQuey;
-use App\Services\Sms\SmsInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
 class ServicesController extends Controller
@@ -276,115 +271,4 @@ class ServicesController extends Controller
         }
     }
 
-    public function testSmsService(Request $request)
-    {
-        $validated = $request->validate([
-            'send_to' => 'required',
-            'message' => 'required',
-        ]);
-
-        try {
-
-            $smsService = resolve(SmsInterface::class);
-            $smsService->send($validated['send_to'], $validated['message']);
-
-            return response()->json(['message' => __('SMS sent successfully')]);
-        } catch (\Throwable $th) {
-            return response()->json(['message' => $th->getMessage()], 400);
-        }
-    }
-
-    public function uploadFirebaseJson(Request $request, $type, JsonHelper $json_helper)
-    {
-        $request->validate([
-            'file' => 'required|mimes:json',
-        ]);
-
-        $file = $request->file('file');
-
-        if (! $json_helper->checkValidJson($file)) {
-            return response()->json(['message' => __('Invalid JSON file')], 400);
-        }
-
-        $storage = Storage::disk('firebase');
-
-        if ($type == 'client') {
-            $storage->put('cloud-messaging.json', file_get_contents($file));
-        } else {
-            $storage->put('admin-sdk.json', file_get_contents($file));
-        }
-
-        return response()->json(['reload' => true, 'message' => __('JSON file uploaded successfully')]);
-    }
-
-    public function downloadFirebaseJson($type)
-    {
-        $storage = Storage::disk('firebase');
-
-        $filename = $type == 'client' ? 'cloud-messaging.json' : 'admin-sdk.json';
-
-        if (! $storage->exists($filename)) {
-            abort(404);
-        }
-
-        $file = $storage->get($filename);
-
-        return Response::make($file, 200, [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="'.$type.'.json"',
-        ]);
-    }
-
-    public function testFirebaseService(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required',
-            'message' => 'required',
-        ]);
-
-        $firebase = new FirebaseNotificationService;
-
-        $client = User::first();
-
-        try {
-            $firebase->sendNotification(
-                $validated['title'],
-                $validated['message'],
-                $client->fcm_token ?? '',
-            );
-
-            Notification::create([
-                'type' => NotifyEventType::NEW_USER,
-                'notifiable_id' => $client->id,
-                'notifiable_type' => User::class,
-                'data' => $validated['message'],
-            ]);
-
-        } catch (\Throwable $th) {
-            return response()->json(['message' => $th->getMessage()], 400);
-        }
-
-        return response()->json(['message' => __('Notification sent successfully')]);
-    }
-
-    public function tokenUpdate(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-        ]);
-
-        try {
-            /**
-             * @var \App\Models\Admin $user
-             */
-            $user = auth('admin')->user();
-
-            $user->fcm_token = $request->token;
-            $user->save();
-
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => __('Failed to subscribe to topic')], 500);
-        }
-    }
 }
