@@ -7,8 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Laravel 12 (PHP 8.2+) **cash-on-delivery (COD) e-commerce** app, converted from a quiz/lottery platform: the quiz/contest/games/payment-gateway/client-API modules were stripped out, and a products/categories/orders backend plus a public Blade storefront were built on the surviving admin shell. There is **no payment gateway** (orders are paid on delivery) and **no client REST API**.
 
 Two server-rendered surfaces, both Blade + Tailwind v4 (separate Vite entries):
-- **Storefront** — public shop at the root (`/`, `/shop`, `/product/{slug}`, `/cart`, `/checkout`), guest checkout, no auth. Routes in [routes/shop.php](routes/shop.php).
-- **Admin dashboard** — session-authenticated, under `/admin`. Routes in [routes/admin.php](routes/admin.php).
+- **Storefront** — public shop at the root (`/`, `/shop`, `/product/{slug}`, `/cart`, `/checkout`). Guest checkout works without auth; customers may **optionally** register/login (`/register`, `/login`, `/account`, `/account/orders`) via the default `web` session guard on the `users` provider — logged-in orders attach to the user (`orders.user_id`), guest orders leave it null. Routes in [routes/shop.php](routes/shop.php).
+- **Admin dashboard** — session-authenticated `admin` guard, under `/admin`. Routes in [routes/admin.php](routes/admin.php).
+
+Note: `User implements MustVerifyEmail`, but there is **no** `verification.verify` route (it left with the API). Do not dispatch `Registered` for storefront signups — it builds that route and 500s; the register controller logs the user in directly instead.
 
 ## Commands
 
@@ -46,15 +48,16 @@ The `admin` guard ([config/auth.php](config/auth.php)) is session-based on the `
 
 ## E-commerce domain
 
-Models ([app/Models/](app/Models/)): `Category` (self-nesting via `parent_id`, Sluggable), `Product` (Sluggable, `category()`, `images()`, scopes `active()`/`inStock()`, `isInStock()`), `ProductImage`, `Order`, `OrderItem`. Order state is enum-cast: `OrderStatusEnum` (pending→confirmed→processing→shipped→delivered / cancelled) and `OrderPaymentStatusEnum` (unpaid/paid/refunded), each with `label()`/`color()`/`values()`.
+Models ([app/Models/](app/Models/)): `Category` (self-nesting via `parent_id`, Sluggable), `Product` (Sluggable, `category()`, `images()`, scopes `active()`/`inStock()`, `isInStock()`), `ProductImage`, `Order`, `OrderItem`, `Banner` (hero slides). Order state is enum-cast: `OrderStatusEnum` (pending→confirmed→processing→shipped→delivered / cancelled) and `OrderPaymentStatusEnum` (unpaid/paid/refunded), each with `label()`/`color()`/`values()`. Admin CRUD modules: Category, Product, Order (status updates only), Banner — all under [app/Http/Controllers/Admin/](app/Http/Controllers/Admin/).
 
 **Checkout (COD)** lives in [app/Services/Ecommerce/](app/Services/Ecommerce/):
 - `Cart` — session-backed cart keyed by product id; product price/stock are always read fresh from the DB (never trusted from session).
-- `CheckoutService::placeOrder()` — runs in a `DB::transaction` with `lockForUpdate()` on each product so concurrent checkouts can't oversell; decrements stock, snapshots product name/price into `OrderItem`, generates the order number via `UniqueCodeGenerator::make(Order::class, 'order_number', 6, 'ORD')`, records the order as `cash_on_delivery`/`unpaid`/`pending`, and clears the cart. Throws `CustomWebException` (422) on empty cart or out-of-stock.
+- `CheckoutService::placeOrder()` — runs in a `DB::transaction` with `lockForUpdate()` on each product so concurrent checkouts can't oversell; decrements stock, snapshots product name/price into `OrderItem`, generates the order number via `UniqueCodeGenerator::make(Order::class, 'order_number', 6, 'ORD')`, records the order as `cash_on_delivery`/`unpaid`/`pending`, and clears the cart. Reads flat shipping via `getOption('shipping_cost', 0)` (set on the admin Shop Settings page, `admin.settings.shop`). Throws `CustomWebException` (422) on empty cart or out-of-stock.
+- `OrderNotifier` — emails the customer on order placement (`ORDER_PLACED`) and admin status change (`ORDER_STATUS_UPDATED`) via `Notification::route('mail', $order->customer_email)`. Gated by the admin's global `email_notification.is_enabled` flag (off by default) and queued (`queue.default=database`), so emails won't appear without a queue worker + the flag on.
 
 ## Storefront (public shop)
 
-Controllers in [app/Http/Controllers/Shop/](app/Http/Controllers/Shop/): `HomeController` (hero + New Collection/Hot Sale/Featured sections, all derived from product data — no banner admin module), `ShopController` (listing with category/search/sort filter + product detail, increments `views`), `CartController` (add is JSON for AJAX; update/remove redirect; `count` feeds the header badge), `CheckoutController` (guest COD: form → `CheckoutService::placeOrder()` → confirmation by order number).
+Controllers in [app/Http/Controllers/Shop/](app/Http/Controllers/Shop/): `HomeController` (hero from `Banner` records with a static fallback when none exist + New Collection/Hot Sale/Featured product sections), `ShopController` (listing with category/search/sort filter + product detail, increments `views`), `CartController` (add is JSON for AJAX; update/remove redirect; `count` feeds the header badge), `CheckoutController` (guest COD: form → `CheckoutService::placeOrder()` → `OrderNotifier::orderPlaced` → confirmation by order number), `AccountController` (dashboard/orders/order detail for logged-in customers), and `Shop/Auth/{Register,Login}Controller`.
 
 Views in [resources/views/shop/](resources/views/shop/) extend `shop.layouts.app` (header with cart badge + category nav, footer). The product card is an **anonymous component** registered via `Blade::anonymousComponentNamespace('shop.components', 'shop')` in `AppServiceProvider` — use it as `<x-shop::product-card :product="$p" />` (double-colon namespace syntax, matching admin's `<x-admin::...>`; the dot form `<x-shop.product-card>` will NOT resolve). Assets: `resources/shop/css/app.css` (Tailwind v4, warm-neutral theme via `@theme` CSS vars) and `resources/shop/js/app.js` (vanilla: AJAX add-to-cart, cart badge, hero carousel, mobile menu) — both registered as Vite inputs in [vite.config.js](vite.config.js). Note: many dead admin JS files (quiz/contest/firebase/etc.) remain referenced in the Vite input list — harmless, left from the strip.
 
