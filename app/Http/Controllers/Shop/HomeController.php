@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
 
@@ -10,6 +11,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $banners = Banner::active()->orderBy('sort_order')->get();
+
         $categories = Category::active()
             ->whereNull('parent_id')
             ->orderBy('sort_order')
@@ -38,6 +41,6 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('shop.home', compact('categories', 'newCollection', 'hotSale', 'featured'));
+        return view('shop.home', compact('banners', 'categories', 'newCollection', 'hotSale', 'featured'));
     }
 }

@@ -27,6 +27,8 @@ enum NotificationType: string
     case ACCOUNT_DEACTIVATED = 'account_deactivated';
     case ACCOUNT_BANNED = 'account_banned';
     case ACCOUNT_ACTIVE = 'account_active';
+    case ORDER_PLACED = 'order_placed';
+    case ORDER_STATUS_UPDATED = 'order_status_updated';
 
     public function label(): string
     {
@@ -54,6 +56,8 @@ enum NotificationType: string
             self::ACCOUNT_DEACTIVATED => 'Account Deactivated',
             self::ACCOUNT_BANNED => 'Account Banned',
             self::ACCOUNT_ACTIVE => 'Account Active',
+            self::ORDER_PLACED => 'Order Placed',
+            self::ORDER_STATUS_UPDATED => 'Order Status Updated',
         };
     }
 
@@ -232,6 +236,20 @@ enum NotificationType: string
                     'name' => 'reset_link',
                     'hint' => 'Reset link',
                 ],
+            ],
+            self::ORDER_PLACED => [
+                ...$full_name,
+                ...$email,
+                ...$phone,
+                '{{order_number}}' => ['name' => 'order_number', 'hint' => 'Order number'],
+                '{{order_total}}' => ['name' => 'order_total', 'hint' => 'Order total amount'],
+            ],
+            self::ORDER_STATUS_UPDATED => [
+                ...$full_name,
+                ...$email,
+                ...$phone,
+                '{{order_number}}' => ['name' => 'order_number', 'hint' => 'Order number'],
+                '{{order_status}}' => ['name' => 'order_status', 'hint' => 'New order status'],
             ],
         };
     }

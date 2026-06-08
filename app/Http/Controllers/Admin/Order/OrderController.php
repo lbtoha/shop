@@ -161,6 +161,8 @@ class OrderController extends Controller
             'payment_status' => ['required', 'in:'.implode(',', OrderPaymentStatusEnum::values())],
         ]);
 
+        $statusChanged = $order->status->value !== $validated['status'];
+
         try {
             DB::beginTransaction();
 
@@ -171,6 +173,10 @@ class OrderController extends Controller
             DB::rollBack();
 
             return response()->json(['message' => $th->getMessage()], 400);
+        }
+
+        if ($statusChanged) {
+            \App\Services\Ecommerce\OrderNotifier::statusUpdated($order->fresh());
         }
 
         return response()->json([

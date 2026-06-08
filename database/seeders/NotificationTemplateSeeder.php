@@ -22,7 +22,7 @@ class NotificationTemplateSeeder extends Seeder
                 'is_auto' => true,
             ]);
             $is_default = $case->value == 'default';
-            $is_active = in_array($case->value, ['default', 'password_reset', 'verify_email']);
+            $is_active = in_array($case->value, ['default', 'password_reset', 'verify_email', 'order_placed', 'order_status_updated']);
 
             $template->bodies()->createMany([
                 [

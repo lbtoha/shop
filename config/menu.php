@@ -17,6 +17,7 @@ return [
                 'submenus' => [
                     ['title' => 'Products', 'link' => 'admin.products.index'],
                     ['title' => 'Categories', 'link' => 'admin.categories.index'],
+                    ['title' => 'Hero Banners', 'link' => 'admin.banners.index'],
                 ],
             ],
             [
@@ -62,6 +63,12 @@ return [
                                 'link' => 'admin.settings.app.index',
                                 'icon' => 'ph ph-gear',
                                 'text' => 'Configure basic system settings',
+                            ],
+                            [
+                                'title' => 'Shop Settings',
+                                'link' => 'admin.settings.shop.index',
+                                'icon' => 'ph ph-storefront',
+                                'text' => 'Currency symbol and flat shipping cost for the shop.',
                             ],
                             [
                                 'title' => 'System Configuration',

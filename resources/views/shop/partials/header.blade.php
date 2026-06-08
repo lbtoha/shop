@@ -14,9 +14,21 @@
         <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-9 text-xs text-[color:var(--color-muted)]">
             <span class="hidden sm:block">{{ $company['description'] ? \Illuminate\Support\Str::limit($company['description'], 60) : '' }}</span>
             <div class="flex items-center gap-4 ml-auto">
-                <a href="tel:{{ $company['phone'] }}" class="flex items-center gap-1 hover:text-[color:var(--color-brand)]">
+                <a href="tel:{{ $company['phone'] }}" class="hidden sm:flex items-center gap-1 hover:text-[color:var(--color-brand)]">
                     <i class="ph ph-phone"></i> {{ $company['phone'] }}
                 </a>
+                @auth
+                    <a href="{{ route('shop.account.index') }}" class="flex items-center gap-1 hover:text-[color:var(--color-brand)]">
+                        <i class="ph ph-user-circle"></i> {{ __('My Account') }}
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="hover:text-[color:var(--color-brand)]">{{ __('Logout') }}</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="hover:text-[color:var(--color-brand)]">{{ __('Login') }}</a>
+                    <a href="{{ route('register') }}" class="hover:text-[color:var(--color-brand)]">{{ __('Register') }}</a>
+                @endauth
             </div>
         </div>
     </div>

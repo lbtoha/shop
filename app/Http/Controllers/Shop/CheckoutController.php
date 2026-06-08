@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\Ecommerce\Cart;
 use App\Services\Ecommerce\CheckoutService;
+use App\Services\Ecommerce\OrderNotifier;
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
@@ -47,10 +48,12 @@ class CheckoutController extends Controller
         $shippingCost = (float) getOption('shipping_cost', 0);
 
         try {
-            $order = $checkout->placeOrder($validated, auth('client')->id(), $shippingCost);
+            $order = $checkout->placeOrder($validated, auth()->id(), $shippingCost);
         } catch (CustomWebException $e) {
             return redirect()->route('shop.cart.index')->with('error', $e->getMessage());
         }
+
+        OrderNotifier::orderPlaced($order);
 
         return redirect()->route('shop.checkout.confirmation', $order->order_number);
     }
