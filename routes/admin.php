@@ -68,6 +68,18 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
         Route::resource('users', User\UserController::class)->only(['index', 'edit', 'update', 'destroy']);
         /** -------------------------- End User USER -------------------------- */
 
+        /** -------------------------- E-COMMERCE -------------------------- */
+        Route::resource('categories', Admin\Category\CategoryController::class)->except(['show']);
+        Route::resource('products', Admin\Product\ProductController::class)->except(['show']);
+
+        Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
+            Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');
+            Route::get('{order}', [Admin\Order\OrderController::class, 'show'])->name('show');
+            Route::put('{order}/status', [Admin\Order\OrderController::class, 'updateStatus'])->name('update-status');
+            Route::delete('{order}', [Admin\Order\OrderController::class, 'destroy'])->name('destroy');
+        });
+        /** -------------------------- End E-COMMERCE -------------------------- */
+
         /** -------------------------- ADMIN USER -------------------------- */
         Route::resource('admin-roles', Admin\AdminUser\RoleController::class);
         Route::resource('admins', Admin\AdminUser\UserController::class);

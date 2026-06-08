@@ -9,6 +9,22 @@ return [
                 'icon' => 'ph ph-house',
             ],
             [
+                'title' => 'Catalog',
+                'link' => 'admin.products',
+                'icon' => 'ph ph-storefront',
+                'parent_menu' => true,
+                'parent' => 'admin/products',
+                'submenus' => [
+                    ['title' => 'Products', 'link' => 'admin.products.index'],
+                    ['title' => 'Categories', 'link' => 'admin.categories.index'],
+                ],
+            ],
+            [
+                'title' => 'Orders',
+                'link' => 'admin.orders.index',
+                'icon' => 'ph ph-shopping-cart',
+            ],
+            [
                 'title' => 'Manage Users',
                 'link' => 'admin.users',
                 'icon' => 'ph ph-users-three',
