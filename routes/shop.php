@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Storefront language switch (en/bn) — stores locale in session for SetAppLocal.
+Route::get('/language/{code}', function (string $code) {
+    if (in_array($code, ['en', 'bn'], true)) {
+        session()->put('locale', $code);
+    }
+
+    return back();
+})->name('shop.language');
+
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('shop.product');
 

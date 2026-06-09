@@ -20,9 +20,12 @@
                 <a href="tel:{{ $company['phone'] }}" class="bg-[color:var(--color-accent)] text-white py-0.5 px-2 text-xs rounded-full">{{ $company['phone'] }}</a>
             </p>
             <div class="flex items-center gap-x-5">
+                @php($locale = app()->getLocale())
                 <span class="hidden sm:inline-flex items-center gap-x-1.5">
                     <span class="inline-flex items-center justify-center size-6 bg-[color:var(--color-brand-dark)] rounded-full"><i class="ph ph-globe"></i></span>
-                    {{ __('English') }}
+                    <a href="{{ route('shop.language', 'en') }}" class="hover:underline {{ $locale === 'en' ? 'font-semibold' : 'opacity-70' }}">EN</a>
+                    <span class="opacity-40">|</span>
+                    <a href="{{ route('shop.language', 'bn') }}" class="hover:underline {{ $locale === 'bn' ? 'font-semibold' : 'opacity-70' }}">বাংলা</a>
                 </span>
                 <span class="hidden sm:inline w-px h-4 bg-white/30"></span>
                 @auth
@@ -122,6 +125,12 @@
             @foreach ($navCategories as $category)
                 <a href="{{ route('shop.index', ['category' => $category->slug]) }}" class="py-2">{{ $category->name }}</a>
             @endforeach
+            <div class="flex items-center gap-2 py-2 border-t border-[color:var(--color-line)] mt-1 pt-3">
+                <i class="ph ph-globe text-[color:var(--color-brand)]"></i>
+                <a href="{{ route('shop.language', 'en') }}" class="{{ app()->getLocale() === 'en' ? 'text-[color:var(--color-brand)] font-semibold' : '' }}">EN</a>
+                <span class="text-[color:var(--color-muted)]">|</span>
+                <a href="{{ route('shop.language', 'bn') }}" class="{{ app()->getLocale() === 'bn' ? 'text-[color:var(--color-brand)] font-semibold' : '' }}">বাংলা</a>
+            </div>
         </div>
     </nav>
 </header>
