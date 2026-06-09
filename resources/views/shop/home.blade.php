@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto px-4">
         {{-- Hero + side promos --}}
         @php
-            $gradients = ['from-[#005c08] to-[#00b207]', 'from-[#1a1a1a] to-[#2c742f]', 'from-[#00b207] to-[#84d187]'];
+            $gradients = ['from-[#04535c] to-[#088178]', 'from-[#161c24] to-[#088178]', 'from-[#088178] to-[#5ed9ba]'];
             $heroSlides = $banners->isNotEmpty()
                 ? $banners
                 : collect([
@@ -17,47 +17,47 @@
         @endphp
         <section class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
             {{-- Hero carousel --}}
-            <div data-hero class="lg:col-span-2 relative rounded-xl overflow-hidden">
+            <div data-hero class="lg:col-span-2 relative rounded-3xl overflow-hidden">
                 @foreach ($heroSlides as $i => $slide)
                     <div data-slide class="{{ $i === 0 ? '' : 'hidden' }}">
-                        @if ($slide->image)
-                            <a href="{{ $slide->link ?: route('shop.index') }}" class="block relative h-72 sm:h-[420px]">
-                                <img src="{{ $slide->image }}" alt="{{ $slide->title }}" class="w-full h-full object-cover">
-                                @if ($slide->title || $slide->subtitle)
-                                    <div class="absolute inset-0 bg-gradient-to-r from-black/55 to-transparent flex flex-col justify-center px-8 sm:px-12 max-w-lg">
-                                        @if ($slide->title)<h2 class="text-3xl sm:text-5xl font-extrabold text-white leading-tight">{{ $slide->title }}</h2>@endif
-                                        @if ($slide->subtitle)<p class="mt-3 text-white/90 sm:text-lg">{{ $slide->subtitle }}</p>@endif
-                                        @if ($slide->button_text)
-                                            <span class="mt-6 inline-flex w-max items-center gap-2 bg-[color:var(--color-brand)] text-white font-semibold px-6 py-3 rounded-full">{{ $slide->button_text }} <i class="ph ph-arrow-right"></i></span>
-                                        @endif
-                                    </div>
-                                @endif
-                            </a>
-                        @else
-                            <div class="relative h-72 sm:h-[420px] bg-gradient-to-r {{ $gradients[$i % count($gradients)] }} flex flex-col justify-center px-8 sm:px-12">
-                                <span class="text-white/80 text-sm font-medium uppercase tracking-wider">{{ __('Welcome to') }} {{ config('application_info.company_info.name') }}</span>
-                                <h2 class="mt-2 text-3xl sm:text-5xl font-extrabold text-white leading-tight max-w-md">{{ $slide->title }}</h2>
-                                <p class="mt-3 text-white/90 sm:text-lg max-w-md">{{ $slide->subtitle }}</p>
+                        <div class="relative h-[420px] sm:h-[480px] rounded-3xl overflow-hidden flex items-center px-8 sm:px-14
+                            @if (! $slide->image) bg-gradient-to-r {{ $gradients[$i % count($gradients)] }} @endif">
+                            @if ($slide->image)
+                                <img src="{{ $slide->image }}" alt="{{ $slide->title }}" class="absolute inset-0 w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-r from-black/55 to-transparent"></div>
+                            @endif
+                            <div class="relative max-w-md">
+                                <div class="flex items-center gap-x-2">
+                                    @if ($i === 0)
+                                        <span class="px-2.5 py-0.5 text-[color:var(--color-ink)] text-xs font-semibold bg-[color:var(--color-success-light)] rounded-full">25% OFF</span>
+                                    @endif
+                                    <h6 class="text-white/80 text-sm font-medium">{{ __('Exclusive offer') }}</h6>
+                                </div>
+                                <h2 class="py-3 text-3xl sm:text-5xl font-extrabold text-white leading-tight">{{ $slide->title }}</h2>
+                                <p class="mb-6 text-white/90 sm:text-lg">{{ $slide->subtitle }}</p>
                                 <a href="{{ $slide->link ?: route('shop.index') }}"
-                                    class="mt-6 inline-flex w-max items-center gap-2 bg-white text-[color:var(--color-brand-dark)] font-semibold px-6 py-3 rounded-full hover:bg-neutral-100 transition">
-                                    {{ $slide->button_text ?: __('Shop Now') }} <i class="ph ph-arrow-right"></i>
+                                    class="group inline-flex items-center gap-3 bg-white text-[color:var(--color-brand-dark)] font-semibold rounded-full py-2 pl-5 pr-2 hover:bg-neutral-50 transition">
+                                    {{ $slide->button_text ?: __('Shop Now') }}
+                                    <span class="size-8 bg-[color:var(--color-brand)] text-white inline-flex items-center justify-center rounded-full rotate-[-40deg] group-hover:rotate-0 transition-transform duration-300">
+                                        <i class="ph ph-arrow-right"></i>
+                                    </span>
                                 </a>
                             </div>
-                        @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
 
             {{-- Side promo cards --}}
             <div class="hidden lg:flex flex-col gap-5">
-                <a href="{{ route('shop.index', ['sort' => 'newest']) }}" class="flex-1 rounded-xl bg-[color:var(--color-brand-soft)] p-6 flex flex-col justify-center relative overflow-hidden group">
-                    <span class="text-xs font-semibold text-[color:var(--color-brand-dark)] uppercase">{{ __('New Arrivals') }}</span>
-                    <h3 class="mt-1 text-xl font-bold text-[color:var(--color-ink)] max-w-[60%]">{{ __('Fresh styles, just in') }}</h3>
+                <a href="{{ route('shop.index', ['sort' => 'newest']) }}" class="flex-1 rounded-3xl bg-[color:var(--color-brand-soft)] p-7 flex flex-col justify-center relative overflow-hidden group">
+                    <span class="text-xs font-semibold text-[color:var(--color-brand-dark)] uppercase tracking-wide">{{ __('New Arrivals') }}</span>
+                    <h3 class="mt-1 text-2xl font-bold text-[color:var(--color-ink)] max-w-[70%]">{{ __('Fresh styles, just in') }}</h3>
                     <span class="mt-3 text-sm font-medium text-[color:var(--color-brand-dark)] group-hover:underline">{{ __('Shop now') }} →</span>
                 </a>
-                <a href="{{ route('shop.index') }}" class="flex-1 rounded-xl bg-[color:var(--color-ink)] p-6 flex flex-col justify-center relative overflow-hidden group">
-                    <span class="text-xs font-semibold text-[color:var(--color-brand-light)] uppercase">{{ __('Cash on Delivery') }}</span>
-                    <h3 class="mt-1 text-xl font-bold text-white max-w-[70%]">{{ __('Pay when it arrives') }}</h3>
+                <a href="{{ route('shop.index') }}" class="flex-1 rounded-3xl bg-[color:var(--color-ink)] p-7 flex flex-col justify-center relative overflow-hidden group">
+                    <span class="text-xs font-semibold text-[color:var(--color-brand-light)] uppercase tracking-wide">{{ __('Cash on Delivery') }}</span>
+                    <h3 class="mt-1 text-2xl font-bold text-white max-w-[80%]">{{ __('Pay when it arrives') }}</h3>
                     <span class="mt-3 text-sm font-medium text-[color:var(--color-brand-light)] group-hover:underline">{{ __('Browse all') }} →</span>
                 </a>
             </div>
@@ -74,7 +74,7 @@
                 ];
             @endphp
             @foreach ($features as $f)
-                <div class="bg-white border border-[color:var(--color-line)] rounded-lg p-4 flex items-center gap-3">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-4 flex items-center gap-3">
                     <i class="ph {{ $f['icon'] }} text-3xl text-[color:var(--color-brand)]"></i>
                     <div>
                         <div class="text-sm font-semibold text-[color:var(--color-ink)]">{{ $f['title'] }}</div>
@@ -94,7 +94,7 @@
                 <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4">
                     @foreach ($categories as $category)
                         <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
-                            class="group bg-white border border-[color:var(--color-line)] rounded-lg p-4 flex flex-col items-center gap-3 hover:border-[color:var(--color-brand)] hover:shadow-sm transition">
+                            class="group bg-white border border-[color:var(--color-line)] rounded-2xl p-5 flex flex-col items-center gap-3 hover:border-[color:var(--color-brand)] hover:shadow-sm transition">
                             <div class="w-16 h-16 rounded-full overflow-hidden bg-[color:var(--color-brand-soft)] flex items-center justify-center">
                                 @if ($category->image)
                                     <img src="{{ $category->image }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
@@ -116,7 +116,7 @@
     @if ($hotSale->isNotEmpty())
         {{-- Promo banner between sections --}}
         <div class="max-w-7xl mx-auto px-4 mt-12">
-            <div class="rounded-xl bg-gradient-to-r from-[color:var(--color-ink)] to-[color:var(--color-brand-dark)] px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="rounded-3xl bg-gradient-to-r from-[color:var(--color-ink)] to-[color:var(--color-brand-dark)] px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <span class="inline-block bg-[color:var(--color-accent)] text-white text-xs font-semibold px-2.5 py-1 rounded">🔥 {{ __('Limited time') }}</span>
                     <h3 class="mt-3 text-2xl sm:text-3xl font-extrabold text-white">{{ __('Hot deals up to 50% off') }}</h3>
