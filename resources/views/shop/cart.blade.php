@@ -3,26 +3,26 @@
 @section('title', __('Shopping Cart') . ' — ' . config('application_info.company_info.name'))
 
 @section('content')
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-ink mb-6">{{ __('Shopping Cart') }}</h1>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <h1 class="text-2xl font-bold text-[color:var(--color-ink)] mb-6">{{ __('Shopping Cart') }}</h1>
 
         @if ($items->isEmpty())
-            <div class="bg-white border border-neutral-100 rounded p-12 text-center">
+            <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-14 text-center">
                 <i class="ph ph-shopping-cart text-6xl text-neutral-300 block mb-4"></i>
                 <p class="text-[color:var(--color-muted)] mb-5">{{ __('Your cart is empty.') }}</p>
                 <a href="{{ route('shop.index') }}"
-                    class="inline-block bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium px-6 py-2.5 rounded transition">
-                    {{ __('Continue Shopping') }}
+                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium px-6 py-3 rounded-full transition">
+                    {{ __('Continue Shopping') }} <i class="ph ph-arrow-right"></i>
                 </a>
             </div>
         @else
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
                     @foreach ($items as $line)
                         @php($product = $line['product'])
-                        <div class="bg-white border border-neutral-100 rounded p-4 flex gap-4">
+                        <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4">
                             <a href="{{ route('shop.product', $product->slug) }}"
-                                class="w-20 h-20 shrink-0 bg-neutral-50 overflow-hidden flex items-center justify-center">
+                                class="w-24 h-24 shrink-0 rounded-xl bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
                                 @if ($product->thumbnail)
                                     <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 @else
@@ -30,15 +30,19 @@
                                 @endif
                             </a>
 
-                            <div class="flex-1">
-                                <a href="{{ route('shop.product', $product->slug) }}" class="font-medium text-ink hover:text-[color:var(--color-brand)]">{{ $product->name }}</a>
+                            <div class="flex-1 w-full">
+                                <a href="{{ route('shop.product', $product->slug) }}" class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-brand)]">{{ $product->name }}</a>
                                 <div class="text-sm text-[color:var(--color-muted)] mt-1">{{ amountWithSymbol($product->price) }} {{ __('each') }}</div>
 
-                                <div class="mt-3 flex items-center gap-4">
-                                    <form method="POST" action="{{ route('shop.cart.update', $product->id) }}" class="flex items-center gap-2">
+                                <div class="mt-3 flex items-center gap-4 flex-wrap">
+                                    <form method="POST" action="{{ route('shop.cart.update', $product->id) }}" class="flex items-center gap-2" data-qty-wrap>
                                         @csrf @method('PUT')
-                                        <input type="number" name="quantity" value="{{ $line['quantity'] }}" min="1" max="{{ $product->stock }}"
-                                            class="w-16 border border-neutral-200 rounded py-1 px-2 text-center text-sm">
+                                        <div class="flex items-center border border-[color:var(--color-line)] rounded-full overflow-hidden">
+                                            <button type="button" data-step="-1" class="px-3 py-1.5 text-lg hover:bg-neutral-50">−</button>
+                                            <input type="number" name="quantity" value="{{ $line['quantity'] }}" min="1" max="{{ $product->stock }}"
+                                                class="w-12 text-center py-1.5 focus:outline-none">
+                                            <button type="button" data-step="1" class="px-3 py-1.5 text-lg hover:bg-neutral-50">+</button>
+                                        </div>
                                         <button type="submit" class="text-sm text-[color:var(--color-brand)] hover:underline">{{ __('Update') }}</button>
                                     </form>
 
@@ -51,31 +55,31 @@
                                 </div>
                             </div>
 
-                            <div class="text-right font-semibold text-ink">{{ amountWithSymbol($line['subtotal']) }}</div>
+                            <div class="text-right font-bold text-[color:var(--color-ink)] sm:w-24">{{ amountWithSymbol($line['subtotal']) }}</div>
                         </div>
                     @endforeach
                 </div>
 
                 {{-- Summary --}}
                 <div class="lg:col-span-1">
-                    <div class="bg-white border border-neutral-100 rounded p-5 sticky top-24">
-                        <h3 class="font-semibold text-ink mb-4">{{ __('Order Summary') }}</h3>
-                        <div class="flex justify-between text-sm mb-2">
+                    <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-6 sticky top-28">
+                        <h3 class="font-bold text-[color:var(--color-ink)] mb-4">{{ __('Order Summary') }}</h3>
+                        <div class="flex justify-between text-sm mb-2.5">
                             <span class="text-[color:var(--color-muted)]">{{ __('Subtotal') }}</span>
-                            <span class="font-medium">{{ amountWithSymbol($subtotal) }}</span>
+                            <span class="font-medium text-[color:var(--color-ink)]">{{ amountWithSymbol($subtotal) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm mb-2">
+                        <div class="flex justify-between text-sm mb-2.5">
                             <span class="text-[color:var(--color-muted)]">{{ __('Shipping') }}</span>
                             <span>{{ __('Calculated at checkout') }}</span>
                         </div>
-                        <div class="border-t border-neutral-100 my-3"></div>
-                        <div class="flex justify-between font-bold text-ink">
+                        <div class="border-t border-[color:var(--color-line)] my-4"></div>
+                        <div class="flex justify-between font-bold text-[color:var(--color-ink)] text-lg">
                             <span>{{ __('Total') }}</span>
                             <span>{{ amountWithSymbol($subtotal) }}</span>
                         </div>
                         <a href="{{ route('shop.checkout.index') }}"
-                            class="mt-5 block text-center bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 rounded transition">
-                            {{ __('Proceed to Checkout') }}
+                            class="mt-5 flex items-center justify-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 rounded-full transition">
+                            {{ __('Proceed to Checkout') }} <i class="ph ph-arrow-right"></i>
                         </a>
                         <a href="{{ route('shop.index') }}" class="mt-3 block text-center text-sm text-[color:var(--color-brand)] hover:underline">
                             {{ __('Continue Shopping') }}
