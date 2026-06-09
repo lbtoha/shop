@@ -1,27 +1,33 @@
 @import "tailwindcss";
 @import "@phosphor-icons/web/regular";
+@import "@phosphor-icons/web/fill";
 
 /*
- * Storefront theme — clean, modern fashion store inspired by loombymegh.com:
- * warm neutral palette, square cards with subtle shadows, generous whitespace.
+ * Storefront theme — modern marketplace look inspired by the Sellzy template:
+ * green accent, clean white sections on a light-gray canvas, soft shadows,
+ * small border radius, generous section spacing.
  */
 @theme {
-    --color-brand: #8a5a44;
-    --color-brand-dark: #6f4636;
-    --color-brand-light: #b08968;
-    --color-ink: #2b2b2b;
-    --color-muted: #6b6b6b;
-    --color-sand: #faf7f2;
+    --color-brand: #00b207;
+    --color-brand-dark: #2c742f;
+    --color-brand-light: #84d187;
+    --color-brand-soft: #ebf7ee;
+    --color-accent: #ff8a00;
+    --color-ink: #1a1a1a;
+    --color-body: #4d4d4d;
+    --color-muted: #808080;
+    --color-line: #e6e6e6;
+    --color-canvas: #f7f8fa;
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-    background-color: var(--color-sand);
-    color: var(--color-ink);
+    background-color: var(--color-canvas);
+    color: var(--color-body);
     font-family: var(--font-sans);
 }
 
-/* Hide scrollbar on the horizontal category strip while keeping it scrollable */
+/* Horizontal scroll strips without a visible scrollbar */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -30,11 +36,32 @@ body {
     scrollbar-width: none;
 }
 
-/* Product card image hover swap */
-.product-card .img-secondary {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+/* Product card: image zoom on hover + reveal of the hover action rail */
+.product-card .pc-image img {
+    transition: transform 0.4s ease;
 }
-.product-card:hover .img-secondary {
+.product-card:hover .pc-image img {
+    transform: scale(1.06);
+}
+.product-card .pc-actions {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s ease;
+}
+.product-card:hover .pc-actions {
     opacity: 1;
+    transform: translateY(0);
+}
+.product-card .pc-cart {
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+}
+.product-card:hover .pc-cart {
+    transform: translateY(0);
+}
+
+/* Star rating */
+.stars {
+    color: #ff8a00;
+    letter-spacing: 1px;
 }

@@ -1,9 +1,14 @@
-{{-- Reusable homepage product section: $title, $products (collection), $viewAll (url) --}}
+{{-- Reusable homepage product section: $title, $subtitle?, $products (collection), $viewAll (url) --}}
 @if ($products->isNotEmpty())
     <section class="max-w-7xl mx-auto px-4 mt-12">
-        <div class="flex items-center justify-between mb-5">
-            <h2 class="text-xl sm:text-2xl font-bold text-ink">{{ $title }}</h2>
-            <a href="{{ $viewAll }}" class="text-sm font-medium text-[color:var(--color-brand)] hover:underline">
+        <div class="flex items-end justify-between mb-5">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-[color:var(--color-ink)]">{{ $title }}</h2>
+                @if (! empty($subtitle))
+                    <p class="text-sm text-[color:var(--color-muted)] mt-0.5">{{ $subtitle }}</p>
+                @endif
+            </div>
+            <a href="{{ $viewAll }}" class="text-sm font-medium text-[color:var(--color-brand)] hover:underline whitespace-nowrap">
                 {{ __('View All') }} <i class="ph ph-arrow-right"></i>
             </a>
         </div>
