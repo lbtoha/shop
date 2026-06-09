@@ -64,9 +64,18 @@ class ShopController extends Controller
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->latest()
-            ->take(4)
+            ->take(5)
             ->get();
 
-        return view('shop.product', compact('product', 'related'));
+        // "You may also like" — popular products outside this category
+        $recommended = Product::active()->inStock()
+            ->with('category')
+            ->where('id', '!=', $product->id)
+            ->whereNotIn('id', $related->pluck('id'))
+            ->orderByDesc('views')
+            ->take(5)
+            ->get();
+
+        return view('shop.product', compact('product', 'related', 'recommended'));
     }
 }

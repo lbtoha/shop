@@ -40,6 +40,8 @@
     @include('shop.partials.footer')
 
     @include('shop.partials.cart-drawer')
+
+    @stack('scripts')
 </body>
 
 </html>

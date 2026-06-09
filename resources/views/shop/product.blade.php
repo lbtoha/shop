@@ -9,7 +9,11 @@
         if ($product->thumbnail) {
             $gallery->prepend($product->thumbnail);
         }
+        $gallery = $gallery->unique()->values();
         $mainImage = $gallery->first();
+        $phone = config('application_info.company_info.phone');
+        $whatsapp = preg_replace('/[^0-9]/', '', $phone);
+        $shareUrl = urlencode(request()->fullUrl());
     @endphp
 
     <div class="shop-container py-8">
@@ -17,48 +21,58 @@
             <a href="{{ route('home') }}" class="hover:text-[color:var(--color-brand)]">{{ __('Home') }}</a>
             <span class="mx-1">/</span>
             <a href="{{ route('shop.index') }}" class="hover:text-[color:var(--color-brand)]">{{ __('Shop') }}</a>
-            <span class="mx-1">/</span><span>{{ $product->name }}</span>
+            <span class="mx-1">/</span><span class="text-[color:var(--color-ink)]">{{ $product->name }}</span>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {{-- Gallery --}}
-            <div>
-                <div class="aspect-square bg-white border border-neutral-100 overflow-hidden flex items-center justify-center">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {{-- Gallery: vertical thumbnails + main image --}}
+            <div class="flex gap-3">
+                @if ($gallery->count() > 1)
+                    <div class="flex flex-col gap-3 shrink-0">
+                        @foreach ($gallery as $img)
+                            <button type="button" data-thumb="{{ $img }}"
+                                class="w-16 h-20 rounded-xl border border-[color:var(--color-line)] overflow-hidden hover:border-[color:var(--color-brand)] focus:border-[color:var(--color-brand)]">
+                                <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="flex-1 rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-image)] overflow-hidden aspect-[3/4] flex items-center justify-center">
                     @if ($mainImage)
                         <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                     @else
                         <i class="ph ph-image text-7xl text-neutral-300"></i>
                     @endif
                 </div>
-                @if ($gallery->count() > 1)
-                    <div class="flex gap-2 mt-3">
-                        @foreach ($gallery as $img)
-                            <button type="button"
-                                onclick="document.getElementById('main-product-image').src='{{ $img }}'"
-                                class="w-16 h-16 border border-neutral-200 overflow-hidden hover:border-[color:var(--color-brand)]">
-                                <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
-                            </button>
-                        @endforeach
-                    </div>
-                @endif
             </div>
 
             {{-- Info --}}
             <div>
-                @if ($product->category)
-                    <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}"
-                        class="text-xs uppercase tracking-wide text-[color:var(--color-brand)]">{{ $product->category->name }}</a>
-                @endif
-                <h1 class="text-2xl sm:text-3xl font-bold text-ink mt-1">{{ $product->name }}</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-[color:var(--color-ink)]">{{ $product->name }}</h1>
 
-                <div class="mt-4 flex items-center gap-3">
+                <div class="mt-3 flex items-center gap-3">
                     <span class="text-2xl font-bold text-[color:var(--color-brand)]">{{ amountWithSymbol($product->price) }}</span>
                     @if ($hasDiscount)
-                        <span class="text-lg text-neutral-400 line-through">{{ amountWithSymbol($product->compare_at_price) }}</span>
+                        <span class="text-base text-[color:var(--color-muted)] line-through">{{ amountWithSymbol($product->compare_at_price) }}</span>
                     @endif
                 </div>
 
-                <div class="mt-2">
+                {{-- Color row --}}
+                @if ($mainImage)
+                    <div class="mt-5 flex items-center justify-between border-t border-[color:var(--color-line)] pt-4">
+                        <span class="text-sm text-[color:var(--color-muted)]">{{ __('Color') }}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-12 rounded-md border-2 border-[color:var(--color-brand)] overflow-hidden">
+                                <img src="{{ $mainImage }}" alt="" class="w-full h-full object-cover">
+                            </span>
+                            <span class="text-sm font-semibold text-[color:var(--color-brand)] uppercase">{{ $product->category?->name }}</span>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Stock / size-style box --}}
+                <div class="mt-4 flex items-center justify-between border-t border-[color:var(--color-line)] pt-4">
+                    <span class="text-sm text-[color:var(--color-muted)]">{{ __('Status') }}</span>
                     @if ($product->isInStock())
                         <span class="inline-flex items-center gap-1 text-sm text-emerald-600"><i class="ph ph-check-circle"></i> {{ __('In stock') }} ({{ $product->stock }})</span>
                     @else
@@ -66,50 +80,121 @@
                     @endif
                 </div>
 
-                @if ($product->short_description)
-                    <p class="mt-4 text-[color:var(--color-muted)] leading-relaxed">{{ $product->short_description }}</p>
-                @endif
-
+                {{-- Quantity + actions --}}
                 @if ($product->isInStock())
-                    <div class="mt-6 flex items-center gap-4">
-                        <div data-qty-wrap class="flex items-center border border-neutral-200 rounded">
-                            <button type="button" data-step="-1" class="px-3 py-2 text-lg hover:bg-neutral-50">−</button>
+                    <div class="mt-6 flex flex-col sm:flex-row items-stretch gap-3">
+                        <div data-qty-wrap class="flex items-center justify-between sm:justify-start border border-[color:var(--color-line)] rounded-full px-1 shrink-0">
+                            <button type="button" data-step="-1" class="size-9 text-lg hover:text-[color:var(--color-brand)]">−</button>
                             <input type="number" data-quantity-input value="1" min="1" max="{{ $product->stock }}"
-                                class="w-14 text-center border-x border-neutral-200 py-2 focus:outline-none">
-                            <button type="button" data-step="1" class="px-3 py-2 text-lg hover:bg-neutral-50">+</button>
+                                class="w-12 text-center py-2 focus:outline-none bg-transparent">
+                            <button type="button" data-step="1" class="size-9 text-lg hover:text-[color:var(--color-brand)]">+</button>
                         </div>
                         <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                            class="flex-1 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 rounded transition-colors">
+                            class="flex-1 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 px-6 rounded-full transition">
                             <i class="ph ph-shopping-cart-simple"></i> {{ __('Add to Cart') }}
                         </button>
+                        <a href="{{ route('shop.cart.add', $product->id) }}" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
+                            class="flex-1 text-center bg-[color:var(--color-ink)] hover:bg-black text-white font-medium py-3 px-6 rounded-full transition">
+                            {{ __('Buy Now') }}
+                        </a>
                     </div>
                 @endif
 
-                <div class="mt-6 flex items-center gap-2 text-sm bg-white border border-neutral-100 rounded px-4 py-3">
-                    <i class="ph ph-truck text-[color:var(--color-brand)] text-xl"></i>
-                    {{ __('Cash on Delivery available') }}
+                {{-- Meta grid --}}
+                <div class="mt-6 grid grid-cols-2 gap-y-3 gap-x-6 text-sm border-t border-[color:var(--color-line)] pt-5">
+                    <div>
+                        <div class="text-[color:var(--color-muted)]">{{ __('Material') }}</div>
+                        <div class="font-medium text-[color:var(--color-ink)]">{{ $product->name }}</div>
+                    </div>
+                    @if ($product->category)
+                        <div>
+                            <div class="text-[color:var(--color-muted)]">{{ __('Category') }}</div>
+                            <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="font-medium text-[color:var(--color-brand)] hover:underline">{{ $product->category->name }}</a>
+                        </div>
+                    @endif
+                    @if ($product->sku)
+                        <div>
+                            <div class="text-[color:var(--color-muted)]">{{ __('Reference SKU') }}</div>
+                            <div class="font-medium text-[color:var(--color-ink)]">{{ $product->sku }}</div>
+                        </div>
+                    @endif
                 </div>
 
-                @if ($product->description)
-                    <div class="mt-8">
-                        <h3 class="font-semibold mb-2 text-ink">{{ __('Description') }}</h3>
-                        <div class="prose prose-sm max-w-none text-[color:var(--color-muted)]">
-                            {!! $product->description !!}
-                        </div>
-                    </div>
-                @endif
+                {{-- Contact cards --}}
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="tel:{{ $phone }}" class="flex items-center gap-3 border border-[color:var(--color-line)] rounded-xl p-4 hover:border-[color:var(--color-brand)] transition">
+                        <span class="size-10 rounded-full bg-[color:var(--color-brand-soft)] text-[color:var(--color-brand)] flex items-center justify-center shrink-0"><i class="ph ph-phone-call text-xl"></i></span>
+                        <span class="leading-tight">
+                            <span class="block text-xs text-[color:var(--color-muted)]">{{ __('Expert Support') }}</span>
+                            <span class="block font-semibold text-[color:var(--color-ink)]">{{ $phone }}</span>
+                        </span>
+                    </a>
+                    <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center gap-3 border border-[color:var(--color-line)] rounded-xl p-4 hover:border-[color:var(--color-brand)] transition">
+                        <span class="size-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="ph ph-whatsapp-logo text-xl"></i></span>
+                        <span class="leading-tight">
+                            <span class="block text-xs text-[color:var(--color-muted)]">{{ __('WhatsApp Order') }}</span>
+                            <span class="block font-semibold text-[color:var(--color-ink)]">{{ $phone }}</span>
+                        </span>
+                    </a>
+                </div>
+
+                {{-- Share --}}
+                <div class="mt-6 flex items-center gap-3">
+                    <span class="text-sm font-medium text-[color:var(--color-ink)]">{{ __('Share') }}</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener" class="size-9 rounded-full bg-[#1877f2] text-white flex items-center justify-center"><i class="ph ph-facebook-logo"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}" target="_blank" rel="noopener" class="size-9 rounded-full bg-[#1da1f2] text-white flex items-center justify-center"><i class="ph ph-twitter-logo"></i></a>
+                    <a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener" class="size-9 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i class="ph ph-whatsapp-logo"></i></a>
+                </div>
             </div>
         </div>
 
+        {{-- Description --}}
+        @if ($product->description)
+            <section class="mt-12 max-w-4xl">
+                <h2 class="text-lg font-bold text-[color:var(--color-ink)] border-l-4 border-[color:var(--color-brand)] pl-3 mb-4">{{ __('Description') }}</h2>
+                <div class="prose prose-sm sm:prose max-w-none text-[color:var(--color-body)]">
+                    {!! $product->description !!}
+                </div>
+            </section>
+        @endif
+
+        {{-- Related --}}
         @if ($related->isNotEmpty())
-            <section class="mt-16">
-                <h2 class="text-xl font-bold text-ink mb-5">{{ __('Related Products') }}</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <section class="mt-14">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-xl font-bold text-[color:var(--color-ink)] border-l-4 border-[color:var(--color-brand)] pl-3">{{ __('Related Products') }}</h2>
+                    <a href="{{ route('shop.index', ['category' => $product->category?->slug]) }}" class="text-sm font-medium text-[color:var(--color-brand)] hover:underline whitespace-nowrap">{{ __('View All') }} <i class="ph ph-arrow-right"></i></a>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     @foreach ($related as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
                 </div>
             </section>
         @endif
+
+        {{-- You may also like --}}
+        @if (isset($recommended) && $recommended->isNotEmpty())
+            <section class="mt-14">
+                <h2 class="text-xl font-bold text-[color:var(--color-ink)] border-l-4 border-[color:var(--color-brand)] pl-3 mb-5">{{ __('You may also like') }}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    @foreach ($recommended as $item)
+                        <x-shop::product-card :product="$item" />
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </div>
+
+    @push('scripts')
+        <script>
+            // Thumbnail click -> swap main image
+            document.querySelectorAll('[data-thumb]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var main = document.getElementById('main-product-image');
+                    if (main) main.src = b.getAttribute('data-thumb');
+                });
+            });
+        </script>
+    @endpush
 @endsection
