@@ -12,7 +12,7 @@
         $mainImage = $gallery->first();
     @endphp
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="shop-container py-8">
         <nav class="text-xs text-[color:var(--color-muted)] mb-5">
             <a href="{{ route('home') }}" class="hover:text-[color:var(--color-brand)]">{{ __('Home') }}</a>
             <span class="mx-1">/</span>

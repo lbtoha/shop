@@ -3,7 +3,7 @@
 @section('title', ($activeCategory->name ?? __('Shop')) . ' — ' . config('application_info.company_info.name'))
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="shop-container py-8">
         {{-- Breadcrumb / heading --}}
         <div class="mb-6">
             <nav class="text-xs text-[color:var(--color-muted)] mb-1">

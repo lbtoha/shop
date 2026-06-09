@@ -1,6 +1,6 @@
 {{-- Reusable homepage product section: $title, $subtitle?, $products (collection), $viewAll (url) --}}
 @if ($products->isNotEmpty())
-    <section class="max-w-7xl mx-auto px-4 mt-12">
+    <section class="shop-container mt-12">
         <div class="flex items-end justify-between mb-5">
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold text-[color:var(--color-ink)]">{{ $title }}</h2>

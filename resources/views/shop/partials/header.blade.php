@@ -13,7 +13,7 @@
 <header class="sticky top-0 z-40">
     {{-- Top bar (green) --}}
     <div class="bg-[color:var(--color-brand)] text-white text-sm">
-        <div class="max-w-7xl mx-auto px-4 flex items-center justify-center xl:justify-between h-11">
+        <div class="shop-container flex items-center justify-center xl:justify-between h-11">
             <p class="hidden xl:flex items-center gap-x-2">
                 <i class="ph ph-headset text-lg"></i>
                 {{ __('Need Support? Call Us') }}
@@ -39,7 +39,7 @@
 
     {{-- Main bar --}}
     <div class="bg-white border-b border-[color:var(--color-line)]">
-        <div class="max-w-7xl mx-auto px-4 flex items-center gap-4 h-20">
+        <div class="shop-container flex items-center gap-4 h-20">
             <button data-menu-toggle class="lg:hidden text-2xl" aria-label="Menu"><i class="ph ph-list"></i></button>
 
             <a href="{{ route('home') }}" class="text-2xl font-extrabold tracking-tight text-[color:var(--color-brand)] shrink-0">
@@ -97,7 +97,7 @@
 
     {{-- Category nav --}}
     <nav class="bg-white border-b border-[color:var(--color-line)] hidden lg:block">
-        <div class="max-w-7xl mx-auto px-4 flex items-center gap-7 h-12 text-sm font-medium overflow-x-auto no-scrollbar">
+        <div class="shop-container flex items-center gap-7 h-12 text-sm font-medium overflow-x-auto no-scrollbar">
             <a href="{{ route('home') }}" class="hover:text-[color:var(--color-brand)] whitespace-nowrap">{{ __('Home') }}</a>
             <a href="{{ route('shop.index') }}" class="hover:text-[color:var(--color-brand)] whitespace-nowrap">{{ __('Shop') }}</a>
             @foreach ($navCategories as $category)

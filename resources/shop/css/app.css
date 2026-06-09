@@ -37,6 +37,20 @@ body {
     scrollbar-width: none;
 }
 
+/* Storefront page container — single source of truth for the layout width.
+ * Wide cap (1536px), centered on very large screens, responsive side padding. */
+.shop-container {
+    width: 100%;
+    max-width: 1536px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+}
+@media (min-width: 1024px) {
+    .shop-container {
+        padding-inline: 2rem;
+    }
+}
+
 /* Product card: Sellzy-style image zoom + slight rotate, centered slide-up action rail */
 .product-card .pc-image img {
     transition: transform 0.3s ease-in-out;

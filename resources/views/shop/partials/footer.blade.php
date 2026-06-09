@@ -6,7 +6,7 @@
 
 {{-- Newsletter strip --}}
 <section class="bg-[color:var(--color-brand-soft)]">
-    <div class="max-w-7xl mx-auto px-4 py-9 flex flex-col md:flex-row items-center justify-between gap-5">
+    <div class="shop-container py-9 flex flex-col md:flex-row items-center justify-between gap-5">
         <div class="text-center md:text-left">
             <h3 class="text-xl font-bold text-[color:var(--color-ink)]">{{ __('Subscribe to our Newsletter') }}</h3>
             <p class="text-sm text-[color:var(--color-muted)] mt-1">{{ __('Get the latest deals and new arrivals straight to your inbox') }}</p>
@@ -20,7 +20,7 @@
 </section>
 
 <footer class="bg-[color:var(--color-ink)] text-neutral-400">
-    <div class="max-w-7xl mx-auto px-4 py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+    <div class="shop-container py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
         {{-- Brand + app --}}
         <div class="col-span-2 lg:col-span-2">
             <h3 class="text-white text-2xl font-extrabold mb-3">{{ $company['name'] }}</h3>
@@ -72,7 +72,7 @@
 
     {{-- Contact row --}}
     <div class="border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm">
+        <div class="shop-container py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm">
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                 <span class="flex items-center gap-2"><i class="ph ph-map-pin"></i> {{ $address['address'] ?? '' }}</span>
                 <span class="flex items-center gap-2"><i class="ph ph-phone"></i> <a href="tel:{{ $company['phone'] }}" class="hover:text-[color:var(--color-brand-light)]">{{ $company['phone'] }}</a></span>
@@ -88,7 +88,7 @@
 
     {{-- Copyright --}}
     <div class="border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
+        <div class="shop-container py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
             <span>&copy; {{ date('Y') }} {{ $company['name'] }}. {{ __('All rights reserved.') }}</span>
             <span class="inline-flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded text-neutral-300"><i class="ph ph-money"></i> {{ __('Cash on Delivery') }}</span>
         </div>

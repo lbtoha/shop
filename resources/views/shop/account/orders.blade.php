@@ -3,7 +3,7 @@
 @section('title', __('My Orders') . ' — ' . config('application_info.company_info.name'))
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="shop-container py-8">
         <h1 class="text-2xl font-bold text-ink mb-6">{{ __('My Orders') }}</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">

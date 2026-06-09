@@ -3,7 +3,7 @@
 @section('title', $order->order_number . ' — ' . config('application_info.company_info.name'))
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="shop-container py-8">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold text-ink">{{ __('Order') }} {{ $order->order_number }}</h1>
             <a href="{{ route('shop.account.orders') }}" class="text-sm text-[color:var(--color-brand)] hover:underline">&larr; {{ __('Back to orders') }}</a>

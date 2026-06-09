@@ -3,7 +3,7 @@
 @section('title', config('application_info.company_info.name') . ' — ' . __('Shop'))
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="shop-container">
         {{-- Hero + side promos --}}
         @php
             $gradients = ['from-[#04535c] to-[#088178]', 'from-[#161c24] to-[#088178]', 'from-[#088178] to-[#5ed9ba]'];
@@ -115,7 +115,7 @@
 
     @if ($hotSale->isNotEmpty())
         {{-- Promo banner between sections --}}
-        <div class="max-w-7xl mx-auto px-4 mt-12">
+        <div class="shop-container mt-12">
             <div class="rounded-3xl bg-gradient-to-r from-[color:var(--color-ink)] to-[color:var(--color-brand-dark)] px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <span class="inline-block bg-[color:var(--color-accent)] text-white text-xs font-semibold px-2.5 py-1 rounded">🔥 {{ __('Limited time') }}</span>
