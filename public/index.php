@@ -2,15 +2,6 @@
 
 use Illuminate\Http\Request;
 
-/**
- * Check if the application is installed.
- * If not, redirect to the installer
- */
-if (! file_exists(__DIR__.'/../storage/installed')) {
-    header('Location: /installer/index.php');
-    exit;
-}
-
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...

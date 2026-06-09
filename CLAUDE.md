@@ -18,7 +18,7 @@ Note: `User implements MustVerifyEmail`, but there is **no** `verification.verif
 composer dev                 # server + queue worker + log tail (pail) + vite, concurrently
 php artisan serve
 npm run dev                  # vite dev server
-npm run build                # production assets (required: public/index.php redirects to /installer until built + storage/installed marker exists)
+npm run build                # production assets
 
 # Database
 php artisan migrate:fresh --seed     # rebuilds schema + sample admin/menu/catalog data
@@ -32,7 +32,7 @@ vendor/bin/pint              # fix
 vendor/bin/pint --test       # check only
 ```
 
-**Install gate:** `public/index.php` redirects to `/installer/index.php` unless `storage/installed` exists. Create that file (and built Vite assets) to run the app directly outside the installer flow.
+The app runs as a standard Laravel front controller (`public/index.php`) — the legacy web installer (`public/installer/` + the `storage/installed` gate) was removed. Set up via the normal flow: `.env`, `php artisan migrate --seed`, `npm run build`.
 
 The scheduler runs `run-task-schedule` every minute ([routes/console.php](routes/console.php)).
 
