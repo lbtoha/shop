@@ -19,7 +19,9 @@ Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::post('add/{product}', [CartController::class, 'add'])->name('add');
     Route::put('update/{product}', [CartController::class, 'update'])->name('update');
     Route::delete('remove/{product}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('clear', [CartController::class, 'clear'])->name('clear');
     Route::get('count', [CartController::class, 'count'])->name('count');
+    Route::get('fragment', [CartController::class, 'fragment'])->name('fragment');
 });
 
 Route::prefix('checkout')->as('shop.checkout.')->group(function () {

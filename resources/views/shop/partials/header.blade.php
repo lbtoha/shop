@@ -78,7 +78,7 @@
                     </a>
                 @endauth
 
-                <a href="{{ route('shop.cart.index') }}" class="flex items-center gap-2 hover:text-[color:var(--color-brand)]">
+                <a href="{{ route('shop.cart.index') }}" data-cart-open class="flex items-center gap-2 hover:text-[color:var(--color-brand)]">
                     <span class="relative">
                         <i class="ph ph-shopping-cart-simple text-2xl text-[color:var(--color-ink)]"></i>
                         <span data-cart-count

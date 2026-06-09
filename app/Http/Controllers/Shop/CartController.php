@@ -44,11 +44,12 @@ class CartController extends Controller
             'success' => true,
             'message' => __(':product added to cart.', ['product' => $product->name]),
             'count' => $this->cart->count(),
+            'drawer' => $this->renderDrawer(),
         ]);
     }
 
     /**
-     * Update the quantity of a cart line.
+     * Update the quantity of a cart line. AJAX returns the refreshed drawer.
      */
     public function update(Request $request, Product $product)
     {
@@ -58,17 +59,71 @@ class CartController extends Controller
 
         $this->cart->update($product, (int) $request->input('quantity'));
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => $this->cart->count(),
+                'drawer' => $this->renderDrawer(),
+            ]);
+        }
+
         return redirect()->route('shop.cart.index')->with('success', __('Cart updated.'));
     }
 
     /**
-     * Remove a line from the cart.
+     * Remove a line from the cart. AJAX returns the refreshed drawer.
      */
-    public function remove(int $product)
+    public function remove(Request $request, int $product)
     {
         $this->cart->remove($product);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => $this->cart->count(),
+                'drawer' => $this->renderDrawer(),
+            ]);
+        }
+
         return redirect()->route('shop.cart.index')->with('success', __('Item removed.'));
+    }
+
+    /**
+     * Empty the cart entirely (drawer "clear all").
+     */
+    public function clear(Request $request)
+    {
+        $this->cart->clear();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => 0,
+                'drawer' => $this->renderDrawer(),
+            ]);
+        }
+
+        return redirect()->route('shop.cart.index')->with('success', __('Cart cleared.'));
+    }
+
+    /**
+     * Return the rendered drawer body (used to populate the slide-in cart).
+     */
+    public function fragment()
+    {
+        return response()->json([
+            'count' => $this->cart->count(),
+            'drawer' => $this->renderDrawer(),
+        ]);
+    }
+
+    private function renderDrawer(): string
+    {
+        return view('shop.partials.cart-drawer-body', [
+            'items' => $this->cart->items(),
+            'subtotal' => $this->cart->subtotal(),
+            'discount' => $this->cart->discount(),
+        ])->render();
     }
 
     /**

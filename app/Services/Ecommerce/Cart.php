@@ -112,6 +112,21 @@ class Cart
         return (float) $this->items()->sum('subtotal');
     }
 
+    /**
+     * Total saved versus each product's compare-at (original) price.
+     */
+    public function discount(): float
+    {
+        return (float) $this->items()->sum(function ($line) {
+            $product = $line['product'];
+            if ($product->compare_at_price && $product->compare_at_price > $product->price) {
+                return ((float) $product->compare_at_price - (float) $product->price) * $line['quantity'];
+            }
+
+            return 0;
+        });
+    }
+
     public function count(): int
     {
         return (int) $this->items()->sum('quantity');

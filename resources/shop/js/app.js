@@ -1,14 +1,22 @@
 /**
- * Storefront interactivity: AJAX add-to-cart, header cart badge, hero carousel,
- * and mobile menu toggle. Vanilla JS, no framework dependency.
+ * Storefront interactivity: AJAX add-to-cart with a slide-in cart drawer,
+ * header cart badge, hero carousel, and mobile menu toggle.
+ * Vanilla JS, no framework dependency.
  */
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
 
+const jsonHeaders = {
+    "Content-Type": "application/json",
+    "X-CSRF-TOKEN": csrfToken,
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+};
+
 function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className =
-        "fixed top-5 right-5 z-50 px-4 py-3 rounded shadow-lg text-white text-sm transition-opacity duration-300 " +
+        "fixed top-5 right-5 z-[60] px-4 py-3 rounded-lg shadow-lg text-white text-sm transition-opacity duration-300 " +
         (type === "success" ? "bg-emerald-600" : "bg-red-600");
     toast.textContent = message;
     document.body.appendChild(toast);
@@ -21,11 +29,73 @@ function showToast(message, type = "success") {
 function updateCartBadge(count) {
     document.querySelectorAll("[data-cart-count]").forEach((el) => {
         el.textContent = count;
+        // The drawer's own badge always shows; header badges hide at 0.
+        if (el.closest("[data-cart-drawer]")) return;
         el.classList.toggle("hidden", !count);
     });
 }
 
-/* AJAX add to cart */
+/* ---------------- Cart drawer ---------------- */
+const drawer = () => document.querySelector("[data-cart-drawer]");
+const overlay = () => document.querySelector("[data-cart-overlay]");
+
+function openCart() {
+    drawer()?.classList.remove("translate-x-full");
+    const o = overlay();
+    if (o) {
+        o.classList.remove("opacity-0", "invisible");
+    }
+    document.body.style.overflow = "hidden";
+}
+
+function closeCart() {
+    drawer()?.classList.add("translate-x-full");
+    const o = overlay();
+    if (o) {
+        o.classList.add("opacity-0", "invisible");
+    }
+    document.body.style.overflow = "";
+}
+
+function renderDrawer(html, count) {
+    const body = document.querySelector("[data-cart-body]");
+    if (body && typeof html === "string") body.innerHTML = html;
+    if (typeof count === "number") updateCartBadge(count);
+}
+
+async function refreshDrawer() {
+    try {
+        const res = await fetch("/cart/fragment", { headers: jsonHeaders });
+        const data = await res.json();
+        renderDrawer(data.drawer, data.count);
+    } catch (_) {
+        /* ignore */
+    }
+}
+
+/* Open the drawer from the header cart icon */
+document.addEventListener("click", (e) => {
+    const opener = e.target.closest("[data-cart-open]");
+    if (!opener) return;
+    e.preventDefault();
+    openCart();
+    refreshDrawer();
+});
+
+/* Close: X button, "Continue Shopping", overlay click, Esc */
+document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-cart-close]")) {
+        // allow links (Continue Shopping) to still navigate, but close first
+        closeCart();
+        return;
+    }
+    if (e.target.matches("[data-cart-overlay]")) closeCart();
+});
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeCart();
+});
+
+/* AJAX add to cart -> open drawer with fresh contents */
 document.addEventListener("click", async (e) => {
     const btn = e.target.closest("[data-add-to-cart]");
     if (!btn) return;
@@ -39,18 +109,13 @@ document.addEventListener("click", async (e) => {
     try {
         const res = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
-                Accept: "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-            },
+            headers: jsonHeaders,
             body: JSON.stringify({ quantity }),
         });
         const data = await res.json();
         if (res.ok && data.success) {
-            updateCartBadge(data.count);
-            showToast(data.message, "success");
+            renderDrawer(data.drawer, data.count);
+            openCart();
         } else {
             showToast(data.message || "Could not add to cart.", "error");
         }
@@ -61,7 +126,48 @@ document.addEventListener("click", async (e) => {
     }
 });
 
-/* Quantity steppers on product / cart pages */
+/* Drawer qty stepper (delegated) */
+document.addEventListener("click", async (e) => {
+    const qtyBtn = e.target.closest("[data-cart-qty]");
+    if (!qtyBtn) return;
+    const url = qtyBtn.getAttribute("data-cart-qty");
+    const delta = parseInt(qtyBtn.getAttribute("data-delta"), 10);
+    const qtyEl = qtyBtn.parentElement.querySelector("[data-qty]");
+    const current = parseInt(qtyEl?.textContent || "1", 10);
+    const next = current + delta; // 0 removes the line server-side
+
+    qtyBtn.disabled = true;
+    try {
+        const res = await fetch(url, {
+            method: "PUT",
+            headers: jsonHeaders,
+            body: JSON.stringify({ quantity: Math.max(0, next) }),
+        });
+        const data = await res.json();
+        renderDrawer(data.drawer, data.count);
+    } finally {
+        qtyBtn.disabled = false;
+    }
+});
+
+/* Drawer remove + clear (delegated) */
+document.addEventListener("click", async (e) => {
+    const removeBtn = e.target.closest("[data-cart-remove]");
+    const clearBtn = e.target.closest("[data-cart-clear]");
+    const target = removeBtn || clearBtn;
+    if (!target) return;
+    const url = target.getAttribute("data-cart-remove") || target.getAttribute("data-cart-clear");
+    target.disabled = true;
+    try {
+        const res = await fetch(url, { method: "DELETE", headers: jsonHeaders });
+        const data = await res.json();
+        renderDrawer(data.drawer, data.count);
+    } finally {
+        target.disabled = false;
+    }
+});
+
+/* Quantity steppers on product / cart full pages */
 document.addEventListener("click", (e) => {
     const stepper = e.target.closest("[data-step]");
     if (!stepper) return;

@@ -38,6 +38,8 @@
     </main>
 
     @include('shop.partials.footer')
+
+    @include('shop.partials.cart-drawer')
 </body>
 
 </html>
