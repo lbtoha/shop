@@ -2,7 +2,7 @@
 <div data-cart-overlay class="fixed inset-0 bg-black/40 z-50 opacity-0 invisible transition-opacity duration-300"></div>
 
 <aside data-cart-drawer
-    class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+    class="fixed top-0 right-0 h-full w-[90vw] max-w-md bg-white z-50 shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
     {{-- Header --}}
     <div class="flex items-center justify-between px-5 h-16 border-b border-[color:var(--color-line)] shrink-0">
         <div class="flex items-center gap-2">
