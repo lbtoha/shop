@@ -15,7 +15,7 @@
     @vite(['resources/shop/css/app.css', 'resources/shop/js/app.js'])
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col overflow-x-hidden">
     @include('shop.partials.header')
 
     <main class="flex-1">

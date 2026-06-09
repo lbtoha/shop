@@ -17,30 +17,32 @@
                             {{ __('You have no orders yet.') }}
                         </div>
                     @else
-                        <table class="w-full text-sm">
-                            <thead class="bg-neutral-50 text-left text-[color:var(--color-muted)]">
-                                <tr>
-                                    <th class="px-4 py-3">{{ __('Order') }}</th>
-                                    <th class="px-4 py-3">{{ __('Date') }}</th>
-                                    <th class="px-4 py-3">{{ __('Items') }}</th>
-                                    <th class="px-4 py-3">{{ __('Total') }}</th>
-                                    <th class="px-4 py-3">{{ __('Status') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-neutral-100">
-                                @foreach ($orders as $order)
-                                    <tr class="hover:bg-neutral-50">
-                                        <td class="px-4 py-3">
-                                            <a href="{{ route('shop.account.order', $order->order_number) }}" class="font-medium text-[color:var(--color-brand)] hover:underline">{{ $order->order_number }}</a>
-                                        </td>
-                                        <td class="px-4 py-3 text-[color:var(--color-muted)]">{{ $order->created_at->format('M d, Y') }}</td>
-                                        <td class="px-4 py-3">{{ $order->items_count }}</td>
-                                        <td class="px-4 py-3 font-medium">{{ amountWithSymbol($order->total) }}</td>
-                                        <td class="px-4 py-3 capitalize">{{ $order->status_name }}</td>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm min-w-[520px]">
+                                <thead class="bg-neutral-50 text-left text-[color:var(--color-muted)]">
+                                    <tr>
+                                        <th class="px-4 py-3">{{ __('Order') }}</th>
+                                        <th class="px-4 py-3">{{ __('Date') }}</th>
+                                        <th class="px-4 py-3">{{ __('Items') }}</th>
+                                        <th class="px-4 py-3">{{ __('Total') }}</th>
+                                        <th class="px-4 py-3">{{ __('Status') }}</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    @foreach ($orders as $order)
+                                        <tr class="hover:bg-neutral-50">
+                                            <td class="px-4 py-3">
+                                                <a href="{{ route('shop.account.order', $order->order_number) }}" class="font-medium text-[color:var(--color-brand)] hover:underline">{{ $order->order_number }}</a>
+                                            </td>
+                                            <td class="px-4 py-3 text-[color:var(--color-muted)] whitespace-nowrap">{{ $order->created_at->format('M d, Y') }}</td>
+                                            <td class="px-4 py-3">{{ $order->items_count }}</td>
+                                            <td class="px-4 py-3 font-medium whitespace-nowrap">{{ amountWithSymbol($order->total) }}</td>
+                                            <td class="px-4 py-3 capitalize">{{ $order->status_name }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     @endif
                 </div>
 

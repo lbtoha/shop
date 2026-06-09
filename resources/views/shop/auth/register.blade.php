@@ -18,7 +18,7 @@
 
             <form method="POST" action="{{ route('register') }}" class="space-y-4">
                 @csrf
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-medium mb-1">{{ __('First Name') }}</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}" required autofocus

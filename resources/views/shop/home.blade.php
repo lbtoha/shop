@@ -20,7 +20,7 @@
             <div data-hero class="lg:col-span-2 relative rounded-3xl overflow-hidden">
                 @foreach ($heroSlides as $i => $slide)
                     <div data-slide class="{{ $i === 0 ? '' : 'hidden' }}">
-                        <div class="relative h-[420px] sm:h-[480px] rounded-3xl overflow-hidden flex items-center px-8 sm:px-14
+                        <div class="relative h-[320px] sm:h-[420px] lg:h-[480px] rounded-3xl overflow-hidden flex items-center px-6 sm:px-10 lg:px-14
                             @if (! $slide->image) bg-gradient-to-r {{ $gradients[$i % count($gradients)] }} @endif">
                             @if ($slide->image)
                                 <img src="{{ $slide->image }}" alt="{{ $slide->title }}" class="absolute inset-0 w-full h-full object-cover">
@@ -74,11 +74,11 @@
                 ];
             @endphp
             @foreach ($features as $f)
-                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-4 flex items-center gap-3">
-                    <i class="ph {{ $f['icon'] }} text-3xl text-[color:var(--color-brand)]"></i>
-                    <div>
-                        <div class="text-sm font-semibold text-[color:var(--color-ink)]">{{ $f['title'] }}</div>
-                        <div class="text-xs text-[color:var(--color-muted)]">{{ $f['text'] }}</div>
+                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+                    <i class="ph {{ $f['icon'] }} text-2xl sm:text-3xl text-[color:var(--color-brand)] shrink-0"></i>
+                    <div class="min-w-0">
+                        <div class="text-sm font-semibold text-[color:var(--color-ink)] truncate">{{ $f['title'] }}</div>
+                        <div class="text-xs text-[color:var(--color-muted)] truncate">{{ $f['text'] }}</div>
                     </div>
                 </div>
             @endforeach
