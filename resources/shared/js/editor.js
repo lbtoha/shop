@@ -716,6 +716,11 @@ export const editorInit = () => {
         // Setup image context toolbar for resize/position
         setupImageClickHandlers(quill);
 
+        // Expose the Quill instance on the wrapper element so external scripts
+        // (e.g. description template helper buttons) can access it via
+        // document.getElementById('description-editor').__quill
+        element.__quill = quill;
+
         element.dataset.initialized = "true";
     });
 };
