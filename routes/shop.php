@@ -26,8 +26,8 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('shop.produ
 Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('add/{product}', [CartController::class, 'add'])->name('add');
-    Route::put('update/{product}', [CartController::class, 'update'])->name('update');
-    Route::delete('remove/{product}', [CartController::class, 'remove'])->name('remove');
+    Route::put('update/{lineKey}', [CartController::class, 'update'])->name('update')->where('lineKey', '[0-9]+(:[0-9]+)?');
+    Route::delete('remove/{lineKey}', [CartController::class, 'remove'])->name('remove')->where('lineKey', '[0-9]+(:[0-9]+)?');
     Route::delete('clear', [CartController::class, 'clear'])->name('clear');
     Route::get('count', [CartController::class, 'count'])->name('count');
     Route::get('fragment', [CartController::class, 'fragment'])->name('fragment');

@@ -49,22 +49,49 @@ class CheckoutService
                     throw new CustomWebException(__('A product in your cart is no longer available.'), 422);
                 }
 
-                if (! $product->isInStock($line['quantity'])) {
-                    throw new CustomWebException(
-                        __(':product is out of stock.', ['product' => $product->name]),
-                        422
-                    );
+                $variant = null;
+
+                if (! empty($line['variant']?->id)) {
+                    // Lock and re-check the chosen variant; stock lives on it.
+                    $variant = \App\Models\ProductVariant::query()
+                        ->lockForUpdate()
+                        ->where('product_id', $product->id)
+                        ->find($line['variant']->id);
+
+                    if (! $variant) {
+                        throw new CustomWebException(__('A product option in your cart is no longer available.'), 422);
+                    }
+
+                    if (! $variant->isInStock($line['quantity'])) {
+                        throw new CustomWebException(
+                            __(':product (:variant) is out of stock.', ['product' => $product->name, 'variant' => $variant->name]),
+                            422
+                        );
+                    }
+
+                    $unitPrice = $variant->price();
+                    $variant->decrement('stock', $line['quantity']);
+                } else {
+                    if (! $product->isInStock($line['quantity'])) {
+                        throw new CustomWebException(
+                            __(':product is out of stock.', ['product' => $product->name]),
+                            422
+                        );
+                    }
+
+                    $unitPrice = (float) $product->price;
+                    $product->decrement('stock', $line['quantity']);
                 }
 
-                $lineSubtotal = (float) $product->price * $line['quantity'];
+                $lineSubtotal = $unitPrice * $line['quantity'];
                 $subtotal += $lineSubtotal;
-
-                $product->decrement('stock', $line['quantity']);
 
                 $orderItems[] = [
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
                     'product_name' => $product->name,
-                    'price' => $product->price,
+                    'variant_name' => $variant?->name,
+                    'price' => $unitPrice,
                     'quantity' => $line['quantity'],
                     'subtotal' => $lineSubtotal,
                 ];

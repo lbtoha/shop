@@ -83,7 +83,7 @@
         <tbody>
             @foreach ($order->items as $item)
                 <tr>
-                    <td>{{ $item->product_name }}</td>
+                    <td>{{ $item->product_name }}@if ($item->variant_name) <span class="muted">({{ $item->variant_name }})</span>@endif</td>
                     <td class="right">{{ amountWithSymbol($item->price) }}</td>
                     <td class="right">{{ $item->quantity }}</td>
                     <td class="right">{{ amountWithSymbol($item->subtotal) }}</td>

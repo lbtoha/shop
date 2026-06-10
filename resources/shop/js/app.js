@@ -104,13 +104,15 @@ document.addEventListener("click", async (e) => {
     const url = btn.getAttribute("data-add-to-cart");
     const qtyInput = document.querySelector("[data-quantity-input]");
     const quantity = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
+    const variantEl = document.getElementById("selected-variant-id");
+    const variantId = variantEl && variantEl.value ? parseInt(variantEl.value, 10) : null;
 
     btn.disabled = true;
     try {
         const res = await fetch(url, {
             method: "POST",
             headers: jsonHeaders,
-            body: JSON.stringify({ quantity }),
+            body: JSON.stringify({ quantity, variant_id: variantId }),
         });
         const data = await res.json();
         if (res.ok && data.success) {
@@ -123,6 +125,38 @@ document.addEventListener("click", async (e) => {
         showToast("Something went wrong.", "error");
     } finally {
         btn.disabled = false;
+    }
+});
+
+/* Buy now -> add to cart (with variant) then go straight to checkout */
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-buy-now]");
+    if (!btn) return;
+    e.preventDefault();
+
+    const url = btn.getAttribute("data-buy-now");
+    const qtyInput = document.querySelector("[data-quantity-input]");
+    const quantity = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
+    const variantEl = document.getElementById("selected-variant-id");
+    const variantId = variantEl && variantEl.value ? parseInt(variantEl.value, 10) : null;
+
+    btn.style.pointerEvents = "none";
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: jsonHeaders,
+            body: JSON.stringify({ quantity, variant_id: variantId }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            window.location.href = "/checkout";
+        } else {
+            showToast(data.message || "Could not add to cart.", "error");
+            btn.style.pointerEvents = "";
+        }
+    } catch (err) {
+        showToast("Something went wrong.", "error");
+        btn.style.pointerEvents = "";
     }
 });
 

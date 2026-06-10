@@ -20,6 +20,7 @@
                 <div class="lg:col-span-2 space-y-4">
                     @foreach ($items as $line)
                         @php($product = $line['product'])
+                        @php($maxQty = $line['variant'] ? $line['variant']->stock : $product->stock)
                         <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4">
                             <a href="{{ route('shop.product', $product->slug) }}"
                                 class="w-24 h-24 shrink-0 rounded-xl bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
@@ -32,21 +33,24 @@
 
                             <div class="flex-1 w-full">
                                 <a href="{{ route('shop.product', $product->slug) }}" class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-brand)]">{{ $product->name }}</a>
-                                <div class="text-sm text-[color:var(--color-muted)] mt-1">{{ amountWithSymbol($product->price) }} {{ __('each') }}</div>
+                                @if ($line['variant'])
+                                    <div class="text-sm text-[color:var(--color-brand)] mt-0.5">{{ $line['variant']->name }}</div>
+                                @endif
+                                <div class="text-sm text-[color:var(--color-muted)] mt-1">{{ amountWithSymbol($line['unit_price']) }} {{ __('each') }}</div>
 
                                 <div class="mt-3 flex items-center gap-4 flex-wrap">
-                                    <form method="POST" action="{{ route('shop.cart.update', $product->id) }}" class="flex items-center gap-2" data-qty-wrap>
+                                    <form method="POST" action="{{ route('shop.cart.update', $line['key']) }}" class="flex items-center gap-2" data-qty-wrap>
                                         @csrf @method('PUT')
                                         <div class="flex items-center border border-[color:var(--color-line)] rounded-full overflow-hidden">
                                             <button type="button" data-step="-1" class="px-3 py-1.5 text-lg hover:bg-neutral-50">−</button>
-                                            <input type="number" name="quantity" value="{{ $line['quantity'] }}" min="1" max="{{ $product->stock }}"
+                                            <input type="number" name="quantity" value="{{ $line['quantity'] }}" min="1" max="{{ $maxQty }}"
                                                 class="w-12 text-center py-1.5 focus:outline-none">
                                             <button type="button" data-step="1" class="px-3 py-1.5 text-lg hover:bg-neutral-50">+</button>
                                         </div>
                                         <button type="submit" class="text-sm text-[color:var(--color-brand)] hover:underline">{{ __('Update') }}</button>
                                     </form>
 
-                                    <form method="POST" action="{{ route('shop.cart.remove', $product->id) }}">
+                                    <form method="POST" action="{{ route('shop.cart.remove', $line['key']) }}">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-sm text-red-500 hover:underline flex items-center gap-1">
                                             <i class="ph ph-trash"></i> {{ __('Remove') }}

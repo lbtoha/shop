@@ -78,6 +78,9 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="s-text font-medium truncate">{{ $item->product_name }}</p>
+                                @if ($item->variant_name)
+                                    <span class="text-xs text-primary block">{{ $item->variant_name }}</span>
+                                @endif
                                 <span class="text-xs">{{ amountWithSymbol($item->price) }} × {{ $item->quantity }}</span>
                                 @if ($item->product)
                                     <a href="{{ route('admin.products.edit', $item->product_id) }}" class="text-xs text-primary block">{{ __('View product') }}</a>

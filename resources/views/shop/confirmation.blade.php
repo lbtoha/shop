@@ -46,7 +46,7 @@
             <div class="border-t border-neutral-100 pt-4 space-y-2">
                 @foreach ($order->items as $item)
                     <div class="flex justify-between text-sm">
-                        <span>{{ $item->product_name }} <span class="text-[color:var(--color-muted)]">× {{ $item->quantity }}</span></span>
+                        <span>{{ $item->product_name }}@if ($item->variant_name)<span class="text-[color:var(--color-brand)]"> · {{ $item->variant_name }}</span>@endif <span class="text-[color:var(--color-muted)]">× {{ $item->quantity }}</span></span>
                         <span class="font-medium">{{ amountWithSymbol($item->subtotal) }}</span>
                     </div>
                 @endforeach

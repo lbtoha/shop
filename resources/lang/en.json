@@ -1547,5 +1547,17 @@
     "This coupon has expired.": "This coupon has expired.",
     "This coupon has reached its usage limit.": "This coupon has reached its usage limit.",
     "Add :amount more to use this coupon.": "Add :amount more to use this coupon.",
-    "Coupon \":code\" applied — you saved :amount.": "Coupon \":code\" applied — you saved :amount."
+    "Coupon \":code\" applied — you saved :amount.": "Coupon \":code\" applied — you saved :amount.",
+    "Variants (size / color)": "Variants (size / color)",
+    "Add Variant": "Add Variant",
+    "Add rows to sell this product in options. Each option carries its own stock. Price adjustment is added to the base price (use negatives for discounts). Leave empty for a single-stock product.": "Add rows to sell this product in options. Each option carries its own stock. Price adjustment is added to the base price (use negatives for discounts). Leave empty for a single-stock product.",
+    "Price +/-": "Price +/-",
+    "Select an option first.": "Select an option first.",
+    "Please select an option first.": "Please select an option first.",
+    "Selected option is unavailable.": "Selected option is unavailable.",
+    "This option is out of stock.": "This option is out of stock.",
+    "Unavailable combination": "Unavailable combination",
+    "Choose options": "Choose options",
+    ":product (:variant) is out of stock.": ":product (:variant) is out of stock.",
+    "A product option in your cart is no longer available.": "A product option in your cart is no longer available."
 }

@@ -50,6 +50,11 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -62,11 +67,60 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->where('stock', '>', 0);
+        // A product is purchasable if its own stock is positive OR it has at
+        // least one variant with stock. (Variant stock lives on a related table,
+        // so use a subquery rather than a column comparison.)
+        return $query->where(function ($q) {
+            $q->where('stock', '>', 0)
+                ->orWhereHas('variants', fn ($v) => $v->where('stock', '>', 0));
+        });
+    }
+
+    /**
+     * Whether this product sells through variants (size/color) rather than a
+     * single stock pool.
+     */
+    public function hasVariants(): bool
+    {
+        // Prefer already-loaded data to avoid N+1 on listing pages.
+        if ($this->relationLoaded('variants')) {
+            return $this->variants->isNotEmpty();
+        }
+
+        if (isset($this->attributes['variants_count'])) {
+            return $this->variants_count > 0;
+        }
+
+        return $this->variants()->exists();
+    }
+
+    /**
+     * The stock figure that actually governs purchasability: the sum of variant
+     * stock when variants exist, otherwise the product's own stock.
+     */
+    public function effectiveStock(): int
+    {
+        if ($this->relationLoaded('variants') ? $this->variants->isNotEmpty() : $this->hasVariants()) {
+            return (int) $this->variants()->sum('stock');
+        }
+
+        return (int) $this->stock;
     }
 
     public function isInStock(int $quantity = 1): bool
     {
-        return $this->stock >= $quantity;
+        return $this->effectiveStock() >= $quantity;
+    }
+
+    /**
+     * Lowest sellable price including variant adjustments (used for "from" labels).
+     */
+    public function displayPrice(): float
+    {
+        if ($this->relationLoaded('variants') && $this->variants->isNotEmpty()) {
+            return (float) $this->price + (float) $this->variants->min('price_adjustment');
+        }
+
+        return (float) $this->price;
     }
 }

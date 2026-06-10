@@ -1547,5 +1547,17 @@
     "This coupon has expired.": "এই কুপনের মেয়াদ শেষ হয়েছে।",
     "This coupon has reached its usage limit.": "এই কুপনটি ব্যবহারের সীমায় পৌঁছেছে।",
     "Add :amount more to use this coupon.": "এই কুপন ব্যবহার করতে আরও :amount যোগ করুন।",
-    "Coupon \":code\" applied — you saved :amount.": "কুপন \":code\" প্রয়োগ হয়েছে — আপনি :amount সাশ্রয় করেছেন।"
+    "Coupon \":code\" applied — you saved :amount.": "কুপন \":code\" প্রয়োগ হয়েছে — আপনি :amount সাশ্রয় করেছেন।",
+    "Variants (size / color)": "ভ্যারিয়েন্ট (সাইজ / রঙ)",
+    "Add Variant": "ভ্যারিয়েন্ট যোগ করুন",
+    "Add rows to sell this product in options. Each option carries its own stock. Price adjustment is added to the base price (use negatives for discounts). Leave empty for a single-stock product.": "অপশনে এই পণ্য বিক্রি করতে সারি যোগ করুন। প্রতিটি অপশনের নিজস্ব স্টক থাকে। মূল্য সমন্বয় বেস প্রাইসের সাথে যোগ হয় (ছাড়ের জন্য নেগেটিভ ব্যবহার করুন)। একক-স্টক পণ্যের জন্য খালি রাখুন।",
+    "Price +/-": "মূল্য +/-",
+    "Select an option first.": "প্রথমে একটি অপশন নির্বাচন করুন।",
+    "Please select an option first.": "অনুগ্রহ করে প্রথমে একটি অপশন নির্বাচন করুন।",
+    "Selected option is unavailable.": "নির্বাচিত অপশনটি অনুপলব্ধ।",
+    "This option is out of stock.": "এই অপশনটি স্টকে নেই।",
+    "Unavailable combination": "অনুপলব্ধ সংমিশ্রণ",
+    "Choose options": "অপশন নির্বাচন করুন",
+    ":product (:variant) is out of stock.": ":product (:variant) স্টকে নেই।",
+    "A product option in your cart is no longer available.": "আপনার কার্টের একটি পণ্য অপশন আর উপলব্ধ নেই।"
 }

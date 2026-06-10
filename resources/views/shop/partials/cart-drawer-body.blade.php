@@ -26,15 +26,18 @@
                 </a>
                 <div class="flex-1 min-w-0">
                     <a href="{{ route('shop.product', $product->slug) }}" class="block text-sm font-medium text-[color:var(--color-ink)] truncate hover:text-[color:var(--color-brand)]">{{ $product->name }}</a>
-                    <div class="text-xs text-[color:var(--color-muted)] mt-0.5">{{ amountWithSymbol($product->price) }} {{ __('each') }}</div>
+                    @if ($line['variant'])
+                        <div class="text-xs text-[color:var(--color-brand)] mt-0.5">{{ $line['variant']->name }}</div>
+                    @endif
+                    <div class="text-xs text-[color:var(--color-muted)] mt-0.5">{{ amountWithSymbol($line['unit_price']) }} {{ __('each') }}</div>
                     <div class="flex items-center justify-between mt-2">
                         {{-- Qty stepper (AJAX) --}}
                         <div class="flex items-center border border-[color:var(--color-line)] rounded-full overflow-hidden text-sm">
-                            <button type="button" data-cart-qty="{{ route('shop.cart.update', $product->id) }}" data-delta="-1" class="px-2.5 py-1 hover:bg-neutral-50">−</button>
+                            <button type="button" data-cart-qty="{{ route('shop.cart.update', $line['key']) }}" data-delta="-1" class="px-2.5 py-1 hover:bg-neutral-50">−</button>
                             <span class="px-2 min-w-[1.5rem] text-center" data-qty>{{ $line['quantity'] }}</span>
-                            <button type="button" data-cart-qty="{{ route('shop.cart.update', $product->id) }}" data-delta="1" class="px-2.5 py-1 hover:bg-neutral-50">+</button>
+                            <button type="button" data-cart-qty="{{ route('shop.cart.update', $line['key']) }}" data-delta="1" class="px-2.5 py-1 hover:bg-neutral-50">+</button>
                         </div>
-                        <button type="button" data-cart-remove="{{ route('shop.cart.remove', $product->id) }}" class="text-neutral-400 hover:text-red-500" aria-label="{{ __('Remove') }}">
+                        <button type="button" data-cart-remove="{{ route('shop.cart.remove', $line['key']) }}" class="text-neutral-400 hover:text-red-500" aria-label="{{ __('Remove') }}">
                             <i class="ph ph-trash"></i>
                         </button>
                     </div>

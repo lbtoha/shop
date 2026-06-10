@@ -14,6 +14,31 @@
         $phone = config('application_info.company_info.phone');
         $whatsapp = preg_replace('/[^0-9]/', '', $phone);
         $shareUrl = urlencode(request()->fullUrl());
+
+        // Variant option groups (e.g. Color => [Red, Blue], Size => [S, M, L])
+        // and a JS-friendly map of "Color|Size" combos to id/price/stock.
+        $hasVariants = $product->variants->isNotEmpty();
+        $optionGroups = [];
+        $variantMap = [];
+        if ($hasVariants) {
+            foreach ($product->variants as $v) {
+                $attrs = $v->attributes ?? [];
+                foreach ($attrs as $key => $val) {
+                    $optionGroups[$key] = $optionGroups[$key] ?? [];
+                    if (! in_array($val, $optionGroups[$key], true)) {
+                        $optionGroups[$key][] = $val;
+                    }
+                }
+                $comboKey = implode('|', array_values($attrs));
+                $variantMap[$comboKey] = [
+                    'id' => $v->id,
+                    'price' => $v->price(),
+                    'price_label' => amountWithSymbol($v->price()),
+                    'stock' => (int) $v->stock,
+                    'name' => $v->name,
+                ];
+            }
+        }
     @endphp
 
     <div class="shop-container py-8">
@@ -51,14 +76,32 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-[color:var(--color-ink)]">{{ $product->name }}</h1>
 
                 <div class="mt-3 flex items-center gap-3">
-                    <span class="text-2xl font-bold text-[color:var(--color-brand)]">{{ amountWithSymbol($product->price) }}</span>
+                    <span id="product-price" class="text-2xl font-bold text-[color:var(--color-brand)]">{{ amountWithSymbol($product->displayPrice()) }}</span>
                     @if ($hasDiscount)
                         <span class="text-base text-[color:var(--color-muted)] line-through">{{ amountWithSymbol($product->compare_at_price) }}</span>
                     @endif
                 </div>
 
-                {{-- Color row --}}
-                @if ($mainImage)
+                {{-- Variant option pickers --}}
+                @if ($hasVariants)
+                    <div id="variant-picker" class="mt-5 border-t border-[color:var(--color-line)] pt-4 space-y-4"
+                        data-variant-map='@json($variantMap)' data-option-groups='@json($optionGroups)'>
+                        @foreach ($optionGroups as $groupName => $values)
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="text-sm text-[color:var(--color-muted)] pt-1.5">{{ __($groupName) }}</span>
+                                <div class="flex flex-wrap items-center gap-2 justify-end" data-option-group="{{ $groupName }}">
+                                    @foreach ($values as $val)
+                                        <button type="button" data-option-value="{{ $val }}"
+                                            class="px-3.5 py-1.5 text-sm rounded-full border border-[color:var(--color-line)] hover:border-[color:var(--color-brand)] transition">
+                                            {{ $val }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @elseif ($mainImage)
+                    {{-- Color row (simple product) --}}
                     <div class="mt-5 flex items-center justify-between border-t border-[color:var(--color-line)] pt-4">
                         <span class="text-sm text-[color:var(--color-muted)]">{{ __('Color') }}</span>
                         <div class="flex items-center gap-3">
@@ -70,27 +113,33 @@
                     </div>
                 @endif
 
-                {{-- Stock / size-style box --}}
+                {{-- Stock status --}}
                 <div class="mt-4 flex items-center justify-between border-t border-[color:var(--color-line)] pt-4">
                     <span class="text-sm text-[color:var(--color-muted)]">{{ __('Status') }}</span>
-                    @if ($product->isInStock())
-                        <span class="inline-flex items-center gap-1 text-sm text-emerald-600"><i class="ph ph-check-circle"></i> {{ __('In stock') }} ({{ $product->stock }})</span>
-                    @else
-                        <span class="inline-flex items-center gap-1 text-sm text-red-600"><i class="ph ph-x-circle"></i> {{ __('Out of stock') }}</span>
-                    @endif
+                    <span id="variant-status">
+                        @if ($hasVariants)
+                            <span class="inline-flex items-center gap-1 text-sm text-[color:var(--color-muted)]">{{ __('Select an option') }}</span>
+                        @elseif ($product->isInStock())
+                            <span class="inline-flex items-center gap-1 text-sm text-emerald-600"><i class="ph ph-check-circle"></i> {{ __('In stock') }} ({{ $product->effectiveStock() }})</span>
+                        @else
+                            <span class="inline-flex items-center gap-1 text-sm text-red-600"><i class="ph ph-x-circle"></i> {{ __('Out of stock') }}</span>
+                        @endif
+                    </span>
                 </div>
 
                 {{-- Quantity + actions --}}
                 @if ($product->isInStock())
                     <div class="mt-6 flex flex-col sm:flex-row items-stretch gap-3">
+                        <input type="hidden" id="selected-variant-id" value="">
                         <div data-qty-wrap class="flex items-center justify-between sm:justify-start border border-[color:var(--color-line)] rounded-full px-1 shrink-0">
                             <button type="button" data-step="-1" class="size-9 text-lg hover:text-[color:var(--color-brand)]">−</button>
-                            <input type="number" data-quantity-input value="1" min="1" max="{{ $product->stock }}"
+                            <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->stock }}"
                                 class="w-12 text-center py-2 focus:outline-none bg-transparent">
                             <button type="button" data-step="1" class="size-9 text-lg hover:text-[color:var(--color-brand)]">+</button>
                         </div>
                         <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                            class="flex-1 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 px-6 rounded-full transition">
+                            @if ($hasVariants) disabled @endif
+                            class="flex-1 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 px-6 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="ph ph-shopping-cart-simple"></i> {{ __('Add to Cart') }}
                         </button>
                         <a href="{{ route('shop.cart.add', $product->id) }}" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
@@ -195,6 +244,68 @@
                     if (main) main.src = b.getAttribute('data-thumb');
                 });
             });
+
+            // Variant picker: selecting one value per option group resolves a variant.
+            (function () {
+                var picker = document.getElementById('variant-picker');
+                if (!picker) return;
+
+                var variantMap = JSON.parse(picker.getAttribute('data-variant-map') || '{}');
+                var optionGroups = JSON.parse(picker.getAttribute('data-option-groups') || '{}');
+                var groupNames = Object.keys(optionGroups);
+                var selected = {};
+
+                var priceEl = document.getElementById('product-price');
+                var statusEl = document.getElementById('variant-status');
+                var variantIdEl = document.getElementById('selected-variant-id');
+                var addBtn = document.querySelector('[data-add-to-cart]');
+                var qtyInput = document.querySelector('[data-quantity-input]');
+
+                function setStatus(html) { if (statusEl) statusEl.innerHTML = html; }
+
+                function resolve() {
+                    // Need every group chosen before a combo exists.
+                    var allChosen = groupNames.every(function (g) { return selected[g]; });
+                    if (!allChosen) {
+                        if (addBtn) addBtn.disabled = true;
+                        if (variantIdEl) variantIdEl.value = '';
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm text-[color:var(--color-muted)]">{{ __('Select an option') }}</span>');
+                        return;
+                    }
+                    var key = groupNames.map(function (g) { return selected[g]; }).join('|');
+                    var v = variantMap[key];
+                    if (!v) {
+                        if (addBtn) addBtn.disabled = true;
+                        if (variantIdEl) variantIdEl.value = '';
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm text-red-600"><i class="ph ph-x-circle"></i> {{ __('Unavailable combination') }}</span>');
+                        return;
+                    }
+                    if (priceEl) priceEl.textContent = v.price_label;
+                    if (variantIdEl) variantIdEl.value = v.id;
+                    if (qtyInput) qtyInput.max = Math.max(1, v.stock);
+                    if (v.stock > 0) {
+                        if (addBtn) addBtn.disabled = false;
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm text-emerald-600"><i class="ph ph-check-circle"></i> {{ __('In stock') }} (' + v.stock + ')</span>');
+                    } else {
+                        if (addBtn) addBtn.disabled = true;
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm text-red-600"><i class="ph ph-x-circle"></i> {{ __('Out of stock') }}</span>');
+                    }
+                }
+
+                picker.querySelectorAll('[data-option-group]').forEach(function (group) {
+                    var name = group.getAttribute('data-option-group');
+                    group.querySelectorAll('[data-option-value]').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            selected[name] = btn.getAttribute('data-option-value');
+                            group.querySelectorAll('[data-option-value]').forEach(function (b) {
+                                b.classList.remove('border-[color:var(--color-brand)]', 'bg-[color:var(--color-brand-soft)]', 'text-[color:var(--color-brand)]', 'font-semibold');
+                            });
+                            btn.classList.add('border-[color:var(--color-brand)]', 'bg-[color:var(--color-brand-soft)]', 'text-[color:var(--color-brand)]', 'font-semibold');
+                            resolve();
+                        });
+                    });
+                });
+            })();
         </script>
     @endpush
 @endsection

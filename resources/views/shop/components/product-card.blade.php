@@ -47,10 +47,18 @@
                 </li>
                 @if ($product->isInStock())
                     <li>
-                        <button type="button" aria-label="{{ __('Add to cart') }}" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                            class="size-11 bg-[color:var(--color-brand)] inline-flex items-center justify-center text-white hover:bg-[color:var(--color-brand-dark)] transition">
-                            <i class="ph ph-shopping-cart-simple text-xl"></i>
-                        </button>
+                        @if ($product->hasVariants())
+                            {{-- Variant products need an option chosen — send to the detail page. --}}
+                            <a aria-label="{{ __('Choose options') }}" href="{{ route('shop.product', $product->slug) }}"
+                                class="size-11 bg-[color:var(--color-brand)] inline-flex items-center justify-center text-white hover:bg-[color:var(--color-brand-dark)] transition">
+                                <i class="ph ph-sliders-horizontal text-xl"></i>
+                            </a>
+                        @else
+                            <button type="button" aria-label="{{ __('Add to cart') }}" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
+                                class="size-11 bg-[color:var(--color-brand)] inline-flex items-center justify-center text-white hover:bg-[color:var(--color-brand-dark)] transition">
+                                <i class="ph ph-shopping-cart-simple text-xl"></i>
+                            </button>
+                        @endif
                     </li>
                 @endif
                 <li>

@@ -69,20 +69,46 @@ class CartController extends Controller
     {
         $request->validate([
             'quantity' => 'nullable|integer|min:1',
+            'variant_id' => 'nullable|integer',
         ]);
 
-        if (! $product->is_active || ! $product->isInStock()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('This product is out of stock.'),
-            ], 422);
+        if (! $product->is_active) {
+            return response()->json(['success' => false, 'message' => __('This product is out of stock.')], 422);
         }
 
-        $this->cart->add($product, (int) $request->input('quantity', 1));
+        $variant = null;
+        $variantId = $request->filled('variant_id') ? (int) $request->input('variant_id') : null;
+
+        // If the product sells through variants, one must be chosen and in stock.
+        if ($product->hasVariants()) {
+            if (! $variantId) {
+                return response()->json(['success' => false, 'message' => __('Please select an option first.')], 422);
+            }
+
+            $variant = $product->variants()->find($variantId);
+
+            if (! $variant) {
+                return response()->json(['success' => false, 'message' => __('Selected option is unavailable.')], 422);
+            }
+
+            if (! $variant->isInStock()) {
+                return response()->json(['success' => false, 'message' => __('This option is out of stock.')], 422);
+            }
+        } else {
+            $variantId = null; // ignore stray variant_id on simple products
+
+            if (! $product->isInStock()) {
+                return response()->json(['success' => false, 'message' => __('This product is out of stock.')], 422);
+            }
+        }
+
+        $this->cart->add($product, (int) $request->input('quantity', 1), $variantId);
+
+        $label = $variant ? $product->name.' ('.$variant->name.')' : $product->name;
 
         return response()->json([
             'success' => true,
-            'message' => __(':product added to cart.', ['product' => $product->name]),
+            'message' => __(':product added to cart.', ['product' => $label]),
             'count' => $this->cart->count(),
             'drawer' => $this->renderDrawer(),
         ]);
@@ -91,13 +117,13 @@ class CartController extends Controller
     /**
      * Update the quantity of a cart line. AJAX returns the refreshed drawer.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, string $lineKey)
     {
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
 
-        $this->cart->update($product, (int) $request->input('quantity'));
+        $this->cart->update($lineKey, (int) $request->input('quantity'));
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -113,9 +139,9 @@ class CartController extends Controller
     /**
      * Remove a line from the cart. AJAX returns the refreshed drawer.
      */
-    public function remove(Request $request, int $product)
+    public function remove(Request $request, string $lineKey)
     {
-        $this->cart->remove($product);
+        $this->cart->remove($lineKey);
 
         if ($request->expectsJson()) {
             return response()->json([

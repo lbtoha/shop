@@ -72,7 +72,7 @@
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($items as $line)
                             <div class="flex justify-between text-sm">
-                                <span class="text-[color:var(--color-muted)]">{{ $line['product']->name }} <span class="text-xs">× {{ $line['quantity'] }}</span></span>
+                                <span class="text-[color:var(--color-muted)]">{{ $line['product']->name }}@if ($line['variant'])<span class="text-[color:var(--color-brand)]"> · {{ $line['variant']->name }}</span>@endif <span class="text-xs">× {{ $line['quantity'] }}</span></span>
                                 <span class="font-medium shrink-0 ml-2">{{ amountWithSymbol($line['subtotal']) }}</span>
                             </div>
                         @endforeach

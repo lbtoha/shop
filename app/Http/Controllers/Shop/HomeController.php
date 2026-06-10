@@ -20,14 +20,14 @@ class HomeController extends Controller
             ->get();
 
         $newCollection = Product::active()->inStock()
-            ->with('category')
+            ->with('category')->withCount('variants')
             ->latest()
             ->take(8)
             ->get();
 
         // "Hot Sale" = products that carry a higher compare-at price (i.e. discounted)
         $hotSale = Product::active()->inStock()
-            ->with('category')
+            ->with('category')->withCount('variants')
             ->whereNotNull('compare_at_price')
             ->whereColumn('compare_at_price', '>', 'price')
             ->latest()
@@ -35,7 +35,7 @@ class HomeController extends Controller
             ->get();
 
         $featured = Product::active()->inStock()
-            ->with('category')
+            ->with('category')->withCount('variants')
             ->where('is_featured', true)
             ->latest()
             ->take(8)
