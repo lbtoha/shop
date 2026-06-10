@@ -12,6 +12,10 @@
             <span class="text-xs">{{ $order->created_at->format('M d, Y · g:i A') }} ({{ $order->created_at->diffForHumans() }})</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ \App\Services\Notification\OrderMessages::whatsappLink($order) }}" target="_blank" rel="noopener"
+                class="btn-primary outlined !py-2 !border-success !text-success">
+                <i class="ph ph-whatsapp-logo"></i><span class="text-xs font-medium">{{ __('Notify on WhatsApp') }}</span>
+            </a>
             <a href="{{ route('admin.orders.invoice', $order->id) }}" class="btn-primary outlined !py-2">
                 <i class="ph ph-file-pdf"></i><span class="text-xs font-medium">{{ __('Invoice') }}</span>
             </a>

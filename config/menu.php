@@ -71,6 +71,12 @@ return [
                                 'text' => 'Currency symbol and flat shipping cost for the shop.',
                             ],
                             [
+                                'title' => 'Order Notifications',
+                                'link' => 'admin.settings.order-notifications.index',
+                                'icon' => 'ph ph-bell-ringing',
+                                'text' => 'Email, SMS gateway and WhatsApp notifications for orders.',
+                            ],
+                            [
                                 'title' => 'System Configuration',
                                 'link' => 'admin.settings.system-configurations.index',
                                 'icon' => 'ph ph-wrench',

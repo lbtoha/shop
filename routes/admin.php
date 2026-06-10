@@ -134,6 +134,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 Route::resource('shop', Admin\Settings\ShopSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END SHOP SETTINGS -------------------------- */
 
+                /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
+                Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
+                /** -------------------------- END ORDER NOTIFICATIONS -------------------------- */
+
                 /** -------------------------- COOKIES POLICY -------------------------- */
                 Route::resource('gdpr-cookies', Admin\Settings\CookieController::class)->only(['index', 'store']);
                 /** -------------------------- END COOKIES POLICY -------------------------- */
