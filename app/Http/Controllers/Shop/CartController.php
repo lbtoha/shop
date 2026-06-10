@@ -90,19 +90,42 @@ class CartController extends Controller
             if (! $variant) {
                 return response()->json(['success' => false, 'message' => __('Selected option is unavailable.')], 422);
             }
+        } else {
+            $variantId = null; // ignore stray variant_id on simple products
+        }
 
-            if (! $variant->isInStock()) {
+        // Validate stock against total requested quantity (existing in cart + new quantity)
+        $quantity = (int) $request->input('quantity', 1);
+        $key = \App\Services\Ecommerce\Cart::lineKey($product->id, $variantId);
+        $existingLines = session()->get('cart', []);
+        $currentInCart = $existingLines[$key]['quantity'] ?? 0;
+        $newTotal = $currentInCart + $quantity;
+
+        if ($variant) {
+            if (! $variant->isInStock($newTotal)) {
+                $available = max(0, $variant->stock - $currentInCart);
+                if ($available > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('Only :count more of this option is available.', ['count' => $available])
+                    ], 422);
+                }
                 return response()->json(['success' => false, 'message' => __('This option is out of stock.')], 422);
             }
         } else {
-            $variantId = null; // ignore stray variant_id on simple products
-
-            if (! $product->isInStock()) {
+            if (! $product->isInStock($newTotal)) {
+                $available = max(0, $product->stock - $currentInCart);
+                if ($available > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('Only :count more of this product is available.', ['count' => $available])
+                    ], 422);
+                }
                 return response()->json(['success' => false, 'message' => __('This product is out of stock.')], 422);
             }
         }
 
-        $this->cart->add($product, (int) $request->input('quantity', 1), $variantId);
+        $this->cart->add($product, $quantity, $variantId);
 
         $label = $variant ? $product->name.' ('.$variant->name.')' : $product->name;
 
@@ -123,7 +146,27 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:0',
         ]);
 
-        $this->cart->update($lineKey, (int) $request->input('quantity'));
+        $quantity = (int) $request->input('quantity');
+
+        if ($quantity > 0) {
+            $lines = session()->get('cart', []);
+            if (isset($lines[$lineKey])) {
+                $line = $lines[$lineKey];
+                $product = Product::find($line['product_id']);
+                if ($product) {
+                    $variant = $line['variant_id'] ? \App\Models\ProductVariant::find($line['variant_id']) : null;
+                    $available = $variant ? $variant->stock : $product->stock;
+                    if ($quantity > $available) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => __('Only :count items are available in stock.', ['count' => $available])
+                        ], 422);
+                    }
+                }
+            }
+        }
+
+        $this->cart->update($lineKey, $quantity);
 
         if ($request->expectsJson()) {
             return response()->json([

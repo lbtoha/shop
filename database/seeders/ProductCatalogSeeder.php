@@ -212,6 +212,30 @@ class ProductCatalogSeeder extends Seeder
                         'sort_order' => $i,
                     ]);
                 }
+
+                // Seed variants for the product based on category
+                $sizes = [];
+                if ($categoryName === 'Kids Girls') {
+                    $sizes = ['24', '26', '28'];
+                } elseif ($categoryName === 'Ladies Three Piece') {
+                    $sizes = ['40', '42', '44'];
+                } elseif ($categoryName === 'Combo Sets') {
+                    $sizes = ['Regular', 'Plus'];
+                }
+
+                if (!empty($sizes)) {
+                    foreach ($sizes as $idx => $size) {
+                        \App\Models\ProductVariant::create([
+                            'product_id' => $created->id,
+                            'name' => "Size {$size}",
+                            'sku' => $product['sku'] ? "{$product['sku']}-{$size}" : null,
+                            'attributes' => ['Size' => $size],
+                            'price_adjustment' => 0.00,
+                            'stock' => 50,
+                            'sort_order' => $idx,
+                        ]);
+                    }
+                }
             }
         }
     }

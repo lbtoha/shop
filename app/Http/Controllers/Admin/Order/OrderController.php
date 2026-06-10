@@ -206,6 +206,17 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            if ($statusChanged) {
+                $oldStatus = $order->status->value;
+                $newStatus = $validated['status'];
+
+                if ($newStatus === OrderStatusEnum::CANCELLED->value) {
+                    $this->restockOrder($order);
+                } elseif ($oldStatus === OrderStatusEnum::CANCELLED->value) {
+                    $this->deductOrder($order);
+                }
+            }
+
             $order->update($validated);
 
             DB::commit();
@@ -239,7 +250,18 @@ class OrderController extends Controller
             return response()->json(['message' => __('Order is already at the final status.')], 422);
         }
 
-        $order->update(['status' => $next->value]);
+        try {
+            DB::beginTransaction();
+
+            // Advancing status from CANCELLED is not possible, so only need to handle normal pipeline progression.
+            $order->update(['status' => $next->value]);
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json(['message' => $th->getMessage()], 400);
+        }
 
         \App\Services\Ecommerce\OrderNotifier::statusUpdated($order->fresh());
 
@@ -308,8 +330,84 @@ class OrderController extends Controller
         adminUserHasPermission(permission: 'delete');
         protectOnDemo($order);
 
-        $order->delete();
+        try {
+            DB::beginTransaction();
+
+            if ($order->status !== OrderStatusEnum::CANCELLED) {
+                $this->restockOrder($order);
+            }
+
+            $order->delete();
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json(['message' => $th->getMessage()], 400);
+        }
 
         return response()->json(['message' => __('Order deleted successfully')]);
+    }
+
+    /**
+     * Restore stock to products/variants when an order is cancelled or deleted.
+     */
+    private function restockOrder(Order $order): void
+    {
+        foreach ($order->items as $item) {
+            if ($item->variant_id) {
+                $variant = \App\Models\ProductVariant::find($item->variant_id);
+                if ($variant) {
+                    $variant->increment('stock', $item->quantity);
+                }
+            } else {
+                $product = \App\Models\Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('stock', $item->quantity);
+                }
+            }
+        }
+
+        if ($order->coupon_id) {
+            $coupon = \App\Models\Coupon::find($order->coupon_id);
+            if ($coupon) {
+                $coupon->decrement('used_count');
+            }
+        }
+    }
+
+    /**
+     * Deduct stock from products/variants when a cancelled order is reactivated.
+     */
+    private function deductOrder(Order $order): void
+    {
+        foreach ($order->items as $item) {
+            if ($item->variant_id) {
+                $variant = \App\Models\ProductVariant::find($item->variant_id);
+                if (!$variant) {
+                    throw new \Exception(__('Product variant is no longer available.'));
+                }
+                if ($variant->stock < $item->quantity) {
+                    throw new \Exception(__(':product (:variant) is out of stock.', ['product' => $item->product_name, 'variant' => $variant->name]));
+                }
+                $variant->decrement('stock', $item->quantity);
+            } else {
+                $product = \App\Models\Product::find($item->product_id);
+                if (!$product) {
+                    throw new \Exception(__('Product is no longer available.'));
+                }
+                if ($product->stock < $item->quantity) {
+                    throw new \Exception(__(':product is out of stock.', ['product' => $product->name]));
+                }
+                $product->decrement('stock', $item->quantity);
+            }
+        }
+
+        if ($order->coupon_id) {
+            $coupon = \App\Models\Coupon::find($order->coupon_id);
+            if ($coupon) {
+                $coupon->increment('used_count');
+            }
+        }
     }
 }
