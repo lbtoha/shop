@@ -128,7 +128,7 @@ class RoleController extends Controller
     public function update(Request $request, AdminRole $adminRole)
     {
         $user = auth('admin')->user();
-        
+
         if ($adminRole->is_supper_admin && $user->admin_role_id !== $adminRole->id) {
             throw new CustomWebException(__('You can not update super admin role'));
         }

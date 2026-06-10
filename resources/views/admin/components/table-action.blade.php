@@ -22,6 +22,15 @@
                             class="{{ $button['icon'] }} text-lg"></i>
                         {{ __($button['label']) }}
                     </button>
+                @elseif ($button['type'] == 'action-confirm')
+                    <button type="button" class="action-confirm-btn"
+                        action="{{ $button['href'] }}"
+                        method="{{ $button['method'] ?? 'POST' }}"
+                        title="{{ $button['title'] ?? __('Are you sure?') }}"
+                        text="{{ $button['text'] ?? '' }}"><i
+                            class="{{ $button['icon'] }} text-lg"></i>
+                        {{ __($button['label']) }}
+                    </button>
                 @endif
             </li>
         @endforeach

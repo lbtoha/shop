@@ -34,13 +34,15 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        $featured = Product::active()->inStock()
+        $ladiesThreePiece = Product::active()->inStock()
             ->with('category')
-            ->where('is_featured', true)
+            ->whereHas('category', function ($q) {
+                $q->where('name', 'Ladies Three Piece');
+            })
             ->latest()
             ->take(8)
             ->get();
 
-        return view('shop.home', compact('banners', 'categories', 'newCollection', 'hotSale', 'featured'));
+        return view('shop.home', compact('banners', 'categories', 'newCollection', 'hotSale', 'ladiesThreePiece'));
     }
 }

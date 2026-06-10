@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Admin\Settings\Notification;
 
 use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
 use App\Models\NotificationTemplate;
-use App\Models\User;
 use App\Services\ModalIndexQuey;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -270,5 +268,4 @@ class ServicesController extends Controller
             return response()->json(['message' => $th->getMessage()]);
         }
     }
-
 }

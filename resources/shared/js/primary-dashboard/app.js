@@ -10,6 +10,7 @@ import { select2dynamic, select2Init, select2InitByClass } from "../select2";
 // initialize select with number input for symbol change
 
 window.Alpine = Alpine;
+window.$ = window.jQuery = $;
 
 // switch to dark mode
 const theme = localStorage.getItem("theme");

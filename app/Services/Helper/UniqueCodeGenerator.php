@@ -15,7 +15,7 @@ class UniqueCodeGenerator
      * @param  string|null  $defaultPrefix  Default prefix to use if no sequence exists
      * @return string Generated sequence code
      */
-    public static function make($model, string $column, int $minLength = 6, ?string $defaultPrefix = 'TRACK', string $orderBy='created_at'): string
+    public static function make($model, string $column, int $minLength = 6, ?string $defaultPrefix = 'TRACK', string $orderBy = 'created_at'): string
     {
         // Validate inputs
         if (empty($model) || empty($column)) {

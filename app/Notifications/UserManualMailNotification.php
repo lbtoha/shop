@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 
 class UserManualMailNotification extends Notification
 {
-    use Queueable, NotificationHelper;
+    use NotificationHelper, Queueable;
 
     /**
      * Create a new notification instance.

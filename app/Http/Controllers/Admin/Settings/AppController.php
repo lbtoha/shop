@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class AppController extends Controller
 {
     use MediaUploader;
+
     public function index(Request $request)
     {
         adminUserHasPermission(permission: 'read');

@@ -239,6 +239,16 @@ $(document).on("click", ".action-confirm-btn", function (e) {
     if (action) {
         config.action = action;
         config.method = $(this).attr("method") || "REDIRECT";
+        const data = {};
+        $.each(this.attributes, function() {
+            if (this.name.startsWith('data-')) {
+                const key = this.name.substring(5);
+                data[key] = this.value;
+            }
+        });
+        if (Object.keys(data).length > 0) {
+            config.data = data;
+        }
     } else {
         config.form = $(this).closest("form");
     }

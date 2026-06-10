@@ -70,6 +70,7 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
 
         /** -------------------------- E-COMMERCE -------------------------- */
         Route::resource('categories', Admin\Category\CategoryController::class)->except(['show']);
+        Route::post('products/{product}/toggle-status', [Admin\Product\ProductController::class, 'toggleStatus'])->name('products.toggle-status');
         Route::resource('products', Admin\Product\ProductController::class)->except(['show']);
         Route::resource('banners', Admin\Banner\BannerController::class)->except(['show']);
 

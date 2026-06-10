@@ -29,10 +29,10 @@ if (! function_exists('currencyRate')) {
 if (! function_exists('defaultCurrency')) {
     function defaultCurrency()
     {
-        $symbol = getOption('currency_symbol', '$');
+        $symbol = getOption('currency_symbol', '৳');
 
         return (object) [
-            'code' => getOption('currency_code', 'USD'),
+            'code' => getOption('currency_code', 'BDT'),
             'symbol' => $symbol,
             'symbol_position' => 'left',
             'rate' => 1,
@@ -110,13 +110,13 @@ if (! function_exists('getOption')) {
 if (! function_exists('currencySymbol')) {
     function currencySymbol($code = null)
     {
-        return getOption('currency_symbol', '$');
+        return getOption('currency_symbol', '৳');
     }
 }
 if (! function_exists('amountWithSymbol')) {
     function amountWithSymbol(float|string $amount, $code = null)
     {
-        return getOption('currency_symbol', '$').$amount;
+        return getOption('currency_symbol', '৳').$amount;
     }
 }
 

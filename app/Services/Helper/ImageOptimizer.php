@@ -3,8 +3,8 @@
 namespace App\Services\Helper;
 
 use Illuminate\Console\Command;
-use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class ImageOptimizer extends Command
@@ -12,7 +12,7 @@ class ImageOptimizer extends Command
     public static function optimize($file)
     {
         try {
-            $imageManager = new ImageManager(new Driver());
+            $imageManager = new ImageManager(new Driver);
 
             $tmpPath = $file->getPathname();
             $extension = strtolower($file->getClientOriginalExtension());
@@ -22,7 +22,7 @@ class ImageOptimizer extends Command
             }
 
             // Create WebP temp file
-            $webpPath = $tmpPath . '.webp';
+            $webpPath = $tmpPath.'.webp';
 
             $image = $imageManager->read($tmpPath);
 
@@ -37,7 +37,7 @@ class ImageOptimizer extends Command
 
             return new \Illuminate\Http\UploadedFile(
                 $webpPath,
-                pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.webp',
+                pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'.webp',
                 'image/webp',
                 null,
                 true
@@ -45,8 +45,8 @@ class ImageOptimizer extends Command
 
         } catch (\Throwable $e) {
             report($e);
+
             return $file;
         }
     }
-
 }

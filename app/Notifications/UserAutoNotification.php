@@ -7,18 +7,16 @@ use App\Models\NotificationTemplate;
 use App\Services\Helper\ShortCodeParser;
 use App\Traits\NotificationHelper;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class UserAutoNotification extends Notification
 {
-    use Queueable, NotificationHelper;
+    use NotificationHelper, Queueable;
 
     /**
      * Determine if the notification should be sent.
      */
-
     private array $email_template;
 
     /**
@@ -95,8 +93,7 @@ class UserAutoNotification extends Notification
         return match (true) {
 
             // Email
-            $this->isValidEmailTemplate() && $channel === 'mail' =>
-                $this->hasValue($notifiable, 'email')
+            $this->isValidEmailTemplate() && $channel === 'mail' => $this->hasValue($notifiable, 'email')
                 || $this->hasAnonymousRoute($notifiable, 'mail'),
 
             default => false,
@@ -108,7 +105,7 @@ class UserAutoNotification extends Notification
      */
     public function toMail(object $notifiable): ?MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($this->email_template['subject'])
             ->view('emails.user-notification', [
                 'notificationTemplate' => ShortCodeParser::emailBodyParse(
@@ -145,6 +142,4 @@ class UserAutoNotification extends Notification
             'status' => $notificationTemplate->status,
         ];
     }
-
-
 }

@@ -160,7 +160,7 @@ class LanguageController extends Controller
             Cache::forget('lang_list');
             Cache::forget('language_list');
 
-            if( $validated['is_default']) {
+            if ($validated['is_default']) {
                 Option::updateOption(
                     'default_language',
                     $validated['code'],

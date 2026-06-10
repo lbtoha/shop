@@ -89,7 +89,7 @@ class RunTaskSchedule extends Command
     {
         $endTime = now();
         $nextRun = now()->addSeconds((int) $schedule->schedule_time->interval);
-        
+
         $schedule->update([
             'next_run' => $nextRun,
             'last_run' => $endTime,

@@ -67,4 +67,17 @@ class CheckoutController extends Controller
 
         return view('shop.confirmation', compact('order'));
     }
+
+    /**
+     * Download invoice as PDF.
+     */
+    public function invoice(string $orderNumber)
+    {
+        $order = Order::with('items')->where('order_number', $orderNumber)->firstOrFail();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('shop.invoice', compact('order'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download("invoice-{$order->order_number}.pdf");
+    }
 }

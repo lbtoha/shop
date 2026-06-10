@@ -157,9 +157,9 @@ return [
             'icon' => '/assets/client/apple.svg',
         ],
     ],
-    'admob'=>[
-        'androidAppId'=>'ca-app-pub-6030102340960445~2567958201',
-        'iosAppId'=>'ca-app-pub-6030102340960445~4848181773'
+    'admob' => [
+        'androidAppId' => 'ca-app-pub-6030102340960445~2567958201',
+        'iosAppId' => 'ca-app-pub-6030102340960445~4848181773',
     ],
     'mobile_app_key' => env('MOBILE_APP_KEY', '1234567890'),
 ];

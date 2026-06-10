@@ -1,109 +1,66 @@
 @extends('shop.layouts.app')
 
-@section('title', config('application_info.company_info.name') . ' — ' . __('Shop'))
+@section('title', config('application_info.company_info.name') . ' — ' . __('Premium Ethnic Wear'))
 
 @section('content')
-    <div class="shop-container">
-        {{-- Hero + side promos --}}
-        @php
-            $gradients = ['from-[#04535c] to-[#088178]', 'from-[#161c24] to-[#088178]', 'from-[#088178] to-[#5ed9ba]'];
-            $heroSlides = $banners->isNotEmpty()
-                ? $banners
-                : collect([
-                    (object) ['title' => __('Everyday Fresh & Best Deals'), 'subtitle' => __('Shop the new collection — pay on delivery'), 'image' => null, 'button_text' => __('Shop Now'), 'link' => route('shop.index')],
-                    (object) ['title' => __('Up to 50% Off'), 'subtitle' => __('Hand-picked styles for limited time'), 'image' => null, 'button_text' => __('Grab Deals'), 'link' => route('shop.index')],
-                    (object) ['title' => __('Cash on Delivery'), 'subtitle' => __('Order now, pay when it arrives'), 'image' => null, 'button_text' => __('Start Shopping'), 'link' => route('shop.index')],
-                ]);
-        @endphp
-        <section class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {{-- Hero carousel --}}
-            <div data-hero class="lg:col-span-2 relative rounded-3xl overflow-hidden">
-                @foreach ($heroSlides as $i => $slide)
-                    <div data-slide class="{{ $i === 0 ? '' : 'hidden' }}">
-                        <div class="relative h-[320px] sm:h-[420px] lg:h-[480px] rounded-3xl overflow-hidden flex items-center px-6 sm:px-10 lg:px-14
-                            @if (! $slide->image) bg-gradient-to-r {{ $gradients[$i % count($gradients)] }} @endif">
-                            @if ($slide->image)
-                                <img src="{{ $slide->image }}" alt="{{ $slide->title }}" class="absolute inset-0 w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-r from-black/55 to-transparent"></div>
-                            @endif
-                            <div class="relative max-w-md">
-                                <div class="flex items-center gap-x-2">
-                                    @if ($i === 0)
-                                        <span class="px-2.5 py-0.5 text-[color:var(--color-ink)] text-xs font-semibold bg-[color:var(--color-success-light)] rounded-full">25% OFF</span>
-                                    @endif
-                                    <h6 class="text-white/80 text-sm font-medium">{{ __('Exclusive offer') }}</h6>
-                                </div>
-                                <h2 class="py-3 text-3xl sm:text-5xl font-extrabold text-white leading-tight">{{ $slide->title }}</h2>
-                                <p class="mb-6 text-white/90 sm:text-lg">{{ $slide->subtitle }}</p>
-                                <a href="{{ $slide->link ?: route('shop.index') }}"
-                                    class="group inline-flex items-center gap-3 bg-white text-[color:var(--color-brand-dark)] font-semibold rounded-full py-2 pl-5 pr-2 hover:bg-neutral-50 transition">
-                                    {{ $slide->button_text ?: __('Shop Now') }}
-                                    <span class="size-8 bg-[color:var(--color-brand)] text-white inline-flex items-center justify-center rounded-full rotate-[-40deg] group-hover:rotate-0 transition-transform duration-300">
-                                        <i class="ph ph-arrow-right"></i>
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Side promo cards --}}
-            <div class="hidden lg:flex flex-col gap-5">
-                <a href="{{ route('shop.index', ['sort' => 'newest']) }}" class="flex-1 rounded-3xl bg-[color:var(--color-brand-soft)] p-7 flex flex-col justify-center relative overflow-hidden group">
-                    <span class="text-xs font-semibold text-[color:var(--color-brand-dark)] uppercase tracking-wide">{{ __('New Arrivals') }}</span>
-                    <h3 class="mt-1 text-2xl font-bold text-[color:var(--color-ink)] max-w-[70%]">{{ __('Fresh styles, just in') }}</h3>
-                    <span class="mt-3 text-sm font-medium text-[color:var(--color-brand-dark)] group-hover:underline">{{ __('Shop now') }} →</span>
-                </a>
-                <a href="{{ route('shop.index') }}" class="flex-1 rounded-3xl bg-[color:var(--color-ink)] p-7 flex flex-col justify-center relative overflow-hidden group">
-                    <span class="text-xs font-semibold text-[color:var(--color-brand-light)] uppercase tracking-wide">{{ __('Cash on Delivery') }}</span>
-                    <h3 class="mt-1 text-2xl font-bold text-white max-w-[80%]">{{ __('Pay when it arrives') }}</h3>
-                    <span class="mt-3 text-sm font-medium text-[color:var(--color-brand-light)] group-hover:underline">{{ __('Browse all') }} →</span>
-                </a>
-            </div>
+    {{-- Full-Width Hero Slider --}}
+    @if ($banners->isNotEmpty())
+        <section class="w-full relative overflow-hidden h-[250px] sm:h-[420px] lg:h-[520px] bg-neutral-100" data-hero>
+            @foreach ($banners as $i => $banner)
+                <div data-slide class="{{ $i === 0 ? '' : 'hidden' }} absolute inset-0 w-full h-full">
+                    <a href="{{ $banner->link ?: route('shop.index') }}" class="block w-full h-full">
+                        <img src="{{ $banner->image }}" alt="{{ $banner->title }}" class="w-full h-full object-cover">
+                    </a>
+                </div>
+            @endforeach
         </section>
+    @endif
 
-        {{-- Feature strip --}}
-        <section class="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {{-- Main Container --}}
+    <div class="shop-container">
+        {{-- Info Strip / Feature List --}}
+        <section class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
             @php
                 $features = [
-                    ['icon' => 'ph-truck', 'title' => __('Cash on Delivery'), 'text' => __('Pay at your door')],
-                    ['icon' => 'ph-arrow-counter-clockwise', 'title' => __('Easy Returns'), 'text' => __('Hassle-free policy')],
-                    ['icon' => 'ph-shield-check', 'title' => __('Secure Checkout'), 'text' => __('Your data is safe')],
-                    ['icon' => 'ph-headset', 'title' => __('Support'), 'text' => __('We are here to help')],
+                    ['icon' => 'ph-truck', 'title' => __('Free Delivery'), 'text' => __('Orders above ৳5000')],
+                    ['icon' => 'ph-arrow-counter-clockwise', 'title' => __('Easy Returns'), 'text' => __('7 days exchange policy')],
+                    ['icon' => 'ph-hand-coins', 'title' => __('Cash on Delivery'), 'text' => __('Pay at your doorstep')],
+                    ['icon' => 'ph-shield-check', 'title' => __('Safe Shopping'), 'text' => __('100% genuine products')],
                 ];
             @endphp
             @foreach ($features as $f)
-                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
-                    <i class="ph {{ $f['icon'] }} text-2xl sm:text-3xl text-[color:var(--color-brand)] shrink-0"></i>
+                <div class="bg-white border border-neutral-100 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm transition hover:shadow-md">
+                    <div class="w-10 h-10 rounded-full bg-brand/5 flex items-center justify-center shrink-0">
+                        <i class="ph {{ $f['icon'] }} text-xl text-brand"></i>
+                    </div>
                     <div class="min-w-0">
-                        <div class="text-sm font-semibold text-[color:var(--color-ink)] truncate">{{ $f['title'] }}</div>
-                        <div class="text-xs text-[color:var(--color-muted)] truncate">{{ $f['text'] }}</div>
+                        <div class="text-xs sm:text-sm font-bold text-neutral-800 truncate">{{ $f['title'] }}</div>
+                        <div class="text-[10px] sm:text-xs text-neutral-400 font-medium mt-0.5 truncate">{{ $f['text'] }}</div>
                     </div>
                 </div>
             @endforeach
         </section>
 
-        {{-- Category showcase --}}
+        {{-- Shop By Category Section --}}
         @if ($categories->isNotEmpty())
-            <section class="mt-12">
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-xl sm:text-2xl font-bold text-[color:var(--color-ink)]">{{ __('Shop by Category') }}</h2>
-                    <a href="{{ route('shop.index') }}" class="text-sm font-medium text-[color:var(--color-brand)] hover:underline">{{ __('View All') }} <i class="ph ph-arrow-right"></i></a>
+            <section class="mt-16">
+                <div class="relative mb-8 border-b border-neutral-100 pb-3">
+                    <h2 class="text-xl sm:text-2xl font-black text-neutral-900 tracking-wider uppercase inline-block relative">
+                        {{ __('SHOP BY CATEGORY') }}
+                        <span class="absolute bottom-[-13px] left-0 w-16 h-0.5 bg-brand"></span>
+                    </h2>
                 </div>
-                <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach ($categories as $category)
                         <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
-                            class="group bg-white border border-[color:var(--color-line)] rounded-2xl p-5 flex flex-col items-center gap-3 hover:border-[color:var(--color-brand)] hover:shadow-sm transition">
-                            <div class="w-16 h-16 rounded-full overflow-hidden bg-[color:var(--color-brand-soft)] flex items-center justify-center">
-                                @if ($category->image)
-                                    <img src="{{ $category->image }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
-                                @else
-                                    <i class="ph ph-package text-2xl text-[color:var(--color-brand)]"></i>
-                                @endif
+                            class="group relative h-[180px] sm:h-[220px] rounded-3xl overflow-hidden shadow-sm block">
+                            <img src="{{ $category->image }}" alt="{{ $category->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                            <div class="absolute bottom-6 left-6">
+                                <h3 class="text-white text-lg sm:text-xl font-black tracking-wider uppercase">
+                                    {{ __($category->name) }}
+                                </h3>
                             </div>
-                            <span class="text-xs text-center font-medium text-[color:var(--color-ink)] group-hover:text-[color:var(--color-brand)] line-clamp-1">{{ $category->name }}</span>
-                            <span class="text-[11px] text-[color:var(--color-muted)]">{{ $category->products_count }} {{ __('items') }}</span>
                         </a>
                     @endforeach
                 </div>
@@ -111,26 +68,105 @@
         @endif
     </div>
 
-    @include('shop.partials.product-section', ['title' => __('New Collection'), 'subtitle' => __('Fresh picks added recently'), 'products' => $newCollection, 'viewAll' => route('shop.index', ['sort' => 'newest'])])
+    {{-- New Arrivals Product Section --}}
+    @include('shop.partials.product-section', [
+        'title' => __('New Arrivals'),
+        'products' => $newCollection,
+        'viewAll' => route('shop.index', ['sort' => 'newest'])
+    ])
 
+    {{-- Hot Sale Product Section --}}
     @if ($hotSale->isNotEmpty())
-        {{-- Promo banner between sections --}}
-        <div class="shop-container mt-12">
-            <div class="rounded-3xl bg-gradient-to-r from-[color:var(--color-ink)] to-[color:var(--color-brand-dark)] px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <span class="inline-block bg-[color:var(--color-accent)] text-white text-xs font-semibold px-2.5 py-1 rounded">🔥 {{ __('Limited time') }}</span>
-                    <h3 class="mt-3 text-2xl sm:text-3xl font-extrabold text-white">{{ __('Hot deals up to 50% off') }}</h3>
-                    <p class="mt-1 text-white/80">{{ __('Grab your favorites before they sell out') }}</p>
+        @include('shop.partials.product-section', [
+            'title' => __('Hot Sale'),
+            'products' => $hotSale,
+            'viewAll' => route('shop.index')
+        ])
+    @endif
+
+    {{-- Ladies Three Piece Section --}}
+    @if ($ladiesThreePiece->isNotEmpty())
+        @include('shop.partials.product-section', [
+            'title' => __('Ladies Three Piece'),
+            'products' => $ladiesThreePiece,
+            'viewAll' => route('shop.index', ['category' => 'ladies-three-piece'])
+        ])
+    @endif
+
+    {{-- Videos Section --}}
+    <section class="shop-container mt-16">
+        <div class="relative mb-8 border-b border-neutral-100 pb-3">
+            <h2 class="text-xl sm:text-2xl font-black text-neutral-900 tracking-wider uppercase inline-block relative">
+                {{ __('VIDEOS') }}
+                <span class="absolute bottom-[-13px] left-0 w-16 h-0.5 bg-brand"></span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            @php
+                $videoThumbs = [
+                    'https://images.unsplash.com/photo-1608748010899-18f300247112?w=400&q=80',
+                    'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=80',
+                    'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400&q=80',
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&q=80',
+                    'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=400&q=80',
+                ];
+            @endphp
+            @foreach ($videoThumbs as $thumb)
+                <div class="group relative rounded-2xl overflow-hidden aspect-[9/16] shadow-sm cursor-pointer bg-neutral-100">
+                    <img src="{{ $thumb }}" alt="Video" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black/30 flex items-center justify-center transition duration-300 group-hover:bg-black/40">
+                        <div class="w-12 h-12 rounded-full bg-white/90 text-neutral-900 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-md">
+                            <i class="ph ph-play text-xl fill-current"></i>
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ route('shop.index') }}" class="bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-light)] text-white font-semibold px-6 py-3 rounded-full whitespace-nowrap">{{ __('Shop Deals') }}</a>
+            @endforeach
+        </div>
+    </section>
+
+    {{-- Showrooms Section --}}
+    <section class="mt-16 mb-12 shop-container">
+        <div class="text-center mb-8">
+            <h2 class="text-xs font-bold text-neutral-400 tracking-[0.2em] uppercase">{{ __('VISIT US IN PERSON') }}</h2>
+            <h3 class="text-2xl sm:text-3xl font-black text-neutral-900 mt-2 uppercase tracking-wide">{{ __('FIND OUR SHOWROOMS') }}</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {{-- Store 1 --}}
+            <div class="bg-white border border-neutral-100 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-2 text-brand mb-4">
+                        <i class="ph ph-map-pin text-2xl font-bold"></i>
+                        <h4 class="font-extrabold text-neutral-900 text-lg uppercase tracking-wide">{{ __('Uttara 10 Flagship Store') }}</h4>
+                    </div>
+                    <p class="text-neutral-500 text-sm leading-relaxed mb-6">
+                        {{ __('House #23, Road #12, Sector 10, Uttara, Dhaka-1230, Bangladesh.') }}<br>
+                        {{ __('Phone: +880 1711223344') }}
+                    </p>
+                </div>
+                <a href="https://maps.google.com" target="_blank"
+                    class="inline-flex items-center gap-2 border-2 border-neutral-200 hover:border-brand hover:text-brand text-neutral-800 font-bold px-5 py-2.5 rounded-xl transition text-xs tracking-wider uppercase">
+                    <i class="ph ph-compass"></i>
+                    <span>{{ __('VIEW ON MAP') }}</span>
+                </a>
+            </div>
+            {{-- Store 2 --}}
+            <div class="bg-white border border-neutral-100 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-2 text-brand mb-4">
+                        <i class="ph ph-map-pin text-2xl font-bold"></i>
+                        <h4 class="font-extrabold text-neutral-900 text-lg uppercase tracking-wide">{{ __('Uttara 13 Outlet') }}</h4>
+                    </div>
+                    <p class="text-neutral-500 text-sm leading-relaxed mb-6">
+                        {{ __('Flat #4A, House #45, Sector 13, Sonargaon Janapath Road, Uttara, Dhaka-1230, Bangladesh.') }}<br>
+                        {{ __('Phone: +880 1711223355') }}
+                    </p>
+                </div>
+                <a href="https://maps.google.com" target="_blank"
+                    class="inline-flex items-center gap-2 border-2 border-neutral-200 hover:border-brand hover:text-brand text-neutral-800 font-bold px-5 py-2.5 rounded-xl transition text-xs tracking-wider uppercase">
+                    <i class="ph ph-compass"></i>
+                    <span>{{ __('VIEW ON MAP') }}</span>
+                </a>
             </div>
         </div>
-        @include('shop.partials.product-section', ['title' => __('Hot Sale'), 'subtitle' => __('Discounted right now'), 'products' => $hotSale, 'viewAll' => route('shop.index')])
-    @endif
-
-    @if ($featured->isNotEmpty())
-        @include('shop.partials.product-section', ['title' => __('Featured Products'), 'subtitle' => __('Our top recommendations'), 'products' => $featured, 'viewAll' => route('shop.index')])
-    @endif
-
-    <div class="h-4"></div>
+    </section>
 @endsection

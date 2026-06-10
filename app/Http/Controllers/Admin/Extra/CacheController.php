@@ -41,6 +41,7 @@ class CacheController extends Controller
             $response = Http::post(config('application_info.frontend_url').'/optimize');
             if ($response->failed()) {
                 $response = json_decode($response->body());
+
                 return redirect()->back()->withError($response?->message ?? 'Failed to clear frontend cache');
             }
         } catch (\Exception $exception) {

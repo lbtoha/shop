@@ -37,6 +37,7 @@ Route::prefix('checkout')->as('shop.checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('confirmation/{orderNumber}', [CheckoutController::class, 'confirmation'])->name('confirmation');
+    Route::get('confirmation/{orderNumber}/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
 });
 
 /**

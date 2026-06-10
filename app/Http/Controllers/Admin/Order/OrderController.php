@@ -70,10 +70,18 @@ class OrderController extends Controller
             ],
             [
                 'label' => __('Payment'),
+                'key' => 'payment_status',
                 'render' => function ($order) {
                     $status = $order->payment_status;
                     if ($status instanceof OrderPaymentStatusEnum) {
-                        return '<span class="status '.$status->color().' capitalize">'.__($status->label()).'</span>';
+                        $html = '<select class="inline-order-payment-select status '.$status->color().' border-0 rounded cursor-pointer capitalize font-semibold pr-7 text-xs focus:ring-0 focus:outline-none" data-action="'.route('admin.orders.update-status', $order->id).'">';
+                        foreach (OrderPaymentStatusEnum::cases() as $case) {
+                            $selected = $order->payment_status->value === $case->value ? ' selected' : '';
+                            $html .= '<option value="'.$case->value.'"'.$selected.' class="text-neutral-900 bg-white">'.__($case->label()).'</option>';
+                        }
+                        $html .= '</select>';
+
+                        return $html;
                     }
 
                     return '<span class="status text-gray-400 capitalize">'.__('Unknown').'</span>';
@@ -85,7 +93,14 @@ class OrderController extends Controller
                 'render' => function ($order) {
                     $status = $order->status;
                     if ($status instanceof OrderStatusEnum) {
-                        return '<span class="status '.$status->color().' capitalize">'.__($status->label()).'</span>';
+                        $html = '<select class="inline-order-status-select status '.$status->color().' border-0 rounded cursor-pointer capitalize font-semibold pr-7 text-xs focus:ring-0 focus:outline-none" data-action="'.route('admin.orders.update-status', $order->id).'">';
+                        foreach (OrderStatusEnum::cases() as $case) {
+                            $selected = $order->status->value === $case->value ? ' selected' : '';
+                            $html .= '<option value="'.$case->value.'"'.$selected.' class="text-neutral-900 bg-white">'.__($case->label()).'</option>';
+                        }
+                        $html .= '</select>';
+
+                        return $html;
                     }
 
                     return '<span class="status text-gray-400 capitalize">'.__('Unknown').'</span>';
@@ -157,11 +172,11 @@ class OrderController extends Controller
         protectOnDemo($order);
 
         $validated = $request->validate([
-            'status' => ['required', 'in:'.implode(',', OrderStatusEnum::values())],
-            'payment_status' => ['required', 'in:'.implode(',', OrderPaymentStatusEnum::values())],
+            'status' => ['sometimes', 'required', 'in:'.implode(',', OrderStatusEnum::values())],
+            'payment_status' => ['sometimes', 'required', 'in:'.implode(',', OrderPaymentStatusEnum::values())],
         ]);
 
-        $statusChanged = $order->status->value !== $validated['status'];
+        $statusChanged = $request->has('status') && $order->status->value !== $validated['status'];
 
         try {
             DB::beginTransaction();

@@ -79,8 +79,8 @@ class ProductController extends Controller
                 'label' => __('Active'),
                 'render' => function ($product) {
                     return $product->is_active
-                        ? '<span class="status bg-green-100 text-green-600">'.__('Active').'</span>'
-                        : '<span class="status bg-gray-100 text-gray-500">'.__('Inactive').'</span>';
+                        ? '<button type="button" class="action-confirm-btn status bg-green-100 text-green-600 hover:opacity-80 transition-opacity" action="'.route('admin.products.toggle-status', $product->id).'" method="POST" title="'.__('Toggle Status?').'" text="'.__('Change status of :name to Inactive?', ['name' => $product->name]).'">'.__('Active').'</button>'
+                        : '<button type="button" class="action-confirm-btn status bg-gray-100 text-gray-500 hover:opacity-80 transition-opacity" action="'.route('admin.products.toggle-status', $product->id).'" method="POST" title="'.__('Toggle Status?').'" text="'.__('Change status of :name to Active?', ['name' => $product->name]).'">'.__('Inactive').'</button>';
                 },
             ],
             [
@@ -101,6 +101,15 @@ class ProductController extends Controller
                             'icon' => 'ph ph-pencil',
                             'type' => 'link',
                             'href' => route('admin.products.edit', $product->id),
+                        ],
+                        [
+                            'label' => $product->is_active ? __('Deactivate') : __('Activate'),
+                            'icon' => $product->is_active ? 'ph ph-toggle-left' : 'ph ph-toggle-right',
+                            'type' => 'action-confirm',
+                            'href' => route('admin.products.toggle-status', $product->id),
+                            'method' => 'POST',
+                            'title' => __('Toggle Product Status?'),
+                            'text' => __('Change status of :name to :status?', ['name' => $product->name, 'status' => $product->is_active ? __('Inactive') : __('Active')]),
                         ],
                         [
                             'label' => __('Delete'),
@@ -231,5 +240,22 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(['message' => __('Product deleted successfully'), 'reload' => true]);
+    }
+
+    /**
+     * Toggle the active status of the product.
+     */
+    public function toggleStatus(Product $product)
+    {
+        adminUserHasPermission(permission: 'edit');
+
+        $product->update([
+            'is_active' => ! $product->is_active,
+        ]);
+
+        return response()->json([
+            'message' => __('Product status updated successfully'),
+            'reload' => true,
+        ]);
     }
 }

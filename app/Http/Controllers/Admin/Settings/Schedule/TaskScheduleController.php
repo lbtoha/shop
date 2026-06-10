@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schedule;
 
 class TaskScheduleController extends Controller
 {

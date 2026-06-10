@@ -23,7 +23,6 @@ trait NotificationHelper
             && ! empty($notifiable->routeNotificationFor($channel));
     }
 
-
     private function getModelOrRoute(object $notifiable, string $channel)
     {
         $channels = [
