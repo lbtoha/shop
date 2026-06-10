@@ -1,8 +1,5 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(echo \"about exit=$?\")",
-      "WebFetch(domain:sellzy-preview.netlify.app)"
-    ]
-  }
+    "permissions": {
+        "allow": ["Bash", "Bash(echo \"about exit=$?\")", "WebFetch(domain:sellzy-preview.netlify.app)"]
+    }
 }

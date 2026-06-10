@@ -39,4 +39,32 @@ enum OrderStatusEnum: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    /**
+     * The fulfilment pipeline (cancelled is a terminal off-ramp, not part of it).
+     */
+    public static function pipeline(): array
+    {
+        return [self::PENDING, self::CONFIRMED, self::PROCESSING, self::SHIPPED, self::DELIVERED];
+    }
+
+    /**
+     * The next status in the fulfilment pipeline, or null if at the end / cancelled.
+     */
+    public function next(): ?self
+    {
+        $pipeline = self::pipeline();
+        $index = array_search($this, $pipeline, true);
+
+        if ($index === false || $index === count($pipeline) - 1) {
+            return null;
+        }
+
+        return $pipeline[$index + 1];
+    }
+
+    public function isTerminal(): bool
+    {
+        return $this === self::DELIVERED || $this === self::CANCELLED;
+    }
 }

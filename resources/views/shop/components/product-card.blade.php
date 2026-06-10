@@ -50,14 +50,22 @@
         </div>
     </div>
 
-    {{-- Full width Add to Cart Button --}}
+    {{-- Full width Add to Cart / Choose Options Button --}}
     <div class="mt-2">
         @if ($product->isInStock())
-            <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2.5 px-3 rounded-lg transition duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-sm">
-                <i class="ph ph-shopping-cart-simple text-sm"></i>
-                <span>{{ __('ADD TO CART') }}</span>
-            </button>
+            @if ($product->hasVariants())
+                <a href="{{ route('shop.product', $product->slug) }}"
+                    class="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-2.5 px-3 rounded-lg transition duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="ph ph-sliders-horizontal text-sm"></i>
+                    <span>{{ __('CHOOSE OPTIONS') }}</span>
+                </a>
+            @else
+                <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
+                    class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2.5 px-3 rounded-lg transition duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="ph ph-shopping-cart-simple text-sm"></i>
+                    <span>{{ __('ADD TO CART') }}</span>
+                </button>
+            @endif
         @else
             <button type="button" disabled
                 class="w-full bg-neutral-100 text-neutral-400 font-bold py-2.5 px-3 rounded-lg text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 cursor-not-allowed">

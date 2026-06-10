@@ -27,6 +27,13 @@ class ProductController extends Controller
             ],
         ];
 
+        $stats = [
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->count(),
+            'low' => Product::whereBetween('stock', [1, 5])->count(),
+            'out' => Product::where('stock', 0)->count(),
+        ];
+
         $products = ModalIndexQuey::get(Product::query(), ['category']);
 
         $columns = [
@@ -124,7 +131,7 @@ class ProductController extends Controller
             ],
         ];
 
-        return view('admin.pages.products.index', compact('buttons', 'products', 'columns'));
+        return view('admin.pages.products.index', compact('buttons', 'products', 'columns', 'stats'));
     }
 
     /**
@@ -157,9 +164,10 @@ class ProductController extends Controller
 
         $validated = $request->validated();
         $images = $validated['images'] ?? [];
-        unset($validated['images']);
+        $variants = $validated['variants'] ?? [];
+        unset($validated['images'], $validated['variants']);
 
-        DB::transaction(function () use ($validated, $images) {
+        DB::transaction(function () use ($validated, $images, $variants) {
             $product = Product::create($validated);
 
             // Gallery: create a ProductImage row for each non-empty submitted path, keeping the order index as sort_order.
@@ -171,6 +179,8 @@ class ProductController extends Controller
                     ]);
                 }
             }
+
+            $this->syncVariants($product, $variants);
         });
 
         return response()->json(['message' => __('Product created successfully'), 'redirect' => route('admin.products.index')]);
@@ -192,7 +202,7 @@ class ProductController extends Controller
             ],
         ];
 
-        $product->load('images');
+        $product->load('images', 'variants');
         $categories = Category::active()->get();
 
         return view('admin.pages.products.edit', compact('buttons', 'product', 'categories'));
@@ -207,9 +217,10 @@ class ProductController extends Controller
 
         $validated = $request->validated();
         $images = $validated['images'] ?? [];
-        unset($validated['images']);
+        $variants = $validated['variants'] ?? [];
+        unset($validated['images'], $validated['variants']);
 
-        DB::transaction(function () use ($validated, $images, $product) {
+        DB::transaction(function () use ($validated, $images, $variants, $product) {
             $product->update($validated);
 
             // Sync gallery: simplest correct approach — delete all existing images and recreate
@@ -224,9 +235,50 @@ class ProductController extends Controller
                     ]);
                 }
             }
+
+            $this->syncVariants($product, $variants);
         });
 
         return response()->json(['message' => __('Product updated successfully'), 'redirect' => route('admin.products.index')]);
+    }
+
+    /**
+     * Replace a product's variants from the submitted rows. Rows with neither a
+     * color nor a size are skipped. Delete-and-recreate keeps it simple; existing
+     * order_items keep their snapshot (variant_id is null-on-delete).
+     *
+     * @param  array<int, array<string, mixed>>  $variants
+     */
+    private function syncVariants(Product $product, array $variants): void
+    {
+        $product->variants()->delete();
+
+        $sort = 0;
+        foreach ($variants as $row) {
+            $color = trim((string) ($row['color'] ?? ''));
+            $size = trim((string) ($row['size'] ?? ''));
+
+            if ($color === '' && $size === '') {
+                continue;
+            }
+
+            $attributes = [];
+            if ($color !== '') {
+                $attributes['Color'] = $color;
+            }
+            if ($size !== '') {
+                $attributes['Size'] = $size;
+            }
+
+            $product->variants()->create([
+                'name' => implode(' / ', array_values($attributes)),
+                'sku' => $row['sku'] ?? null,
+                'attributes' => $attributes,
+                'price_adjustment' => $row['price_adjustment'] ?? 0,
+                'stock' => $row['stock'] ?? 0,
+                'sort_order' => $sort++,
+            ]);
+        }
     }
 
     /**

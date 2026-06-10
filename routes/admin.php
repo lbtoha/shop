@@ -73,11 +73,15 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
         Route::post('products/{product}/toggle-status', [Admin\Product\ProductController::class, 'toggleStatus'])->name('products.toggle-status');
         Route::resource('products', Admin\Product\ProductController::class)->except(['show']);
         Route::resource('banners', Admin\Banner\BannerController::class)->except(['show']);
+        Route::resource('coupons', Admin\Coupon\CouponController::class)->except(['show']);
 
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
             Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');
+            Route::get('export', [Admin\Order\OrderController::class, 'export'])->name('export');
             Route::get('{order}', [Admin\Order\OrderController::class, 'show'])->name('show');
+            Route::get('{order}/invoice', [Admin\Order\OrderController::class, 'invoice'])->name('invoice');
             Route::put('{order}/status', [Admin\Order\OrderController::class, 'updateStatus'])->name('update-status');
+            Route::put('{order}/advance', [Admin\Order\OrderController::class, 'advanceStatus'])->name('advance');
             Route::delete('{order}', [Admin\Order\OrderController::class, 'destroy'])->name('destroy');
         });
         /** -------------------------- End E-COMMERCE -------------------------- */
@@ -131,6 +135,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 /** -------------------------- SHOP SETTINGS -------------------------- */
                 Route::resource('shop', Admin\Settings\ShopSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END SHOP SETTINGS -------------------------- */
+
+                /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
+                Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
+                /** -------------------------- END ORDER NOTIFICATIONS -------------------------- */
 
                 /** -------------------------- COOKIES POLICY -------------------------- */
                 Route::resource('gdpr-cookies', Admin\Settings\CookieController::class)->only(['index', 'store']);

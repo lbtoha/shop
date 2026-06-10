@@ -72,7 +72,7 @@
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($items as $line)
                             <div class="flex justify-between text-sm">
-                                <span class="text-[color:var(--color-muted)]">{{ $line['product']->name }} <span class="text-xs">× {{ $line['quantity'] }}</span></span>
+                                <span class="text-[color:var(--color-muted)]">{{ $line['product']->name }}@if ($line['variant'])<span class="text-[color:var(--color-brand)]"> · {{ $line['variant']->name }}</span>@endif <span class="text-xs">× {{ $line['quantity'] }}</span></span>
                                 <span class="font-medium shrink-0 ml-2">{{ amountWithSymbol($line['subtotal']) }}</span>
                             </div>
                         @endforeach
@@ -82,6 +82,12 @@
                         <span class="text-[color:var(--color-muted)]">{{ __('Subtotal') }}</span>
                         <span>{{ amountWithSymbol($subtotal) }}</span>
                     </div>
+                    @if ($couponDiscount > 0)
+                        <div class="flex justify-between text-sm mb-2 text-[color:var(--color-brand)]">
+                            <span>{{ __('Discount') }} <span class="text-xs">({{ $couponCode }})</span></span>
+                            <span class="font-medium">−{{ amountWithSymbol($couponDiscount) }}</span>
+                        </div>
+                    @endif
                     <div class="flex justify-between text-sm mb-2">
                         <span class="text-[color:var(--color-muted)]">{{ __('Shipping') }}</span>
                         <span>{{ $shippingCost > 0 ? amountWithSymbol($shippingCost) : __('Free') }}</span>
@@ -89,7 +95,7 @@
                     <div class="border-t border-neutral-100 my-3"></div>
                     <div class="flex justify-between font-bold text-ink text-lg">
                         <span>{{ __('Total') }}</span>
-                        <span>{{ amountWithSymbol($subtotal + $shippingCost) }}</span>
+                        <span>{{ amountWithSymbol(max(0, $subtotal - $couponDiscount) + $shippingCost) }}</span>
                     </div>
 
                     <button type="submit"

@@ -17,6 +17,7 @@ return [
                 'submenus' => [
                     ['title' => 'Products', 'link' => 'admin.products.index'],
                     ['title' => 'Categories', 'link' => 'admin.categories.index'],
+                    ['title' => 'Coupons', 'link' => 'admin.coupons.index'],
                     ['title' => 'Hero Banners', 'link' => 'admin.banners.index'],
                 ],
             ],
@@ -69,6 +70,12 @@ return [
                                 'link' => 'admin.settings.shop.index',
                                 'icon' => 'ph ph-storefront',
                                 'text' => 'Currency symbol and flat shipping cost for the shop.',
+                            ],
+                            [
+                                'title' => 'Order Notifications',
+                                'link' => 'admin.settings.order-notifications.index',
+                                'icon' => 'ph ph-bell-ringing',
+                                'text' => 'Email, SMS gateway and WhatsApp notifications for orders.',
                             ],
                             [
                                 'title' => 'System Configuration',

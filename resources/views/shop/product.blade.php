@@ -14,38 +14,60 @@
         $phone = '01935100013';
         $whatsappNumber = '01710733329';
         $shareUrl = urlencode(request()->fullUrl());
+
+        // Variant option groups (e.g. Color => [Red, Blue], Size => [S, M, L])
+        // and a JS-friendly map of "Color|Size" combos to id/price/stock.
+        $hasVariants = $product->variants->isNotEmpty();
+        $optionGroups = [];
+        $variantMap = [];
+        if ($hasVariants) {
+            foreach ($product->variants as $v) {
+                $attrs = $v->attributes ?? [];
+                foreach ($attrs as $key => $val) {
+                    $optionGroups[$key] = $optionGroups[$key] ?? [];
+                    if (! in_array($val, $optionGroups[$key], true)) {
+                        $optionGroups[$key][] = $val;
+                    }
+                }
+                $comboKey = implode('|', array_values($attrs));
+                $variantMap[$comboKey] = [
+                    'id' => $v->id,
+                    'price' => $v->price(),
+                    'price_label' => amountWithSymbol($v->price()),
+                    'stock' => (int) $v->stock,
+                    'name' => $v->name,
+                ];
+            }
+        }
     @endphp
 
     <div class="shop-container py-8">
         {{-- Breadcrumb --}}
-        <nav class="text-xs text-neutral-400 mb-6 flex items-center gap-1.5 font-medium">
-            <a href="{{ route('home') }}" class="hover:text-brand transition">{{ __('HOME') }}</a>
-            <i class="ph ph-caret-right text-[10px]"></i>
-            <a href="{{ route('shop.index') }}" class="hover:text-brand transition">{{ __('SHOP') }}</a>
-            <i class="ph ph-caret-right text-[10px]"></i>
-            @if ($product->category)
-                <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="hover:text-brand transition uppercase">{{ __($product->category->name) }}</a>
-                <i class="ph ph-caret-right text-[10px]"></i>
-            @endif
-            <span class="text-neutral-800 uppercase font-semibold truncate">{{ $product->name }}</span>
+        <nav class="text-xs text-neutral-400 mb-6 font-bold tracking-wider uppercase">
+            <a href="{{ route('home') }}" class="hover:text-brand transition">{{ __('Home') }}</a>
+            <span class="mx-2">/</span>
+            <a href="{{ route('shop.index') }}" class="hover:text-brand transition">{{ __('Shop') }}</a>
+            <span class="mx-2">/</span>
+            <span class="text-neutral-800">{{ $product->name }}</span>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            {{-- Gallery: vertical thumbnails + main image --}}
-            <div class="lg:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
+        {{-- Product Details Layout --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {{-- Image Gallery Column --}}
+            <div class="lg:col-span-7 flex flex-col sm:flex-row gap-4">
                 {{-- Thumbnails --}}
                 @if ($gallery->count() > 1)
-                    <div class="flex sm:flex-col gap-3 shrink-0 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+                    <div class="flex sm:flex-col gap-3 order-2 sm:order-1 overflow-x-auto sm:overflow-visible shrink-0 py-1">
                         @foreach ($gallery as $img)
                             <button type="button" data-thumb="{{ $img }}"
-                                class="w-16 h-20 sm:w-20 sm:h-26 rounded-xl border-2 border-neutral-100 overflow-hidden hover:border-brand focus:border-brand focus:outline-none transition shrink-0 active-thumb">
-                                <img src="{{ $img }}" alt="Thumbnail" class="w-full h-full object-cover">
+                                class="w-16 h-20 rounded-xl border-2 border-neutral-100 overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
+                                <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg">
                             </button>
                         @endforeach
                     </div>
                 @endif
                 {{-- Primary Image --}}
-                <div class="flex-1 rounded-[2rem] overflow-hidden bg-neutral-50 aspect-[3/4] shadow-sm">
+                <div class="flex-1 rounded-[2rem] overflow-hidden bg-neutral-50 aspect-[3/4] shadow-sm order-1 sm:order-2">
                     @if ($mainImage)
                         <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                     @else
@@ -62,63 +84,93 @@
 
                 {{-- Price Row --}}
                 <div class="mt-4 flex items-baseline gap-3">
-                    <span class="text-2xl sm:text-3xl font-black text-brand">{{ amountWithSymbol($product->price) }}</span>
+                    <span id="product-price" class="text-2xl sm:text-3xl font-black text-brand">{{ amountWithSymbol($product->displayPrice()) }}</span>
                     @if ($hasDiscount)
                         <span class="text-base text-neutral-400 line-through font-semibold">{{ amountWithSymbol($product->compare_at_price) }}</span>
                     @endif
                 </div>
 
-                {{-- Color Selector --}}
-                <div class="mt-6 border-t border-neutral-100 pt-5">
-                    <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                        {{ __('COLOR') }}: <span class="text-neutral-800 font-extrabold ml-1">{{ $product->name === 'Fuchsia Azure Delight' ? 'PINK & BLUE' : 'MULTICOLOR' }}</span>
-                    </div>
-                    @if ($mainImage)
-                        <div class="mt-2.5">
-                            <button type="button" class="w-12 h-16 rounded-xl border-2 border-brand overflow-hidden focus:outline-none p-0.5">
-                                <img src="{{ $mainImage }}" alt="Color template" class="w-full h-full object-cover rounded-lg">
-                            </button>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Size Selector --}}
-                <div class="mt-6 border-t border-neutral-100 pt-5">
-                    <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
-                        {{ __('SIZE') }}
-                    </div>
-                    <div class="flex items-center gap-3">
-                        @foreach (['40', '42', '44'] as $size)
-                            <button type="button" data-size-btn="{{ $size }}"
-                                class="w-12 h-12 rounded-xl border-2 border-neutral-200 text-sm font-black text-neutral-700 flex items-center justify-center hover:border-brand transition focus:outline-none {{ $loop->first ? 'border-brand bg-brand text-white' : '' }}">
-                                {{ $size }}
-                            </button>
+                {{-- Variant Option Pickers --}}
+                @if ($hasVariants)
+                    <div id="variant-picker" class="mt-6 border-t border-neutral-100 pt-5 space-y-5"
+                        data-variant-map='@json($variantMap)' data-option-groups='@json($optionGroups)'>
+                        @foreach ($optionGroups as $groupName => $values)
+                            <div class="flex flex-col gap-2">
+                                <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                                    {{ __($groupName) }}
+                                </div>
+                                <div class="flex items-center gap-3 flex-wrap" data-option-group="{{ $groupName }}">
+                                    @foreach ($values as $val)
+                                        <button type="button" data-option-value="{{ $val }}"
+                                            class="px-4 h-12 rounded-xl border-2 border-neutral-200 text-sm font-black text-neutral-700 flex items-center justify-center hover:border-brand transition focus:outline-none">
+                                            {{ $val }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
-                    <input type="hidden" name="size" id="selected-size" value="40">
+                @else
+                    {{-- Color Selector (for simple product without database variants) --}}
+                    <div class="mt-6 border-t border-neutral-100 pt-5">
+                        <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                            {{ __('COLOR') }}: <span class="text-neutral-800 font-extrabold ml-1">{{ $product->name === 'Fuchsia Azure Delight' ? 'PINK & BLUE' : 'MULTICOLOR' }}</span>
+                        </div>
+                        @if ($mainImage)
+                            <div class="mt-2.5">
+                                <button type="button" class="w-12 h-16 rounded-xl border-2 border-brand overflow-hidden focus:outline-none p-0.5">
+                                    <img src="{{ $mainImage }}" alt="Color template" class="w-full h-full object-cover rounded-lg">
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Stock Status Display --}}
+                <div class="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
+                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{ __('AVAILABILITY') }}</span>
+                    <span id="variant-status">
+                        @if ($hasVariants)
+                            <span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-500">{{ __('Select options') }}</span>
+                        @elseif ($product->isInStock())
+                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                {{ __('In Stock') }} ({{ $product->effectiveStock() }})
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                {{ __('Out of Stock') }}
+                            </span>
+                        @endif
+                    </span>
                 </div>
 
                 {{-- Add to Cart / Order Now actions --}}
                 @if ($product->isInStock())
                     <div class="mt-8 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-stretch gap-4">
+                        <input type="hidden" id="selected-variant-id" name="variant_id" value="">
+
                         {{-- Quantity Stepper --}}
                         <div data-qty-wrap class="flex items-center justify-between border-2 border-neutral-100 rounded-xl px-2 shrink-0 bg-neutral-50/50">
                             <button type="button" data-step="-1" class="w-9 h-11 text-xl font-bold text-neutral-500 hover:text-brand transition">−</button>
-                            <input type="number" data-quantity-input value="1" min="1" max="{{ $product->stock }}"
+                            <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->effectiveStock() }}"
                                 class="w-10 text-center py-2 font-black text-neutral-800 focus:outline-none bg-transparent select-none">
                             <button type="button" data-step="1" class="w-9 h-11 text-xl font-bold text-neutral-500 hover:text-brand transition">+</button>
                         </div>
 
                         {{-- Add to Cart --}}
-                        <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                            class="flex-1 bg-brand hover:bg-brand-dark text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm">
+                        <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
+                            @if ($hasVariants) disabled @endif
+                            class="flex-1 bg-brand hover:bg-brand-dark text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="ph ph-shopping-cart-simple text-base"></i>
                             <span>{{ __('ADD TO CART') }}</span>
                         </button>
 
                         {{-- Order Now --}}
-                        <button type="button" data-order-now="{{ route('shop.cart.add', $product->id) }}"
-                            class="flex-1 bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm">
+                        <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
+                            @if ($hasVariants) disabled @endif
+                            class="flex-1 bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="ph ph-lightning text-base"></i>
                             <span>{{ __('ORDER NOW') }}</span>
                         </button>
@@ -246,64 +298,80 @@
 
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Thumbnail click -> swap main image
-                const thumbnails = document.querySelectorAll('[data-thumb]');
-                const mainImg = document.getElementById('main-product-image');
-
-                thumbnails.forEach(function (btn) {
-                    btn.addEventListener('click', function () {
-                        if (mainImg) {
-                            mainImg.src = btn.getAttribute('data-thumb');
-                        }
-                    });
-                });
-
-                // Size select buttons
-                const sizeBtns = document.querySelectorAll('[data-size-btn]');
-                const sizeInput = document.getElementById('selected-size');
-
-                sizeBtns.forEach(function (btn) {
-                    btn.addEventListener('click', function () {
-                        sizeBtns.forEach(b => b.classList.remove('border-brand', 'bg-brand', 'text-white'));
-                        btn.classList.add('border-brand', 'bg-brand', 'text-white');
-                        if (sizeInput) {
-                            sizeInput.value = btn.getAttribute('data-size-btn');
-                        }
-                    });
-                });
-
-                // Order Now quick purchase
-                const orderNowBtn = document.querySelector('[data-order-now]');
-                if (orderNowBtn) {
-                    orderNowBtn.addEventListener('click', async function (e) {
-                        e.preventDefault();
-                        const url = orderNowBtn.getAttribute('data-order-now');
-                        const qtyInput = document.querySelector('[data-quantity-input]');
-                        const quantity = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
-
-                        orderNowBtn.disabled = true;
-                        try {
-                            const res = await fetch(url, {
-                                method: 'POST',
-                                headers: jsonHeaders,
-                                body: JSON.stringify({ quantity })
-                            });
-                            const data = await res.json();
-                            if (res.ok && data.success) {
-                                // Redirect directly to checkout
-                                window.location.href = "{{ route('shop.checkout.index') }}";
-                            } else {
-                                showToast(data.message || "Could not proceed to order.", "error");
-                            }
-                        } catch (err) {
-                            showToast("Something went wrong.", "error");
-                        } finally {
-                            orderNowBtn.disabled = false;
-                        }
-                    });
+            // Thumbnail click -> swap main image
+            document.querySelectorAll('[data-thumb]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var main = document.getElementById('main-product-image');
+                    if (main) main.src = b.getAttribute('data-thumb');
                 });
             });
+
+            // Variant picker: selecting one value per option group resolves a variant.
+            (function () {
+                var picker = document.getElementById('variant-picker');
+                if (!picker) return;
+
+                var variantMap = JSON.parse(picker.getAttribute('data-variant-map') || '{}');
+                var optionGroups = JSON.parse(picker.getAttribute('data-option-groups') || '{}');
+                var groupNames = Object.keys(optionGroups);
+                var selected = {};
+
+                var priceEl = document.getElementById('product-price');
+                var statusEl = document.getElementById('variant-status');
+                var variantIdEl = document.getElementById('selected-variant-id');
+                var addBtn = document.getElementById('btn-add-to-cart');
+                var buyBtn = document.getElementById('btn-order-now');
+                var qtyInput = document.querySelector('[data-quantity-input]');
+
+                function setStatus(html) { if (statusEl) statusEl.innerHTML = html; }
+
+                function resolve() {
+                    // Need every group chosen before a combo exists.
+                    var allChosen = groupNames.every(function (g) { return selected[g]; });
+                    if (!allChosen) {
+                        if (addBtn) addBtn.disabled = true;
+                        if (buyBtn) buyBtn.disabled = true;
+                        if (variantIdEl) variantIdEl.value = '';
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-500">{{ __('Select options') }}</span>');
+                        return;
+                    }
+                    var key = groupNames.map(function (g) { return selected[g]; }).join('|');
+                    var v = variantMap[key];
+                    if (!v) {
+                        if (addBtn) addBtn.disabled = true;
+                        if (buyBtn) buyBtn.disabled = true;
+                        if (variantIdEl) variantIdEl.value = '';
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span>{{ __('Unavailable combination') }}</span>');
+                        return;
+                    }
+                    if (priceEl) priceEl.textContent = v.price_label;
+                    if (variantIdEl) variantIdEl.value = v.id;
+                    if (qtyInput) qtyInput.max = Math.max(1, v.stock);
+                    if (v.stock > 0) {
+                        if (addBtn) addBtn.disabled = false;
+                        if (buyBtn) buyBtn.disabled = false;
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>{{ __('In stock') }} (' + v.stock + ')</span>');
+                    } else {
+                        if (addBtn) addBtn.disabled = true;
+                        if (buyBtn) buyBtn.disabled = true;
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span>{{ __('Out of stock') }}</span>');
+                    }
+                }
+
+                picker.querySelectorAll('[data-option-group]').forEach(function (group) {
+                    var name = group.getAttribute('data-option-group');
+                    group.querySelectorAll('[data-option-value]').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            selected[name] = btn.getAttribute('data-option-value');
+                            group.querySelectorAll('[data-option-value]').forEach(function (b) {
+                                b.classList.remove('border-brand', 'bg-brand', 'text-white');
+                            });
+                            btn.classList.add('border-brand', 'bg-brand', 'text-white');
+                            resolve();
+                        });
+                    });
+                });
+            })();
         </script>
     @endpush
 @endsection

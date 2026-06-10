@@ -70,6 +70,8 @@
                         @endfor
                     </div>
                 </div>
+
+                @include('admin.pages.products._variants')
             </div>
 
             <div class="flex items-center justify-end mt-4">

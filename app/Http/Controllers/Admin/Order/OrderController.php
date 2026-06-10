@@ -7,8 +7,10 @@ use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ModalIndexQuey;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OrderController extends Controller
 {
@@ -18,6 +20,23 @@ class OrderController extends Controller
     public function index()
     {
         adminUserHasPermission(permission: 'read');
+
+        // KPI summary cards
+        $stats = [
+            'total' => Order::count(),
+            'pending' => Order::where('status', OrderStatusEnum::PENDING->value)->count(),
+            'today' => Order::whereDate('created_at', today())->count(),
+            'revenue' => (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('total'),
+        ];
+
+        $buttons = [
+            [
+                'label' => __('Export CSV'),
+                'icon' => 'ph ph-download-simple',
+                'type' => 'link',
+                'link' => route('admin.orders.export', request()->only('status')),
+            ],
+        ];
 
         $tab_buttons = [
             [
@@ -127,6 +146,12 @@ class OrderController extends Controller
                             'href' => route('admin.orders.show', $order->id),
                         ],
                         [
+                            'label' => __('Invoice'),
+                            'icon' => 'ph ph-file-pdf',
+                            'type' => 'link',
+                            'href' => route('admin.orders.invoice', $order->id),
+                        ],
+                        [
                             'label' => __('Delete'),
                             'icon' => 'ph ph-trash',
                             'type' => 'delete',
@@ -139,7 +164,7 @@ class OrderController extends Controller
             ],
         ];
 
-        return view('admin.pages.orders.index', compact('tab_buttons', 'orders', 'columns'));
+        return view('admin.pages.orders.index', compact('tab_buttons', 'orders', 'columns', 'stats', 'buttons'));
     }
 
     /**
@@ -198,6 +223,81 @@ class OrderController extends Controller
             'message' => __('Order updated'),
             'redirect' => route('admin.orders.show', $order->id),
         ]);
+    }
+
+    /**
+     * Advance the order to the next status in the fulfilment pipeline (one click).
+     */
+    public function advanceStatus(Order $order)
+    {
+        adminUserHasPermission(permission: 'edit');
+        protectOnDemo($order);
+
+        $next = $order->status->next();
+
+        if (! $next) {
+            return response()->json(['message' => __('Order is already at the final status.')], 422);
+        }
+
+        $order->update(['status' => $next->value]);
+
+        \App\Services\Ecommerce\OrderNotifier::statusUpdated($order->fresh());
+
+        return response()->json([
+            'message' => __('Order moved to :status', ['status' => __($next->label())]),
+            'redirect' => route('admin.orders.show', $order->id),
+        ]);
+    }
+
+    /**
+     * Download a PDF invoice for the order.
+     */
+    public function invoice(Order $order)
+    {
+        adminUserHasPermission(permission: 'read');
+
+        $order->load('items');
+
+        $pdf = Pdf::loadView('admin.pages.orders.invoice', compact('order'));
+
+        return $pdf->download('invoice-'.$order->order_number.'.pdf');
+    }
+
+    /**
+     * Export the (filtered) order list as CSV.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        adminUserHasPermission(permission: 'read');
+
+        $orders = Order::query()
+            ->withCount('items')
+            ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
+            ->latest()
+            ->get();
+
+        $filename = 'orders-'.now()->format('Y-m-d').'.csv';
+
+        return response()->streamDownload(function () use ($orders) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['Order #', 'Customer', 'Phone', 'Email', 'Items', 'Subtotal', 'Shipping', 'Total', 'Payment', 'Status', 'Placed']);
+            foreach ($orders as $order) {
+                fputcsv($out, [
+                    $order->order_number,
+                    $order->customer_name,
+                    $order->customer_phone,
+                    $order->customer_email,
+                    $order->items_count,
+                    $order->subtotal,
+                    $order->shipping_cost,
+                    $order->total,
+                    $order->payment_status?->label(),
+                    $order->status?->label(),
+                    $order->created_at->format('Y-m-d H:i'),
+                ]);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv']);
     }
 
     /**

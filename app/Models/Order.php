@@ -17,6 +17,7 @@ class Order extends Model
         'status' => OrderStatusEnum::class,
         'payment_status' => OrderPaymentStatusEnum::class,
         'subtotal' => 'decimal:2',
+        'discount' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
     ];
@@ -49,6 +50,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     public function items(): HasMany

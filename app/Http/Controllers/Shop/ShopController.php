@@ -22,7 +22,7 @@ class ShopController extends Controller
 
         $activeCategory = null;
 
-        $query = Product::active()->with('category');
+        $query = Product::active()->with('category')->withCount('variants');
 
         if ($request->filled('category')) {
             $activeCategory = Category::active()->where('slug', $request->category)->first();
@@ -53,14 +53,14 @@ class ShopController extends Controller
     public function show(string $slug)
     {
         $product = Product::active()
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'variants'])
             ->where('slug', $slug)
             ->firstOrFail();
 
         $product->increment('views');
 
         $related = Product::active()->inStock()
-            ->with('category')
+            ->with('category')->withCount('variants')
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->latest()
@@ -69,7 +69,7 @@ class ShopController extends Controller
 
         // "You may also like" — popular products outside this category
         $recommended = Product::active()->inStock()
-            ->with('category')
+            ->with('category')->withCount('variants')
             ->where('id', '!=', $product->id)
             ->whereNotIn('id', $related->pluck('id'))
             ->orderByDesc('views')
