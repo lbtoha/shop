@@ -75,8 +75,11 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
 
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
             Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');
+            Route::get('export', [Admin\Order\OrderController::class, 'export'])->name('export');
             Route::get('{order}', [Admin\Order\OrderController::class, 'show'])->name('show');
+            Route::get('{order}/invoice', [Admin\Order\OrderController::class, 'invoice'])->name('invoice');
             Route::put('{order}/status', [Admin\Order\OrderController::class, 'updateStatus'])->name('update-status');
+            Route::put('{order}/advance', [Admin\Order\OrderController::class, 'advanceStatus'])->name('advance');
             Route::delete('{order}', [Admin\Order\OrderController::class, 'destroy'])->name('destroy');
         });
         /** -------------------------- End E-COMMERCE -------------------------- */

@@ -27,6 +27,13 @@ class ProductController extends Controller
             ],
         ];
 
+        $stats = [
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->count(),
+            'low' => Product::whereBetween('stock', [1, 5])->count(),
+            'out' => Product::where('stock', 0)->count(),
+        ];
+
         $products = ModalIndexQuey::get(Product::query(), ['category']);
 
         $columns = [
@@ -115,7 +122,7 @@ class ProductController extends Controller
             ],
         ];
 
-        return view('admin.pages.products.index', compact('buttons', 'products', 'columns'));
+        return view('admin.pages.products.index', compact('buttons', 'products', 'columns', 'stats'));
     }
 
     /**

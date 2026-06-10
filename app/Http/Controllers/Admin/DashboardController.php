@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use App\Services\AdminDashboardOverview\UserLoginLogOverview;
 
@@ -13,6 +16,21 @@ class DashboardController extends Controller
         adminUserHasPermission(permission: 'read');
 
         $user_query = User::query();
+
+        // E-commerce widgets
+        $orderStats = [
+            'total' => Order::count(),
+            'pending' => Order::where('status', OrderStatusEnum::PENDING->value)->count(),
+            'revenue' => (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('total'),
+            'products' => Product::count(),
+        ];
+        $recentOrders = Order::latest()->take(8)->get();
+        $ordersByStatus = collect(OrderStatusEnum::cases())->map(fn ($c) => [
+            'label' => __($c->label()),
+            'color' => $c->color(),
+            'count' => Order::where('status', $c->value)->count(),
+        ]);
+        $lowStock = Product::where('stock', '<=', 5)->orderBy('stock')->take(6)->get();
 
         $state = [
             [
@@ -41,7 +59,7 @@ class DashboardController extends Controller
             ],
         ];
 
-        return view('admin.pages.dashboard', compact('state'));
+        return view('admin.pages.dashboard', compact('state', 'orderStats', 'recentOrders', 'ordersByStatus', 'lowStock'));
     }
 
     public function loginLogOverviewBYDay(UserLoginLogOverview $loginLogDaysOverview)
