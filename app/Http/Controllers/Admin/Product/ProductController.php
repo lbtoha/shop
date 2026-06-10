@@ -27,11 +27,19 @@ class ProductController extends Controller
             ],
         ];
 
+        // Stats: for variant-products, aggregate variant stock rather than product.stock
+        $simpleOutOfStock   = Product::withCount('variants')->having('variants_count', 0)->where('stock', 0)->count();
+        $variantOutOfStock  = Product::withCount('variants')->having('variants_count', '>', 0)
+            ->whereDoesntHave('variants', fn ($q) => $q->where('stock', '>', 0))->count();
+        $simpleLowStock     = Product::withCount('variants')->having('variants_count', 0)->whereBetween('stock', [1, 5])->count();
+        $variantLowStock    = Product::withCount('variants')->having('variants_count', '>', 0)
+            ->withSum('variants as vssum', 'stock')->having('vssum', '<=', 5)->having('vssum', '>', 0)->count();
+
         $stats = [
-            'total' => Product::count(),
+            'total'  => Product::count(),
             'active' => Product::where('is_active', true)->count(),
-            'low' => Product::whereBetween('stock', [1, 5])->count(),
-            'out' => Product::where('stock', 0)->count(),
+            'low'    => $simpleLowStock + $variantLowStock,
+            'out'    => $simpleOutOfStock + $variantOutOfStock,
         ];
 
         $products = ModalIndexQuey::get(Product::query(), ['category']);
@@ -243,20 +251,23 @@ class ProductController extends Controller
     }
 
     /**
-     * Replace a product's variants from the submitted rows. Rows with neither a
-     * color nor a size are skipped. Delete-and-recreate keeps it simple; existing
-     * order_items keep their snapshot (variant_id is null-on-delete).
+     * Sync product variants using upsert logic:
+     * - Rows matching an existing variant (by color+size combo) are updated in-place so
+     *   the variant ID is preserved — order_items.variant_id foreign keys remain valid.
+     * - New combinations are inserted fresh.
+     * - Variants whose combo is absent from the submitted payload are deleted.
      *
      * @param  array<int, array<string, mixed>>  $variants
      */
     private function syncVariants(Product $product, array $variants): void
     {
-        $product->variants()->delete();
-
+        $existing = $product->variants()->get()->keyBy(fn ($v) => $this->variantComboKey($v->attributes ?? []));
+        $submittedKeys = [];
         $sort = 0;
+
         foreach ($variants as $row) {
             $color = trim((string) ($row['color'] ?? ''));
-            $size = trim((string) ($row['size'] ?? ''));
+            $size  = trim((string) ($row['size'] ?? ''));
 
             if ($color === '' && $size === '') {
                 continue;
@@ -270,15 +281,48 @@ class ProductController extends Controller
                 $attributes['Size'] = $size;
             }
 
-            $product->variants()->create([
-                'name' => implode(' / ', array_values($attributes)),
-                'sku' => $row['sku'] ?? null,
-                'attributes' => $attributes,
-                'price_adjustment' => $row['price_adjustment'] ?? 0,
-                'stock' => $row['stock'] ?? 0,
-                'sort_order' => $sort++,
-            ]);
+            $key  = $this->variantComboKey($attributes);
+            $name = implode(' / ', array_values($attributes));
+            $submittedKeys[] = $key;
+
+            if ($existing->has($key)) {
+                // Update in-place — preserves the variant ID so order history stays intact.
+                $existing[$key]->update([
+                    'name'             => $name,
+                    'sku'              => $row['sku'] ?? null,
+                    'price_adjustment' => $row['price_adjustment'] ?? 0,
+                    'stock'            => $row['stock'] ?? 0,
+                    'sort_order'       => $sort,
+                ]);
+            } else {
+                $product->variants()->create([
+                    'name'             => $name,
+                    'sku'              => $row['sku'] ?? null,
+                    'attributes'       => $attributes,
+                    'price_adjustment' => $row['price_adjustment'] ?? 0,
+                    'stock'            => $row['stock'] ?? 0,
+                    'sort_order'       => $sort,
+                ]);
+            }
+
+            $sort++;
         }
+
+        // Delete variants that were removed from the form.
+        $existing->each(function ($variant, $key) use ($submittedKeys) {
+            if (! in_array($key, $submittedKeys, true)) {
+                $variant->delete();
+            }
+        });
+    }
+
+    /**
+     * Canonical string key for a variant attribute combo, e.g. "Color:Red|Size:L".
+     */
+    private function variantComboKey(array $attributes): string
+    {
+        ksort($attributes);
+        return implode('|', array_map(fn ($k, $v) => "{$k}:{$v}", array_keys($attributes), $attributes));
     }
 
     /**

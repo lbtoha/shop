@@ -57,15 +57,34 @@ class CheckoutController extends Controller
 
         OrderNotifier::orderPlaced($order);
 
+        // Store the just-placed order number in the session so the confirmation
+        // page can verify the viewer is the actual buyer (not a URL guesser).
+        session()->put('confirmed_order', $order->order_number);
+
         return redirect()->route('shop.checkout.confirmation', $order->order_number);
     }
 
     /**
      * Order confirmation / thank-you page.
+     *
+     * Only the session that placed the order can view the confirmation page.
+     * After first view the session key is cleared so it's a one-time pass.
      */
     public function confirmation(string $orderNumber)
     {
-        $order = Order::with('items')->where('order_number', $orderNumber)->firstOrFail();
+        $order = Order::with(['items.product', 'items.variant'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        // Security: ensure only the session that just placed this order can see it.
+        $confirmedInSession = session()->pull('confirmed_order');
+        if ($confirmedInSession !== $orderNumber) {
+            // Allow admins or the order's registered user to view it without the session key.
+            $isOwner = auth()->check() && auth()->id() === $order->user_id;
+            if (! $isOwner) {
+                abort(403, __('You do not have permission to view this order confirmation.'));
+            }
+        }
 
         return view('shop.confirmation', compact('order'));
     }
@@ -75,7 +94,9 @@ class CheckoutController extends Controller
      */
     public function invoice(string $orderNumber)
     {
-        $order = Order::with('items')->where('order_number', $orderNumber)->firstOrFail();
+        $order = Order::with(['items.product', 'items.variant'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('shop.invoice', compact('order'));
         $pdf->setPaper('a4', 'portrait');

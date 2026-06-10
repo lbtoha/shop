@@ -23,9 +23,9 @@ class OrderController extends Controller
 
         // KPI summary cards
         $stats = [
-            'total' => Order::count(),
+            'total'   => Order::count(),
             'pending' => Order::where('status', OrderStatusEnum::PENDING->value)->count(),
-            'today' => Order::whereDate('created_at', today())->count(),
+            'today'   => Order::whereDate('created_at', today())->count(),
             'revenue' => (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('total'),
         ];
 
@@ -174,14 +174,15 @@ class OrderController extends Controller
     {
         adminUserHasPermission(permission: 'read');
 
-        $order->load('items.product');
+        // Eager-load variant so the view can display the selected option (e.g. Size 42).
+        $order->load('items.product', 'items.variant');
 
         $buttons = [
             [
                 'label' => __('Back'),
-                'icon' => 'ph ph-arrow-left',
-                'type' => 'link',
-                'link' => route('admin.orders.index'),
+                'icon'  => 'ph ph-arrow-left',
+                'type'  => 'link',
+                'link'  => route('admin.orders.index'),
             ],
         ];
 
@@ -278,7 +279,7 @@ class OrderController extends Controller
     {
         adminUserHasPermission(permission: 'read');
 
-        $order->load('items');
+        $order->load(['items.product', 'items.variant']);
 
         $pdf = Pdf::loadView('admin.pages.orders.invoice', compact('order'));
 
@@ -354,6 +355,8 @@ class OrderController extends Controller
      */
     private function restockOrder(Order $order): void
     {
+        $order->loadMissing('items');
+
         foreach ($order->items as $item) {
             if ($item->variant_id) {
                 $variant = \App\Models\ProductVariant::find($item->variant_id);
@@ -370,7 +373,7 @@ class OrderController extends Controller
 
         if ($order->coupon_id) {
             $coupon = \App\Models\Coupon::find($order->coupon_id);
-            if ($coupon) {
+            if ($coupon && $coupon->used_count > 0) {
                 $coupon->decrement('used_count');
             }
         }
@@ -381,10 +384,12 @@ class OrderController extends Controller
      */
     private function deductOrder(Order $order): void
     {
+        $order->loadMissing('items');
+
         foreach ($order->items as $item) {
             if ($item->variant_id) {
                 $variant = \App\Models\ProductVariant::find($item->variant_id);
-                if (!$variant) {
+                if (! $variant) {
                     throw new \Exception(__('Product variant is no longer available.'));
                 }
                 if ($variant->stock < $item->quantity) {
@@ -393,7 +398,7 @@ class OrderController extends Controller
                 $variant->decrement('stock', $item->quantity);
             } else {
                 $product = \App\Models\Product::find($item->product_id);
-                if (!$product) {
+                if (! $product) {
                     throw new \Exception(__('Product is no longer available.'));
                 }
                 if ($product->stock < $item->quantity) {
