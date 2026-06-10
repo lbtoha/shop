@@ -26,8 +26,10 @@ class CheckoutController extends Controller
         $items = $this->cart->items();
         $subtotal = $this->cart->subtotal();
         $shippingCost = (float) getOption('shipping_cost', 0);
+        $couponCode = $this->cart->couponCode();
+        $couponDiscount = $this->cart->couponDiscount();
 
-        return view('shop.checkout', compact('items', 'subtotal', 'shippingCost'));
+        return view('shop.checkout', compact('items', 'subtotal', 'shippingCost', 'couponCode', 'couponDiscount'));
     }
 
     /**

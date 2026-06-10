@@ -98,6 +98,9 @@
             <td style="width:40%;">
                 <table class="totals">
                     <tr><td class="muted">Subtotal</td><td class="right">{{ amountWithSymbol($order->subtotal) }}</td></tr>
+                    @if ($order->discount > 0)
+                        <tr><td class="muted">Discount{{ $order->coupon_code ? ' ('.$order->coupon_code.')' : '' }}</td><td class="right">−{{ amountWithSymbol($order->discount) }}</td></tr>
+                    @endif
                     <tr><td class="muted">Shipping</td><td class="right">{{ amountWithSymbol($order->shipping_cost) }}</td></tr>
                     <tr class="grand"><td>Total</td><td class="right">{{ amountWithSymbol($order->total) }}</td></tr>
                 </table>

@@ -2,6 +2,7 @@
 
 namespace App\Services\Ecommerce;
 
+use App\Models\Coupon;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 
@@ -16,6 +17,8 @@ use Illuminate\Support\Collection;
 class Cart
 {
     private const SESSION_KEY = 'cart';
+
+    private const COUPON_KEY = 'cart_coupon';
 
     /**
      * Raw cart lines from the session: [product_id => quantity].
@@ -61,6 +64,7 @@ class Cart
     public function clear(): void
     {
         session()->forget(self::SESSION_KEY);
+        session()->forget(self::COUPON_KEY);
     }
 
     public function isEmpty(): bool
@@ -130,5 +134,70 @@ class Cart
     public function count(): int
     {
         return (int) $this->items()->sum('quantity');
+    }
+
+    /* ----------------------------- Coupons ----------------------------- */
+
+    /**
+     * Store the applied coupon code in the session.
+     */
+    public function applyCoupon(string $code): void
+    {
+        session()->put(self::COUPON_KEY, trim($code));
+    }
+
+    public function removeCoupon(): void
+    {
+        session()->forget(self::COUPON_KEY);
+    }
+
+    public function couponCode(): ?string
+    {
+        return session()->get(self::COUPON_KEY);
+    }
+
+    /**
+     * The applied coupon, only if it still resolves to a real coupon. Does not
+     * check redeemability against the current subtotal — use couponDiscount()
+     * for the effective discount.
+     */
+    public function coupon(): ?Coupon
+    {
+        $code = $this->couponCode();
+
+        return $code ? Coupon::findByCode($code) : null;
+    }
+
+    /**
+     * Effective coupon discount for the current cart subtotal. Returns 0 (and
+     * forgets a now-invalid coupon) when the coupon no longer applies.
+     */
+    public function couponDiscount(): float
+    {
+        $coupon = $this->coupon();
+
+        if (! $coupon) {
+            return 0;
+        }
+
+        $discount = $coupon->discountFor($this->subtotal());
+
+        if ($discount <= 0) {
+            // The coupon stopped being valid (expired, subtotal dropped, etc.) —
+            // drop it so stale codes don't linger in the session.
+            $this->removeCoupon();
+
+            return 0;
+        }
+
+        return $discount;
+    }
+
+    /**
+     * Order total after shipping and coupon discount.
+     */
+    public function total(float $shippingCost = 0): float
+    {
+        return max(0, $this->subtotal() - $this->couponDiscount()) + $shippingCost;
     }
 }

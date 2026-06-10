@@ -31,6 +31,8 @@ Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::delete('clear', [CartController::class, 'clear'])->name('clear');
     Route::get('count', [CartController::class, 'count'])->name('count');
     Route::get('fragment', [CartController::class, 'fragment'])->name('fragment');
+    Route::post('coupon', [CartController::class, 'applyCoupon'])->name('coupon.apply');
+    Route::delete('coupon', [CartController::class, 'removeCoupon'])->name('coupon.remove');
 });
 
 Route::prefix('checkout')->as('shop.checkout.')->group(function () {

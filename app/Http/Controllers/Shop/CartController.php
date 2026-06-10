@@ -18,8 +18,48 @@ class CartController extends Controller
     {
         $items = $this->cart->items();
         $subtotal = $this->cart->subtotal();
+        $couponCode = $this->cart->couponCode();
+        $couponDiscount = $this->cart->couponDiscount();
 
-        return view('shop.cart', compact('items', 'subtotal'));
+        return view('shop.cart', compact('items', 'subtotal', 'couponCode', 'couponDiscount'));
+    }
+
+    /**
+     * Apply a coupon code to the cart.
+     */
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|max:64',
+        ]);
+
+        if ($this->cart->isEmpty()) {
+            return back()->with('error', __('Your cart is empty.'));
+        }
+
+        $coupon = \App\Models\Coupon::findByCode($request->input('code'));
+        $reason = null;
+
+        if (! $coupon || ! $coupon->isRedeemable($this->cart->subtotal(), $reason)) {
+            return back()->with('error', $reason ?: __('Invalid coupon code.'));
+        }
+
+        $this->cart->applyCoupon($coupon->code);
+
+        return back()->with('success', __('Coupon ":code" applied — you saved :amount.', [
+            'code' => $coupon->code,
+            'amount' => amountWithSymbol($coupon->discountFor($this->cart->subtotal())),
+        ]));
+    }
+
+    /**
+     * Remove the applied coupon.
+     */
+    public function removeCoupon()
+    {
+        $this->cart->removeCoupon();
+
+        return back()->with('success', __('Coupon removed.'));
     }
 
     /**

@@ -17,6 +17,7 @@ return [
                 'submenus' => [
                     ['title' => 'Products', 'link' => 'admin.products.index'],
                     ['title' => 'Categories', 'link' => 'admin.categories.index'],
+                    ['title' => 'Coupons', 'link' => 'admin.coupons.index'],
                     ['title' => 'Hero Banners', 'link' => 'admin.banners.index'],
                 ],
             ],

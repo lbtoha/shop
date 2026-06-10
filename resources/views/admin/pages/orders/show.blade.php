@@ -91,6 +91,9 @@
                 <div class="mt-4 flex justify-end">
                     <div class="w-full max-w-xs space-y-2">
                         <div class="flex justify-between s-text"><span>{{ __('Subtotal') }}</span><span class="font-medium">{{ amountWithSymbol($order->subtotal) }}</span></div>
+                        @if ($order->discount > 0)
+                            <div class="flex justify-between s-text text-success"><span>{{ __('Discount') }} @if ($order->coupon_code)<span class="text-xs">({{ $order->coupon_code }})</span>@endif</span><span class="font-medium">−{{ amountWithSymbol($order->discount) }}</span></div>
+                        @endif
                         <div class="flex justify-between s-text"><span>{{ __('Shipping') }}</span><span class="font-medium">{{ amountWithSymbol($order->shipping_cost) }}</span></div>
                         <div class="flex justify-between m-text font-medium pt-2 border-t border-neutral-30 dark:border-neutral-500"><span>{{ __('Total') }}</span><span>{{ amountWithSymbol($order->total) }}</span></div>
                     </div>

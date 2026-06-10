@@ -72,6 +72,7 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
         Route::resource('categories', Admin\Category\CategoryController::class)->except(['show']);
         Route::resource('products', Admin\Product\ProductController::class)->except(['show']);
         Route::resource('banners', Admin\Banner\BannerController::class)->except(['show']);
+        Route::resource('coupons', Admin\Coupon\CouponController::class)->except(['show']);
 
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
             Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');

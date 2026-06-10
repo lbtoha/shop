@@ -54,6 +54,9 @@
 
             <div class="border-t border-neutral-100 mt-4 pt-4 space-y-1 text-sm">
                 <div class="flex justify-between"><span class="text-[color:var(--color-muted)]">{{ __('Subtotal') }}</span><span>{{ amountWithSymbol($order->subtotal) }}</span></div>
+                @if ($order->discount > 0)
+                    <div class="flex justify-between text-[color:var(--color-brand)]"><span>{{ __('Discount') }} @if ($order->coupon_code)<span class="text-xs">({{ $order->coupon_code }})</span>@endif</span><span>−{{ amountWithSymbol($order->discount) }}</span></div>
+                @endif
                 <div class="flex justify-between"><span class="text-[color:var(--color-muted)]">{{ __('Shipping') }}</span><span>{{ $order->shipping_cost > 0 ? amountWithSymbol($order->shipping_cost) : __('Free') }}</span></div>
                 <div class="flex justify-between font-bold text-ink text-base mt-1"><span>{{ __('Total') }}</span><span>{{ amountWithSymbol($order->total) }}</span></div>
             </div>
