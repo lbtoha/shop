@@ -62,18 +62,57 @@
         // Continue indexing after any server-rendered rows.
         let index = body.querySelectorAll('[data-variant-row]').length;
 
+        const mainStockInput = document.querySelector('input[name="stock"]');
+
+        function syncProductStockFromVariants() {
+            if (!mainStockInput) return;
+
+            const variantRows = body.querySelectorAll('[data-variant-row]');
+            if (variantRows.length > 0) {
+                // There are variants! Make main stock input read-only
+                mainStockInput.readOnly = true;
+                mainStockInput.classList.add('bg-neutral-100', 'dark:bg-neutral-800', 'cursor-not-allowed', 'text-neutral-500');
+                
+                // Sum all variant stock values
+                let totalStock = 0;
+                variantRows.forEach(row => {
+                    const stockInput = row.querySelector('input[name*="[stock]"]');
+                    if (stockInput) {
+                        totalStock += parseInt(stockInput.value) || 0;
+                    }
+                });
+                mainStockInput.value = totalStock;
+            } else {
+                // No variants! Allow manual input
+                mainStockInput.readOnly = false;
+                mainStockInput.classList.remove('bg-neutral-100', 'dark:bg-neutral-800', 'cursor-not-allowed', 'text-neutral-500');
+            }
+        }
+
         addBtn.addEventListener('click', function () {
             const html = tpl.innerHTML.replace(/__INDEX__/g, index++);
             const tmp = document.createElement('tbody');
             tmp.innerHTML = html.trim();
             body.appendChild(tmp.firstElementChild);
+            syncProductStockFromVariants();
         });
 
         body.addEventListener('click', function (e) {
             const btn = e.target.closest('[data-remove-variant]');
             if (!btn) return;
             btn.closest('[data-variant-row]')?.remove();
+            syncProductStockFromVariants();
         });
+
+        // Listen for stock changes in the variant rows
+        body.addEventListener('input', function (e) {
+            if (e.target.name && e.target.name.includes('[stock]')) {
+                syncProductStockFromVariants();
+            }
+        });
+
+        // Initial sync on page load
+        syncProductStockFromVariants();
     })();
 </script>
 @endpush

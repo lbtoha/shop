@@ -71,6 +71,7 @@ class CheckoutService
 
                     $unitPrice = $variant->price();
                     $variant->decrement('stock', $line['quantity']);
+                    $product->decrement('stock', $line['quantity']);
                 } else {
                     if (! $product->isInStock($line['quantity'])) {
                         throw new CustomWebException(

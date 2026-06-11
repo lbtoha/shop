@@ -362,6 +362,10 @@ class OrderController extends Controller
                 $variant = \App\Models\ProductVariant::find($item->variant_id);
                 if ($variant) {
                     $variant->increment('stock', $item->quantity);
+                    $product = \App\Models\Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
                 }
             } else {
                 $product = \App\Models\Product::find($item->product_id);
@@ -396,6 +400,10 @@ class OrderController extends Controller
                     throw new \Exception(__(':product (:variant) is out of stock.', ['product' => $item->product_name, 'variant' => $variant->name]));
                 }
                 $variant->decrement('stock', $item->quantity);
+                $product = \App\Models\Product::find($item->product_id);
+                if ($product) {
+                    $product->decrement('stock', $item->quantity);
+                }
             } else {
                 $product = \App\Models\Product::find($item->product_id);
                 if (! $product) {

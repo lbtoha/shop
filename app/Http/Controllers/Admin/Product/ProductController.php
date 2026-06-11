@@ -314,6 +314,13 @@ class ProductController extends Controller
                 $variant->delete();
             }
         });
+
+        // After syncing, if the product has variants, update its base stock to match the sum of variant stock.
+        if ($product->variants()->count() > 0) {
+            $product->update([
+                'stock' => $product->variants()->sum('stock')
+            ]);
+        }
     }
 
     /**
