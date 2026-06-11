@@ -44,7 +44,7 @@ export const fileManagerInit = (id, type = "image", isMultiple = false) => {
 export const fileManagerInitByClass = (className, type = "image") => {
     (function ($) {
         $.fn.filemanager = function (type, options) {
-            type = "video";
+            type = type || "file";
 
             this.on("click", function (e) {
                 var route_prefix = options && options.prefix ? options.prefix : `${getUrlType()}/filemaneger`;
