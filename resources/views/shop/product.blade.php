@@ -29,7 +29,14 @@
                         $optionGroups[$key][] = $val;
                     }
                 }
-                $comboKey = implode('|', array_values($attrs));
+            }
+            foreach ($product->variants as $v) {
+                $attrs = $v->attributes ?? [];
+                $comboParts = [];
+                foreach (array_keys($optionGroups) as $gk) {
+                    $comboParts[] = $attrs[$gk] ?? '';
+                }
+                $comboKey = implode('|', $comboParts);
                 $variantMap[$comboKey] = [
                     'id' => $v->id,
                     'price' => $v->price(),
@@ -52,191 +59,206 @@
         </nav>
 
         {{-- Product Details Layout --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             {{-- Image Gallery Column --}}
-            <div class="lg:col-span-7 flex flex-col sm:flex-row gap-4">
+            <div class="lg:col-span-5 flex flex-col sm:flex-row gap-4 lg:sticky lg:top-24 relative">
                 {{-- Thumbnails --}}
                 @if ($gallery->count() > 1)
                     <div class="flex sm:flex-col gap-3 order-2 sm:order-1 overflow-x-auto sm:overflow-visible shrink-0 py-1">
-                        @foreach ($gallery as $img)
+                        @foreach ($gallery as $index => $img)
                             <button type="button" data-thumb="{{ $img }}"
-                                class="w-16 h-20 rounded-xl border-2 border-neutral-100 overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
-                                <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg">
+                                class="w-14 h-18 rounded-lg border-2 {{ $index === 0 ? 'border-brand ring-2 ring-brand/10' : 'border-neutral-100' }} overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
+                                <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-md">
                             </button>
                         @endforeach
                     </div>
                 @endif
                 {{-- Primary Image --}}
-                <div class="flex-1 rounded-[2rem] overflow-hidden bg-neutral-50 aspect-[3/4] shadow-sm order-1 sm:order-2">
+                <div id="main-image-container" class="flex-1 rounded-2xl overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative group cursor-zoom-in">
                     @if ($mainImage)
-                        <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                        <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                        
+                        {{-- Zoom Lens --}}
+                        <div id="zoom-lens" class="absolute border border-brand/20 bg-brand/5 pointer-events-none hidden z-10 rounded-lg shadow-sm" style="width: 150px; height: 187.5px;"></div>
                     @else
                         <div class="w-full h-full flex items-center justify-center text-neutral-300">
                             <i class="ph ph-image text-7xl"></i>
                         </div>
                     @endif
                 </div>
+
+                {{-- Zoom Result Window (Desktop only, absolutely positioned relative to the gallery column) --}}
+                @if ($mainImage)
+                    <div id="zoom-result" class="absolute left-[calc(100%+1.5rem)] top-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-neutral-100 bg-neutral-50 z-30 hidden pointer-events-none">
+                        <img id="zoom-result-image" src="{{ $mainImage }}" class="absolute max-w-none origin-top-left">
+                    </div>
+                @endif
             </div>
 
             {{-- Product Info & Action Column --}}
-            <div class="lg:col-span-5">
-                <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-wide leading-tight">{{ $product->name }}</h1>
-
-                {{-- Price Row --}}
-                <div class="mt-4 flex items-baseline gap-3">
-                    <span id="product-price" class="text-2xl sm:text-3xl font-black text-brand">{{ amountWithSymbol($product->displayPrice()) }}</span>
-                    @if ($hasDiscount)
-                        <span class="text-base text-neutral-400 line-through font-semibold">{{ amountWithSymbol($product->compare_at_price) }}</span>
-                    @endif
-                </div>
-
-                {{-- Variant Option Pickers --}}
-                @if ($hasVariants)
-                    <div id="variant-picker" class="mt-6 border-t border-neutral-100 pt-5 space-y-5"
-                        data-variant-map='@json($variantMap)' data-option-groups='@json($optionGroups)'>
-                        @foreach ($optionGroups as $groupName => $values)
-                            <div class="flex flex-col gap-2">
-                                <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                                    {{ __($groupName) }}
-                                </div>
-                                <div class="flex items-center gap-3 flex-wrap" data-option-group="{{ $groupName }}">
-                                    @foreach ($values as $val)
-                                        <button type="button" data-option-value="{{ $val }}"
-                                            class="px-4 h-12 rounded-xl border-2 border-neutral-200 text-sm font-black text-neutral-700 flex items-center justify-center hover:border-brand transition focus:outline-none">
-                                            {{ $val }}
-                                        </button>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    {{-- Color Selector (for simple product without database variants) --}}
-                    <div class="mt-6 border-t border-neutral-100 pt-5">
-                        <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                            {{ __('COLOR') }}: <span class="text-neutral-800 font-extrabold ml-1">{{ $product->name === 'Fuchsia Azure Delight' ? 'PINK & BLUE' : 'MULTICOLOR' }}</span>
-                        </div>
-                        @if ($mainImage)
-                            <div class="mt-2.5">
-                                <button type="button" class="w-12 h-16 rounded-xl border-2 border-brand overflow-hidden focus:outline-none p-0.5">
-                                    <img src="{{ $mainImage }}" alt="Color template" class="w-full h-full object-cover rounded-lg">
-                                </button>
-                            </div>
-                        @endif
-                    </div>
-                @endif
-
-                {{-- Stock Status Display --}}
-                <div class="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
-                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{ __('AVAILABILITY') }}</span>
-                    <span id="variant-status">
-                        @if ($hasVariants)
-                            <span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-500">{{ __('Select options') }}</span>
-                        @elseif ($product->isInStock())
-                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                {{ __('In Stock') }} ({{ $product->effectiveStock() }})
-                            </span>
-                        @else
-                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600">
-                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                {{ __('Out of Stock') }}
-                            </span>
-                        @endif
-                    </span>
-                </div>
-
-                {{-- Add to Cart / Order Now actions --}}
-                @if ($product->isInStock())
-                    <div class="mt-8 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-stretch gap-4">
-                        <input type="hidden" id="selected-variant-id" name="variant_id" value="">
-
-                        {{-- Quantity Stepper --}}
-                        <div data-qty-wrap class="flex items-center justify-between border-2 border-neutral-100 rounded-xl px-2 shrink-0 bg-neutral-50/50">
-                            <button type="button" data-step="-1" class="w-9 h-11 text-xl font-bold text-neutral-500 hover:text-brand transition">−</button>
-                            <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->effectiveStock() }}"
-                                class="w-10 text-center py-2 font-black text-neutral-800 focus:outline-none bg-transparent select-none">
-                            <button type="button" data-step="1" class="w-9 h-11 text-xl font-bold text-neutral-500 hover:text-brand transition">+</button>
-                        </div>
-
-                        {{-- Add to Cart --}}
-                        <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                            @if ($hasVariants) disabled @endif
-                            class="flex-1 bg-brand hover:bg-brand-dark text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="ph ph-shopping-cart-simple text-base"></i>
-                            <span>{{ __('ADD TO CART') }}</span>
-                        </button>
-
-                        {{-- Order Now --}}
-                        <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
-                            @if ($hasVariants) disabled @endif
-                            class="flex-1 bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="ph ph-lightning text-base"></i>
-                            <span>{{ __('ORDER NOW') }}</span>
-                        </button>
-                    </div>
-                @else
-                    <div class="mt-8 pt-6 border-t border-neutral-100">
-                        <button disabled class="w-full bg-neutral-100 text-neutral-400 font-bold py-3 px-6 rounded-xl text-sm tracking-wider uppercase cursor-not-allowed">
-                            {{ __('OUT OF STOCK') }}
-                        </button>
-                    </div>
-                @endif
-
-                {{-- Product Metadata Grid --}}
-                <div class="mt-8 grid grid-cols-2 gap-y-4 gap-x-6 text-xs border-t border-neutral-100 pt-6">
-                    <div>
-                        <div class="text-neutral-400 font-bold uppercase tracking-widest mb-1">{{ __('MATERIAL') }}</div>
-                        <div class="font-extrabold text-neutral-800">{{ $product->name }}</div>
-                    </div>
+            <div class="lg:col-span-7 flex flex-col justify-between self-stretch">
+                <div>
                     @if ($product->category)
-                        <div>
-                            <div class="text-neutral-400 font-bold uppercase tracking-widest mb-1">{{ __('CATEGORY') }}</div>
-                            <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}"
-                                class="font-extrabold text-brand hover:underline uppercase">{{ $product->category->name }}</a>
+                        <span class="inline-block text-[10px] font-black tracking-widest text-brand uppercase bg-brand/5 px-2.5 py-1 rounded-full mb-2">{{ $product->category->name }}</span>
+                    @endif
+                    
+                    <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight leading-tight">{{ $product->name }}</h1>
+
+                    {{-- Price Row --}}
+                    <div class="mt-2.5 flex items-center gap-3 flex-wrap">
+                        <span id="product-price" class="text-3xl font-black text-brand tracking-tight">{{ amountWithSymbol($product->displayPrice()) }}</span>
+                        @if ($hasDiscount)
+                            <span class="text-lg text-neutral-400 line-through font-semibold">{{ amountWithSymbol($product->compare_at_price) }}</span>
+                            @php
+                                $percent = round((($product->compare_at_price - $product->price) / $product->compare_at_price) * 100);
+                            @endphp
+                            <span class="bg-red-50 text-red-600 text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
+                        @endif
+
+                        {{-- Availability aligned to right --}}
+                        <div class="ml-auto" id="variant-status">
+                            @if ($hasVariants)
+                                <span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>
+                            @elseif ($product->isInStock())
+                                <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 uppercase tracking-wider">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    {{ __('In Stock') }} ({{ $product->effectiveStock() }})
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                    {{ __('Out of Stock') }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Variant Option Pickers --}}
+                    @if ($hasVariants)
+                        <div id="variant-picker" class="mt-4 pt-3 border-t border-neutral-100 space-y-3"
+                            data-variant-map='@json($variantMap)' data-option-groups='@json($optionGroups)'>
+                            @foreach ($optionGroups as $groupName => $values)
+                                <div class="flex items-center gap-4">
+                                    <div class="text-xs font-black text-neutral-500 uppercase tracking-widest w-20 shrink-0">
+                                        {{ __($groupName) }}
+                                    </div>
+                                    <div class="flex items-center gap-2 flex-wrap" data-option-group="{{ $groupName }}">
+                                        @foreach ($values as $val)
+                                            <button type="button" data-option-value="{{ $val }}"
+                                                class="h-10 min-w-[40px] px-3 rounded-lg border border-neutral-200 text-sm font-bold text-neutral-800 flex items-center justify-center bg-white hover:border-neutral-800 transition-all duration-200 focus:outline-none">
+                                                {{ $val }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Color Selector (for simple product without database variants) --}}
+                        <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center gap-4">
+                            <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest w-20 shrink-0">
+                                {{ __('COLOR') }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-neutral-800 font-extrabold text-xs uppercase">{{ $product->name === 'Fuchsia Azure Delight' ? 'PINK & BLUE' : 'MULTICOLOR' }}</span>
+                                @if ($mainImage)
+                                    <button type="button" class="w-8 h-10 rounded-lg border-2 border-brand overflow-hidden focus:outline-none p-0.5 ml-2">
+                                        <img src="{{ $mainImage }}" alt="Color template" class="w-full h-full object-cover rounded-md">
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     @endif
-                    @if ($product->sku)
-                        <div class="col-span-2">
-                            <div class="text-neutral-400 font-bold uppercase tracking-widest mb-1">{{ __('REFERENCE SKU') }}</div>
-                            <div class="font-extrabold text-neutral-800 uppercase">{{ $product->sku }}</div>
+
+                    {{-- Add to Cart / Order Now actions --}}
+                    @if ($product->isInStock())
+                        <div class="mt-5 pt-4 border-t border-neutral-100 flex flex-col sm:flex-row items-stretch gap-3">
+                            <input type="hidden" id="selected-variant-id" name="variant_id" value="">
+
+                            {{-- Quantity Stepper --}}
+                            <div data-qty-wrap class="flex items-center justify-between border border-neutral-200 rounded-xl px-1.5 shrink-0 bg-neutral-50/50">
+                                <button type="button" data-step="-1" class="w-8 h-10 text-lg font-bold text-neutral-500 hover:text-brand transition">−</button>
+                                <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->effectiveStock() }}"
+                                    class="w-8 text-center py-2 text-sm font-black text-neutral-800 focus:outline-none bg-transparent select-none">
+                                <button type="button" data-step="1" class="w-8 h-10 text-lg font-bold text-neutral-500 hover:text-brand transition">+</button>
+                            </div>
+
+                            {{-- Add to Cart --}}
+                            <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
+                                @if ($hasVariants) disabled @endif
+                                class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                <i class="ph ph-shopping-cart-simple text-base"></i>
+                                <span>{{ __('ADD TO CART') }}</span>
+                            </button>
+
+                            {{-- Order Now --}}
+                            <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
+                                @if ($hasVariants) disabled @endif
+                                class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                <i class="ph ph-lightning text-base"></i>
+                                <span>{{ __('ORDER NOW') }}</span>
+                            </button>
+                        </div>
+                    @else
+                        <div class="mt-5 pt-4 border-t border-neutral-100">
+                            <button disabled class="w-full bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-xl text-xs tracking-wider uppercase cursor-not-allowed">
+                                {{ __('OUT OF STOCK') }}
+                            </button>
                         </div>
                     @endif
+
+                    {{-- Trust Badges --}}
+                    <div class="mt-4 bg-neutral-50/50 rounded-xl p-2.5 grid grid-cols-3 gap-2 text-center text-neutral-500">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <i class="ph ph-truck text-lg text-neutral-700"></i>
+                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Fast Delivery') }}</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-1.5 border-x border-neutral-200">
+                            <i class="ph ph-shield-check text-lg text-neutral-700"></i>
+                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Secure Checkout') }}</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-1.5">
+                            <i class="ph ph-arrow-counter-clockwise text-lg text-neutral-700"></i>
+                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Easy Returns') }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Support & WhatsApp Buttons --}}
-                <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <a href="tel:{{ $phone }}" class="flex items-center gap-3.5 border border-neutral-100 rounded-2xl p-4 hover:border-brand/40 hover:shadow-sm transition bg-white">
-                        <span class="w-10 h-10 rounded-full bg-brand/5 text-brand flex items-center justify-center shrink-0">
-                            <i class="ph ph-phone text-lg font-bold"></i>
-                        </span>
-                        <span class="leading-tight">
-                            <span class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{{ __('REPORT HELP') }}</span>
-                            <span class="block font-black text-neutral-800 mt-0.5">{{ $phone }}</span>
-                        </span>
-                    </a>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsappNumber) }}" target="_blank" rel="noopener"
-                        class="flex items-center gap-3.5 border border-neutral-100 rounded-2xl p-4 hover:border-emerald-300 hover:shadow-sm transition bg-white">
-                        <span class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            <i class="ph ph-whatsapp-logo text-lg font-bold"></i>
-                        </span>
-                        <span class="leading-tight">
-                            <span class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{{ __('WHATSAPP ORDER') }}</span>
-                            <span class="block font-black text-neutral-800 mt-0.5">{{ $whatsappNumber }}</span>
-                        </span>
-                    </a>
-                </div>
+                <div>
+                    {{-- Support & WhatsApp Bar --}}
+                    <div class="mt-4 bg-neutral-50 rounded-xl p-3 flex items-center justify-between text-sm">
+                        <span class="text-neutral-500 font-extrabold uppercase tracking-wider text-xs">{{ __('Need Help?') }}</span>
+                        <div class="flex items-center gap-4">
+                            <a href="tel:{{ $phone }}" class="font-extrabold text-brand hover:underline flex items-center gap-1">
+                                <i class="ph ph-phone text-base"></i> {{ $phone }}
+                            </a>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsappNumber) }}" target="_blank" rel="noopener" class="font-extrabold text-emerald-600 hover:underline flex items-center gap-1">
+                                <i class="ph ph-whatsapp-logo text-base"></i> {{ $whatsappNumber }}
+                            </a>
+                        </div>
+                    </div>
 
-                {{-- Share row --}}
-                <div class="mt-8 flex items-center gap-4 border-t border-neutral-100 pt-6">
-                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{ __('SHARE') }}</span>
-                    <div class="flex items-center gap-2">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener"
-                            class="w-8 h-8 rounded-full bg-[#1877f2] text-white flex items-center justify-center hover:scale-105 transition"><i class="ph ph-facebook-logo"></i></a>
-                        <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}" target="_blank" rel="noopener"
-                            class="w-8 h-8 rounded-full bg-[#1da1f2] text-white flex items-center justify-center hover:scale-105 transition"><i class="ph ph-twitter-logo"></i></a>
-                        <a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener"
-                            class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:scale-105 transition"><i class="ph ph-whatsapp-logo"></i></a>
+                    {{-- Product Metadata and Share Row --}}
+                    <div class="mt-3 flex items-center justify-between text-xs border-t border-neutral-100 pt-3 flex-wrap gap-2">
+                        <div class="flex items-center gap-4 text-neutral-400 font-bold">
+                            @if ($product->sku)
+                                <div>SKU: <span class="text-neutral-800 font-extrabold uppercase">{{ $product->sku }}</span></div>
+                            @endif
+                            @if ($product->category)
+                                <div>CATEGORY: <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="text-brand hover:underline uppercase font-extrabold">{{ $product->category->name }}</a></div>
+                            @endif
+                        </div>
+                        
+                        {{-- Share inline --}}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest mr-1">{{ __('SHARE') }}</span>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener"
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1877f2] hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-facebook-logo text-base"></i></a>
+                            <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}" target="_blank" rel="noopener"
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1da1f2] hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-twitter-logo text-base"></i></a>
+                            <a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener"
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-emerald-500 hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-whatsapp-logo text-base"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -302,9 +324,84 @@
             document.querySelectorAll('[data-thumb]').forEach(function (b) {
                 b.addEventListener('click', function () {
                     var main = document.getElementById('main-product-image');
-                    if (main) main.src = b.getAttribute('data-thumb');
+                    var zoomResImg = document.getElementById('zoom-result-image');
+                    var src = b.getAttribute('data-thumb');
+                    if (main) main.src = src;
+                    if (zoomResImg) zoomResImg.src = src;
+                    
+                    document.querySelectorAll('[data-thumb]').forEach(function (thumbBtn) {
+                        thumbBtn.classList.remove('border-brand', 'ring-2', 'ring-brand/10');
+                        thumbBtn.classList.add('border-neutral-100');
+                    });
+                    b.classList.remove('border-neutral-100');
+                    b.classList.add('border-brand', 'ring-2', 'ring-brand/10');
                 });
             });
+
+            // Premium Side-by-Side Hover Zoom (Desktop only)
+            (function () {
+                var container = document.getElementById('main-image-container');
+                var mainImg = document.getElementById('main-product-image');
+                var lens = document.getElementById('zoom-lens');
+                var result = document.getElementById('zoom-result');
+                var resultImg = document.getElementById('zoom-result-image');
+
+                if (!container || !mainImg || !lens || !result || !resultImg) return;
+
+                function getCursorPos(e) {
+                    var a = mainImg.getBoundingClientRect();
+                    var x = e.clientX - a.left;
+                    var y = e.clientY - a.top;
+                    return { x: x, y: y };
+                }
+
+                function moveLens(e) {
+                    var pos = getCursorPos(e);
+                    
+                    // Calculate lens position
+                    var x = pos.x - (lens.offsetWidth / 2);
+                    var y = pos.y - (lens.offsetHeight / 2);
+
+                    var maxX = mainImg.offsetWidth - lens.offsetWidth;
+                    var maxY = mainImg.offsetHeight - lens.offsetHeight;
+
+                    if (x > maxX) { x = maxX; }
+                    if (x < 0) { x = 0; }
+                    if (y > maxY) { y = maxY; }
+                    if (y < 0) { y = 0; }
+
+                    lens.style.left = x + "px";
+                    lens.style.top = y + "px";
+
+                    var cx = result.offsetWidth / lens.offsetWidth;
+                    var cy = result.offsetHeight / lens.offsetHeight;
+
+                    resultImg.style.width = (mainImg.offsetWidth * cx) + "px";
+                    resultImg.style.height = (mainImg.offsetHeight * cy) + "px";
+                    resultImg.style.left = "-" + (x * cx) + "px";
+                    resultImg.style.top = "-" + (y * cy) + "px";
+                }
+
+                container.addEventListener('mouseenter', function () {
+                    if (window.innerWidth >= 1024) {
+                        lens.classList.remove('hidden');
+                        result.classList.remove('hidden');
+                        
+                        mainImg.style.transform = 'none';
+                        mainImg.style.transition = 'none';
+                    }
+                });
+
+                container.addEventListener('mouseleave', function () {
+                    lens.classList.add('hidden');
+                    result.classList.add('hidden');
+                    
+                    mainImg.style.transform = '';
+                    mainImg.style.transition = '';
+                });
+
+                container.addEventListener('mousemove', moveLens);
+            })();
 
             // Variant picker: selecting one value per option group resolves a variant.
             (function () {
@@ -332,7 +429,7 @@
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
                         if (variantIdEl) variantIdEl.value = '';
-                        setStatus('<span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-500">{{ __('Select options') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>');
                         return;
                     }
                     var key = groupNames.map(function (g) { return selected[g]; }).join('|');
@@ -341,7 +438,7 @@
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
                         if (variantIdEl) variantIdEl.value = '';
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span>{{ __('Unavailable combination') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Unavailable combination') }}</span>');
                         return;
                     }
                     if (priceEl) priceEl.textContent = v.price_label;
@@ -350,11 +447,11 @@
                     if (v.stock > 0) {
                         if (addBtn) addBtn.disabled = false;
                         if (buyBtn) buyBtn.disabled = false;
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>{{ __('In stock') }} (' + v.stock + ')</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{{ __('In stock') }} (' + v.stock + ')</span>');
                     } else {
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span>{{ __('Out of stock') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Out of stock') }}</span>');
                     }
                 }
 
@@ -364,14 +461,103 @@
                         btn.addEventListener('click', function () {
                             selected[name] = btn.getAttribute('data-option-value');
                             group.querySelectorAll('[data-option-value]').forEach(function (b) {
-                                b.classList.remove('border-brand', 'bg-brand', 'text-white');
+                                b.classList.remove('border-brand', 'bg-brand/5', 'text-brand', 'ring-1', 'ring-brand/10');
+                                b.classList.add('border-neutral-200', 'text-neutral-700', 'bg-white');
                             });
-                            btn.classList.add('border-brand', 'bg-brand', 'text-white');
+                            btn.classList.add('border-brand', 'bg-brand/5', 'text-brand', 'ring-1', 'ring-brand/10');
+                            btn.classList.remove('border-neutral-200', 'text-neutral-700', 'bg-white');
                             resolve();
                         });
                     });
                 });
+            // Sticky Mobile action bar visibility & state sync
+            (function () {
+                var bar = document.getElementById('sticky-action-bar');
+                var mainBtn = document.getElementById('btn-order-now') || document.getElementById('btn-add-to-cart');
+                var stickyBuyBtn = document.getElementById('btn-sticky-buy');
+                var variantIdEl = document.getElementById('selected-variant-id');
+                var picker = document.getElementById('variant-picker');
+
+                if (!bar || !mainBtn) return;
+
+                // Scroll listener
+                window.addEventListener('scroll', function () {
+                    var rect = mainBtn.getBoundingClientRect();
+                    if (rect.bottom < 0) {
+                        bar.classList.remove('translate-y-full');
+                    } else {
+                        bar.classList.add('translate-y-full');
+                    }
+                });
+
+                // Buy handler
+                if (stickyBuyBtn) {
+                    stickyBuyBtn.addEventListener('click', function () {
+                        if (picker && !variantIdEl.value) {
+                            picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            picker.classList.add('ring-2', 'ring-brand/40', 'rounded-2xl', 'p-2', 'transition-all');
+                            setTimeout(function () {
+                                picker.classList.remove('ring-2', 'ring-brand/40', 'rounded-2xl', 'p-2');
+                            }, 1500);
+                            return;
+                        }
+                        var orderNowBtn = document.getElementById('btn-order-now');
+                        if (orderNowBtn) {
+                            orderNowBtn.click();
+                        }
+                    });
+                }
+
+                // Sync variant change with sticky bar price and button text
+                var originalResolve = resolve;
+                resolve = function () {
+                    originalResolve();
+                    var stickyPrice = document.getElementById('sticky-price');
+                    var stickyText = document.getElementById('sticky-btn-text');
+
+                    if (variantIdEl && variantIdEl.value) {
+                        if (stickyText) stickyText.textContent = "{{ __('ORDER NOW') }}";
+                        var variantMap = JSON.parse(picker.getAttribute('data-variant-map') || '{}');
+                        var optionGroups = JSON.parse(picker.getAttribute('data-option-groups') || '{}');
+                        var groupNames = Object.keys(optionGroups);
+                        var key = groupNames.map(function (g) { return selected[g]; }).join('|');
+                        var v = variantMap[key];
+                        if (v && stickyPrice) {
+                            stickyPrice.textContent = v.price_label;
+                        }
+                    } else {
+                        if (stickyText && picker) stickyText.textContent = "{{ __('SELECT OPTIONS') }}";
+                    }
+                };
+                // Pre-select first variant options if available
+                groupNames.forEach(function (name) {
+                    var firstBtn = picker.querySelector('[data-option-group="' + name + '"] [data-option-value]');
+                    if (firstBtn) {
+                        firstBtn.click();
+                    }
+                });
             })();
+        })();
         </script>
     @endpush
+
+    {{-- Sticky Mobile Action Bar --}}
+    @if ($product->isInStock())
+        <div id="sticky-action-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-neutral-100 p-4 z-40 flex items-center justify-between gap-4 lg:hidden shadow-2xl translate-y-full transition-transform duration-300">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-neutral-100 bg-neutral-50">
+                    <img src="{{ $mainImage ?? '' }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                </div>
+                <div class="min-w-0 leading-tight">
+                    <div class="text-xs font-bold text-neutral-800 truncate">{{ $product->name }}</div>
+                    <div id="sticky-price" class="text-sm font-black text-brand mt-0.5">{{ amountWithSymbol($product->displayPrice()) }}</div>
+                </div>
+            </div>
+            <button type="button" id="btn-sticky-buy"
+                class="bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs tracking-wider uppercase shadow-md shrink-0 flex items-center gap-2">
+                <i class="ph ph-lightning text-base"></i>
+                <span id="sticky-btn-text">{{ $hasVariants ? __('SELECT OPTIONS') : __('ORDER NOW') }}</span>
+            </button>
+        </div>
+    @endif
 @endsection

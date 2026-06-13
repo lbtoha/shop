@@ -59,4 +59,8 @@ Route::middleware('auth')->prefix('account')->as('shop.account.')->group(functio
     Route::get('/', [AccountController::class, 'index'])->name('index');
     Route::get('orders', [AccountController::class, 'orders'])->name('orders');
     Route::get('orders/{orderNumber}', [AccountController::class, 'showOrder'])->name('order');
+    Route::post('orders/{orderNumber}/cancel', [AccountController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::get('orders/{orderNumber}/invoice', [AccountController::class, 'downloadInvoice'])->name('orders.invoice');
+    Route::get('profile', [AccountController::class, 'profile'])->name('profile');
+    Route::post('profile', [AccountController::class, 'updateProfile'])->name('profile.update');
 });

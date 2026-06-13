@@ -17,7 +17,7 @@ class ShopController extends Controller
         $categories = Category::active()
             ->whereNull('parent_id')
             ->orderBy('sort_order')
-            ->withCount('products')
+            ->withCount(['products' => fn($q) => $q->active()])
             ->get();
 
         $activeCategory = null;
@@ -28,11 +28,17 @@ class ShopController extends Controller
             $activeCategory = Category::active()->where('slug', $request->category)->first();
             if ($activeCategory) {
                 $query->where('category_id', $activeCategory->id);
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 
         if ($request->filled('search')) {
             $query->whereLike(['name', 'short_description'], $request->search);
+        }
+
+        if ($request->filled('featured')) {
+            $query->where('is_featured', true);
         }
 
         match ($request->get('sort')) {

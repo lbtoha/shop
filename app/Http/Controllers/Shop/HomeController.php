@@ -16,7 +16,7 @@ class HomeController extends Controller
         $categories = Category::active()
             ->whereNull('parent_id')
             ->orderBy('sort_order')
-            ->withCount('products')
+            ->withCount(['products' => fn($q) => $q->active()])
             ->get();
 
         $newCollection = Product::active()->inStock()
@@ -25,24 +25,23 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        // "Hot Sale" = products that carry a higher compare-at price (i.e. discounted)
-        $hotSale = Product::active()->inStock()
+        // Featured Products
+        $featuredProducts = Product::active()->inStock()
             ->with('category')->withCount('variants')
-            ->whereNotNull('compare_at_price')
-            ->whereColumn('compare_at_price', '>', 'price')
+            ->where('is_featured', true)
             ->latest()
-            ->take(8)
+            ->take(12)
             ->get();
-
+ 
         $ladiesThreePiece = Product::active()->inStock()
             ->with('category')->withCount('variants')
             ->whereHas('category', function ($q) {
-                $q->where('name', 'Ladies Three Piece');
+                $q->where('name', "Women's Products");
             })
             ->latest()
             ->take(8)
             ->get();
-
-        return view('shop.home', compact('banners', 'categories', 'newCollection', 'hotSale', 'ladiesThreePiece'));
+ 
+        return view('shop.home', compact('banners', 'categories', 'newCollection', 'featuredProducts', 'ladiesThreePiece'));
     }
 }

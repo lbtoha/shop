@@ -19,6 +19,10 @@
                 class="flex items-center gap-2 py-2 px-2 rounded {{ request()->routeIs('shop.account.orders') || request()->routeIs('shop.account.order') ? 'bg-[color:var(--color-brand)] text-white' : 'hover:bg-neutral-50' }}">
                 <i class="ph ph-package"></i> {{ __('My Orders') }}
             </a>
+            <a href="{{ route('shop.account.profile') }}"
+                class="flex items-center gap-2 py-2 px-2 rounded {{ request()->routeIs('shop.account.profile') ? 'bg-[color:var(--color-brand)] text-white' : 'hover:bg-neutral-50' }}">
+                <i class="ph ph-user"></i> {{ __('Profile Info') }}
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full flex items-center gap-2 py-2 px-2 rounded text-red-500 hover:bg-red-50 text-left">

@@ -62,7 +62,13 @@ class Product extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('category_id')
+                  ->orWhereHas('category', function ($catQuery) {
+                      $catQuery->active();
+                  });
+            });
     }
 
     public function scopeInStock($query)
@@ -122,5 +128,33 @@ class Product extends Model
         }
 
         return (float) $this->price;
+    }
+
+    /**
+     * Check if the product and its category hierarchy are active.
+     */
+    public function isActive(): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        if ($this->category_id) {
+            $category = $this->category;
+            if (!$category || !$category->is_active) {
+                return false;
+            }
+
+            // Check parent recursively
+            $parent = $category->parent;
+            while ($parent) {
+                if (!$parent->is_active) {
+                    return false;
+                }
+                $parent = $parent->parent;
+            }
+        }
+
+        return true;
     }
 }

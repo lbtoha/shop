@@ -72,7 +72,7 @@ class CartController extends Controller
             'variant_id' => 'nullable|integer',
         ]);
 
-        if (! $product->is_active) {
+        if (! $product->isActive()) {
             return response()->json(['success' => false, 'message' => __('This product is out of stock.')], 422);
         }
 
@@ -172,6 +172,10 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'count' => $this->cart->count(),
+                'subtotal' => $this->cart->subtotal(),
+                'couponDiscount' => $this->cart->couponDiscount(),
+                'couponCode' => $this->cart->couponCode(),
+                'discount' => $this->cart->discount(),
                 'drawer' => $this->renderDrawer(),
             ]);
         }
@@ -190,6 +194,10 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'count' => $this->cart->count(),
+                'subtotal' => $this->cart->subtotal(),
+                'couponDiscount' => $this->cart->couponDiscount(),
+                'couponCode' => $this->cart->couponCode(),
+                'discount' => $this->cart->discount(),
                 'drawer' => $this->renderDrawer(),
             ]);
         }

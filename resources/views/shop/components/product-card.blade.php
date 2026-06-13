@@ -50,25 +50,35 @@
         </div>
     </div>
 
-    {{-- Full width Add to Cart / Choose Options Button --}}
-    <div class="mt-2">
+    {{-- Full width Add to Cart & Order Now Buttons --}}
+    <div class="mt-2.5 flex items-center gap-2">
         @if ($product->isInStock())
             @if ($product->hasVariants())
                 <a href="{{ route('shop.product', $product->slug) }}"
-                    class="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-2.5 px-3 rounded-lg transition duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-sm">
-                    <i class="ph ph-sliders-horizontal text-sm"></i>
-                    <span>{{ __('CHOOSE OPTIONS') }}</span>
+                    class="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-extrabold py-2 px-2 rounded-lg transition duration-200 text-[10px] tracking-wider uppercase flex items-center justify-center gap-1">
+                    <i class="ph ph-shopping-cart-simple text-xs"></i>
+                    <span>{{ __('Cart') }}</span>
+                </a>
+                <a href="{{ route('shop.product', $product->slug) }}"
+                    class="flex-1 bg-brand hover:bg-brand-dark text-white font-extrabold py-2 px-2 rounded-lg transition duration-200 text-[10px] tracking-wider uppercase flex items-center justify-center gap-1 shadow-sm">
+                    <i class="ph ph-lightning text-xs"></i>
+                    <span>{{ __('Order') }}</span>
                 </a>
             @else
                 <button type="button" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
-                    class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2.5 px-3 rounded-lg transition duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-sm">
-                    <i class="ph ph-shopping-cart-simple text-sm"></i>
-                    <span>{{ __('ADD TO CART') }}</span>
+                    class="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-extrabold py-2 px-2 rounded-lg transition duration-200 text-[10px] tracking-wider uppercase flex items-center justify-center gap-1">
+                    <i class="ph ph-shopping-cart-simple text-xs"></i>
+                    <span>{{ __('Cart') }}</span>
+                </button>
+                <button type="button" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
+                    class="flex-1 bg-brand hover:bg-brand-dark text-white font-extrabold py-2 px-2 rounded-lg transition duration-200 text-[10px] tracking-wider uppercase flex items-center justify-center gap-1 shadow-sm">
+                    <i class="ph ph-lightning text-xs"></i>
+                    <span>{{ __('Order') }}</span>
                 </button>
             @endif
         @else
             <button type="button" disabled
-                class="w-full bg-neutral-100 text-neutral-400 font-bold py-2.5 px-3 rounded-lg text-xs tracking-wider uppercase flex items-center justify-center gap-1.5 cursor-not-allowed">
+                class="w-full bg-neutral-100 text-neutral-400 font-bold py-2 px-3 rounded-lg text-[10px] tracking-wider uppercase flex items-center justify-center gap-1 cursor-not-allowed">
                 <span>{{ __('SOLD OUT') }}</span>
             </button>
         @endif

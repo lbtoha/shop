@@ -29,7 +29,14 @@ class CheckoutController extends Controller
         $couponCode = $this->cart->couponCode();
         $couponDiscount = $this->cart->couponDiscount();
 
-        return view('shop.checkout', compact('items', 'subtotal', 'shippingCost', 'couponCode', 'couponDiscount'));
+        $previousOrder = null;
+        if (auth()->check()) {
+            $previousOrder = Order::where('user_id', auth()->id())
+                ->latest()
+                ->first();
+        }
+
+        return view('shop.checkout', compact('items', 'subtotal', 'shippingCost', 'couponCode', 'couponDiscount', 'previousOrder'));
     }
 
     /**
@@ -48,9 +55,44 @@ class CheckoutController extends Controller
         ]);
 
         $shippingCost = (float) getOption('shipping_cost', 0);
+        $userId = auth()->id();
+
+        if (!auth()->check()) {
+            $phone = $validated['customer_phone'];
+            $email = $validated['customer_email'] ?? ($phone . '_bd@gmail.com');
+
+            // Find existing user by phone or email
+            $user = \App\Models\User::where('phone', $phone)
+                ->orWhere('email', $email)
+                ->first();
+
+            if (!$user) {
+                // Determine a unique username
+                $baseUsername = \Illuminate\Support\Str::slug($validated['customer_name'], '_') ?: 'user';
+                $username = $baseUsername;
+                $i = 1;
+                while (\App\Models\User::where('username', $username)->exists()) {
+                    $username = $baseUsername . '_' . $i++;
+                }
+
+                $user = \App\Models\User::create([
+                    'first_name' => $validated['customer_name'],
+                    'email' => $email,
+                    'phone' => $phone,
+                    'username' => $username,
+                    'password' => \Illuminate\Support\Facades\Hash::make($phone),
+                    'status' => \App\Enums\UserStatusEnum::ACTIVE->value,
+                ]);
+            }
+
+            // Automatically log them in so their profile is active
+            auth()->login($user);
+            $request->session()->regenerate();
+            $userId = $user->id;
+        }
 
         try {
-            $order = $checkout->placeOrder($validated, auth()->id(), $shippingCost);
+            $order = $checkout->placeOrder($validated, $userId, $shippingCost);
         } catch (CustomWebException $e) {
             return redirect()->route('shop.cart.index')->with('error', $e->getMessage());
         }

@@ -52,6 +52,15 @@ class Category extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('categories.is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('categories.parent_id')
+                  ->orWhereExists(function ($sub) {
+                      $sub->select(\Illuminate\Support\Facades\DB::raw(1))
+                          ->from('categories as parents')
+                          ->whereColumn('parents.id', 'categories.parent_id')
+                          ->where('parents.is_active', true);
+                  });
+            });
     }
 }

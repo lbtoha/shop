@@ -42,8 +42,7 @@ class ProductRequest extends FormRequest
             'images.*' => ['nullable', 'string'],
 
             'variants' => ['nullable', 'array'],
-            'variants.*.color' => ['nullable', 'string', 'max:100'],
-            'variants.*.size' => ['nullable', 'string', 'max:100'],
+            'variants.*.attrs' => ['nullable', 'array'],
             'variants.*.sku' => ['nullable', 'string', 'max:255'],
             'variants.*.price_adjustment' => ['nullable', 'numeric'],
             'variants.*.stock' => ['nullable', 'integer', 'min:0'],

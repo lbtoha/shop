@@ -45,7 +45,7 @@ class CheckoutService
                 /** @var Product $product */
                 $product = Product::query()->lockForUpdate()->find($line['product']->id);
 
-                if (! $product || ! $product->is_active) {
+                if (! $product || ! $product->isActive()) {
                     throw new CustomWebException(__('A product in your cart is no longer available.'), 422);
                 }
 

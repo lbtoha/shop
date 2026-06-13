@@ -28,10 +28,19 @@ function showToast(message, type = "success") {
 
 function updateCartBadge(count) {
     document.querySelectorAll("[data-cart-count]").forEach((el) => {
+        const currentCount = parseInt(el.textContent, 10) || 0;
         el.textContent = count;
         // The drawer's own badge always shows; header badges hide at 0.
         if (el.closest("[data-cart-drawer]")) return;
         el.classList.toggle("hidden", !count);
+
+        // Dynamic pulse animation if count increased
+        if (count > currentCount && !el.closest("[data-cart-drawer]")) {
+            el.classList.add("scale-150");
+            setTimeout(() => {
+                el.classList.remove("scale-150");
+            }, 300);
+        }
     });
 }
 
@@ -219,13 +228,86 @@ function initHero() {
     const hero = document.querySelector("[data-hero]");
     if (!hero) return;
     const slides = hero.querySelectorAll("[data-slide]");
-    if (slides.length < 2) return;
+    const dots = hero.querySelectorAll("[data-hero-dot]");
+    const prevBtn = hero.querySelector("[data-hero-prev]");
+    const nextBtn = hero.querySelector("[data-hero-next]");
+    if (slides.length === 0) return;
+
     let current = 0;
-    setInterval(() => {
-        slides[current].classList.add("hidden");
-        current = (current + 1) % slides.length;
-        slides[current].classList.remove("hidden");
-    }, 4000);
+    let timer = null;
+
+    function showSlide(index) {
+        const nextSlide = (index + slides.length) % slides.length;
+
+        // Hide current slide
+        slides[current].classList.add("hidden", "opacity-0", "z-0");
+        slides[current].classList.remove("active", "opacity-100", "z-10");
+        if (dots.length > current) {
+            dots[current].classList.remove("bg-brand", "w-8");
+            dots[current].classList.add("bg-white/40", "w-3");
+        }
+
+        // Show new slide
+        current = nextSlide;
+        slides[current].classList.remove("hidden", "opacity-0", "z-0");
+        void slides[current].offsetWidth;
+        slides[current].classList.add("active", "opacity-100", "z-10");
+        if (dots.length > current) {
+            dots[current].classList.add("bg-brand", "w-8");
+            dots[current].classList.remove("bg-white/40", "w-3");
+        }
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        if (slides.length < 2) return;
+        timer = setInterval(() => {
+            showSlide(current + 1);
+        }, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    // Set initial slide active state
+    slides[current].classList.add("active", "opacity-100", "z-10");
+    slides[current].classList.remove("opacity-0", "z-0");
+
+    // Controls
+    if (prevBtn) {
+        prevBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            showSlide(current - 1);
+            startAutoPlay();
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            showSlide(current + 1);
+            startAutoPlay();
+        });
+    }
+
+    // Dots
+    dots.forEach((dot) => {
+        dot.addEventListener("click", (e) => {
+            e.preventDefault();
+            const idx = parseInt(dot.getAttribute("data-hero-dot"), 10);
+            showSlide(idx);
+            startAutoPlay();
+        });
+    });
+
+    // Auto play and mouse hover pausing
+    hero.addEventListener("mouseenter", stopAutoPlay);
+    hero.addEventListener("mouseleave", startAutoPlay);
+
+    startAutoPlay();
 }
 
 /* Mobile menu */

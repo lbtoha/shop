@@ -327,7 +327,11 @@ if (! function_exists('isCurrentUrlMatched')) {
         $currentUrl = request()->fullUrl();
         // If it's a route name, convert to full URL
         if (Str::contains($url, '.') && ! Str::startsWith($url, ['http://', 'https://'])) {
-            $url = route($url);
+            if (\Route::has($url)) {
+                $url = route($url);
+            } else {
+                $url = url(str_replace('.', '/', $url));
+            }
         }
         // Exact match
         if ($currentUrl === $url) {
@@ -447,5 +451,25 @@ if (! function_exists('getUrlWithQuery')) {
         $finalQuery = array_merge($query, $existingQuery);
 
         return $baseUrl.'?'.http_build_query($finalQuery);
+    }
+}
+
+if (! function_exists('isSubmenuActive')) {
+    function isSubmenuActive(array $menu): bool
+    {
+        if (isset($menu['link']) && isCurrentUrlMatched($menu['link'])) {
+            return true;
+        }
+        if (isset($menu['parent']) && request()->is($menu['parent'] . '*')) {
+            return true;
+        }
+        if (isset($menu['submenus'])) {
+            foreach ($menu['submenus'] as $submenu) {
+                if (isSubmenuActive($submenu)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

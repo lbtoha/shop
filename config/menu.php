@@ -10,14 +10,32 @@ return [
             ],
             [
                 'title' => 'Catalog',
-                'link' => 'admin.products',
+                'link' => 'admin.products.index',
                 'icon' => 'ph ph-storefront',
                 'parent_menu' => true,
                 'parent' => 'admin/products',
                 'submenus' => [
                     ['title' => 'Products', 'link' => 'admin.products.index'],
                     ['title' => 'Categories', 'link' => 'admin.categories.index'],
+                ],
+            ],
+            [
+                'title' => 'Marketing',
+                'link' => 'admin.coupons.index',
+                'icon' => 'ph ph-megaphone',
+                'parent_menu' => true,
+                'parent' => 'admin/coupons',
+                'submenus' => [
                     ['title' => 'Coupons', 'link' => 'admin.coupons.index'],
+                ],
+            ],
+            [
+                'title' => 'Appearance',
+                'link' => 'admin.banners.index',
+                'icon' => 'ph ph-palette',
+                'parent_menu' => true,
+                'parent' => 'admin/banners',
+                'submenus' => [
                     ['title' => 'Hero Banners', 'link' => 'admin.banners.index'],
                 ],
             ],

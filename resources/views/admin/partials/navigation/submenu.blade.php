@@ -1,8 +1,8 @@
 @if (isset($menu['parent_menu']))
-    <div class="submenu-item {{ request()->is($menu['parent'] . '*') ? 'active' : '' }}">
+    <div class="submenu-item {{ isSubmenuActive($menu) ? 'active' : '' }}">
         @if (Str::is('admin/settings', $menu['parent']))
             <div
-                class="flex justify-between items-center submenu-btn hover:bg-primary hover:text-white {{ request()->is($menu['parent'] . '*') ? 'bg-primary text-white' : '' }}">
+                class="flex justify-between items-center submenu-btn hover:bg-primary hover:text-white {{ isSubmenuActive($menu) ? 'bg-primary text-white' : '' }}">
                 <a href="{{ route($menu['link']) }}" class="flex items-center justify-start gap-2 w-full px-3 py-2">
                     <i class="{{ $menu['icon'] }} text-[22px]"></i>
                     {{ __($menu['title']) }}
@@ -21,7 +21,7 @@
                 <i class="ph ph-caret-down"></i>
             </button>
         @endif
-        <div class="submenu-content {{ request()->is($menu['parent'] . '*') ? 'block' : 'hidden' }}">
+        <div class="submenu-content {{ isSubmenuActive($menu) ? 'block' : 'hidden' }}">
             <ul>
                 @foreach ($menu['submenus'] as $sub_menu)
                     @if (isset($sub_menu['submenus']))
@@ -60,13 +60,13 @@
             </div>
         @else
             <button
-                class="submenu-btn flex items-center py-1.5 text-sm {{ isUrlActiveByParentKey($menu['parent']) ? 'submenu_active' : '' }}">
+                class="submenu-btn flex items-center py-1.5 text-sm {{ isSubmenuActive($menu) ? 'submenu_active' : '' }}">
                 {{ __($menu['title']) }}
                 <i class="ph ph-caret-down ml-2"></i>
             </button>
         @endif
 
-        <ul class="submenu-content {{ isUrlActiveByParentKey($menu['parent']) ? 'block' : 'hidden' }}">
+        <ul class="submenu-content {{ isSubmenuActive($menu) ? 'block' : 'hidden' }}">
             @foreach ($menu['submenus'] as $sub_menu)
                 @if (isset($sub_menu['submenus']))
                     @include('admin.partials.navigation.submenu', ['menu' => $sub_menu])

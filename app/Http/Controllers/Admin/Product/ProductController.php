@@ -266,19 +266,17 @@ class ProductController extends Controller
         $sort = 0;
 
         foreach ($variants as $row) {
-            $color = trim((string) ($row['color'] ?? ''));
-            $size  = trim((string) ($row['size'] ?? ''));
-
-            if ($color === '' && $size === '') {
-                continue;
-            }
-
+            $attrs = $row['attrs'] ?? [];
             $attributes = [];
-            if ($color !== '') {
-                $attributes['Color'] = $color;
+            foreach ($attrs as $k => $v) {
+                $v = trim((string) $v);
+                if ($v !== '') {
+                    $attributes[$k] = $v;
+                }
             }
-            if ($size !== '') {
-                $attributes['Size'] = $size;
+
+            if (empty($attributes)) {
+                continue;
             }
 
             $key  = $this->variantComboKey($attributes);
@@ -290,6 +288,7 @@ class ProductController extends Controller
                 $existing[$key]->update([
                     'name'             => $name,
                     'sku'              => $row['sku'] ?? null,
+                    'attributes'       => $attributes,
                     'price_adjustment' => $row['price_adjustment'] ?? 0,
                     'stock'            => $row['stock'] ?? 0,
                     'sort_order'       => $sort,
