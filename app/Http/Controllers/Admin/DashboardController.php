@@ -20,10 +20,21 @@ class DashboardController extends Controller
         $user_query = User::query();
 
         // E-commerce widgets
+        $totalCost = (float) DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('orders.status', '!=', OrderStatusEnum::CANCELLED->value)
+            ->sum(DB::raw('order_items.quantity * IFNULL(products.buying_price, 0)'));
+
+        $nonCancelledSubtotal = (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('subtotal');
+        $nonCancelledDiscount = (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('discount');
+        $profit = $nonCancelledSubtotal - $nonCancelledDiscount - $totalCost;
+
         $orderStats = [
             'total'    => Order::count(),
             'pending'  => Order::where('status', OrderStatusEnum::PENDING->value)->count(),
             'revenue'  => (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('total'),
+            'profit'   => $profit,
             'products' => Product::count(),
         ];
 

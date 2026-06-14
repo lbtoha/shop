@@ -34,10 +34,13 @@ class ProductRequest extends FormRequest
             'short_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
+            'buying_price' => ['nullable', 'numeric', 'min:0'],
             'compare_at_price' => ['nullable', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
+            'shipping_cost_dhaka' => ['required', 'numeric', 'min:0'],
+            'shipping_cost_outside' => ['required', 'numeric', 'min:0'],
             'images' => ['nullable', 'array'],
             'images.*' => ['nullable', 'string'],
 

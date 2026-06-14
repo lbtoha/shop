@@ -35,12 +35,24 @@
                 </div>
 
                 <div>
+                    <x-admin::number-input-group name="buying_price" label="{{ __('Buying Price / Purchase Cost (৳)') }}" placeholder="0.00" />
+                </div>
+
+                <div>
                     <x-admin::number-input-group name="compare_at_price" label="{{ __('Original Price / Compare At (৳)') }}" placeholder="{{ __('Leave blank if no discount') }}" />
                 </div>
 
                 <div>
                     <x-admin::number-input-group name="stock" label="{{ __('Stock Quantity') }}" placeholder="0" :with_currencySymbol="false" />
                     <p class="text-xs text-neutral-400 mt-1">{{ __('Set to 0 if using variants below for stock control.') }}</p>
+                </div>
+
+                <div>
+                    <x-admin::number-input-group name="shipping_cost_dhaka" label="{{ __('Delivery Charge Inside Dhaka (৳)') }}" placeholder="0.00" value="0" />
+                </div>
+
+                <div>
+                    <x-admin::number-input-group name="shipping_cost_outside" label="{{ __('Delivery Charge Outside Dhaka (৳)') }}" placeholder="0.00" value="0" />
                 </div>
 
                 <div class="flex items-center gap-8 pt-2">

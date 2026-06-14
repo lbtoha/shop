@@ -25,7 +25,17 @@ class CheckoutController extends Controller
 
         $items = $this->cart->items();
         $subtotal = $this->cart->subtotal();
-        $shippingCost = (float) getOption('shipping_cost', 0);
+        
+        // Calculate default shipping cost (inside Dhaka) based on items in cart
+        $shippingCost = 0.0;
+        foreach ($items as $line) {
+            $product = $line['product'];
+            $cost = (float) ($product->shipping_cost_dhaka ?? 0);
+            if ($cost > $shippingCost) {
+                $shippingCost = $cost;
+            }
+        }
+
         $couponCode = $this->cart->couponCode();
         $couponDiscount = $this->cart->couponDiscount();
 
@@ -52,9 +62,22 @@ class CheckoutController extends Controller
             'city' => 'nullable|string|max:255',
             'zip_code' => 'nullable|string|max:30',
             'note' => 'nullable|string|max:1000',
+            'shipping_area' => 'required|string|in:inside,outside',
         ]);
 
-        $shippingCost = (float) getOption('shipping_cost', 0);
+        // Calculate dynamic shipping cost based on selected area and items in cart
+        $shippingArea = $validated['shipping_area'];
+        $shippingCost = 0.0;
+        foreach ($this->cart->items() as $line) {
+            $product = $line['product'];
+            $cost = $shippingArea === 'inside'
+                ? (float) ($product->shipping_cost_dhaka ?? 0)
+                : (float) ($product->shipping_cost_outside ?? 0);
+            if ($cost > $shippingCost) {
+                $shippingCost = $cost;
+            }
+        }
+
         $userId = auth()->id();
 
         if (!auth()->check()) {

@@ -18,7 +18,11 @@
                         @foreach ($items as $line)
                             @php($product = $line['product'])
                             @php($maxQty = $line['variant'] ? $line['variant']->stock : $product->stock)
-                            <div class="py-4 flex items-center gap-4 checkout-item-row" data-line-key="{{ $line['key'] }}" data-unit-price="{{ $line['unit_price'] }}">
+                            <div class="py-4 flex items-center gap-4 checkout-item-row" 
+                                data-line-key="{{ $line['key'] }}" 
+                                data-unit-price="{{ $line['unit_price'] }}"
+                                data-shipping-dhaka="{{ $product->shipping_cost_dhaka }}"
+                                data-shipping-outside="{{ $product->shipping_cost_outside }}">
                                 {{-- Image --}}
                                 <a href="{{ route('shop.product', $product->slug) }}" target="_blank" class="w-16 h-20 shrink-0 rounded-lg bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center border border-neutral-100">
                                     @if ($product->thumbnail)
@@ -135,6 +139,34 @@
                     </div>
                 </div>
 
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">{{ __('Delivery Area / ডেলিভারি এলাকা') }} <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-xl cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="shipping_area" value="inside" checked class="accent-[color:var(--color-brand)] h-4 w-4" onchange="calculateShipping()">
+                                <div>
+                                    <span class="font-bold text-neutral-800 text-sm block">{{ __('Inside Dhaka / ঢাকার ভিতরে') }}</span>
+                                    <span class="text-xs text-neutral-500">{{ __('Cash on Delivery') }}</span>
+                                </div>
+                            </div>
+                            <span class="font-bold text-neutral-900 text-sm" id="shipping-inside-preview">{{ currencySymbol() }}0</span>
+                        </label>
+                        
+                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-xl cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="shipping_area" value="outside" class="accent-[color:var(--color-brand)] h-4 w-4" onchange="calculateShipping()">
+                                <div>
+                                    <span class="font-bold text-neutral-800 text-sm block">{{ __('Outside Dhaka / ঢাকার বাইরে') }}</span>
+                                    <span class="text-xs text-neutral-500">{{ __('Home Delivery') }}</span>
+                                </div>
+                            </div>
+                            <span class="font-bold text-neutral-900 text-sm" id="shipping-outside-preview">{{ currencySymbol() }}0</span>
+                        </label>
+                    </div>
+                    @error('shipping_area')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                </div>
+
                 <div class="mt-6 flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-xl p-4">
                     <input type="radio" checked readonly class="accent-[color:var(--color-brand)]">
                     <div>
@@ -177,7 +209,7 @@
 
                     <div class="flex justify-between text-sm mb-2">
                         <span class="text-[color:var(--color-muted)]">{{ __('Shipping') }}</span>
-                        <span>{{ $shippingCost > 0 ? amountWithSymbol($shippingCost) : __('Free') }}</span>
+                        <span id="checkout-shipping-val">{{ $shippingCost > 0 ? amountWithSymbol($shippingCost) : __('Free') }}</span>
                     </div>
                     <div class="border-t border-neutral-100 my-3"></div>
                     <div class="flex justify-between font-bold text-ink text-lg">
@@ -291,6 +323,57 @@
             });
         }
 
+        function calculateShipping() {
+            let maxDhaka = 0;
+            let maxOutside = 0;
+            
+            document.querySelectorAll('.checkout-item-row').forEach(row => {
+                let dhaka = parseFloat(row.getAttribute('data-shipping-dhaka')) || 0;
+                let outside = parseFloat(row.getAttribute('data-shipping-outside')) || 0;
+                if (dhaka > maxDhaka) {
+                    maxDhaka = dhaka;
+                }
+                if (outside > maxOutside) {
+                    maxOutside = outside;
+                }
+            });
+            
+            const currency = "{{ currencySymbol() }}";
+            const insidePreview = document.getElementById('shipping-inside-preview');
+            const outsidePreview = document.getElementById('shipping-outside-preview');
+            if (insidePreview) insidePreview.innerText = maxDhaka > 0 ? currency + maxDhaka.toFixed(0) : "{{ __('Free') }}";
+            if (outsidePreview) outsidePreview.innerText = maxOutside > 0 ? currency + maxOutside.toFixed(0) : "{{ __('Free') }}";
+            
+            const selectedRadio = document.querySelector('input[name="shipping_area"]:checked');
+            const selectedArea = selectedRadio ? selectedRadio.value : 'inside';
+            const shippingCost = selectedArea === 'inside' ? maxDhaka : maxOutside;
+            
+            const shippingValSpan = document.getElementById('checkout-shipping-val');
+            if (shippingValSpan) {
+                shippingValSpan.innerText = shippingCost > 0 ? currency + shippingCost.toFixed(0) : "{{ __('Free') }}";
+            }
+            
+            const subtotalValSpan = document.getElementById('checkout-subtotal-val');
+            const discountValSpan = document.getElementById('checkout-discount-val');
+            const totalValSpan = document.getElementById('checkout-total-val');
+            
+            if (subtotalValSpan && totalValSpan) {
+                const subtotalText = subtotalValSpan.innerText.replace(/,/g, '');
+                const subtotal = parseFloat(subtotalText) || 0;
+                
+                const discountText = discountValSpan ? discountValSpan.innerText.replace(/,/g, '') : '0';
+                const discount = parseFloat(discountText) || 0;
+                
+                const total = Math.max(0, subtotal - discount) + shippingCost;
+                totalValSpan.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateShipping();
+        });
+
         function updateCheckoutDOM(lineKey, qty, responseData) {
             const row = document.querySelector(`.checkout-item-row[data-line-key="${lineKey}"]`);
             if (row && qty > 0) {
@@ -319,7 +402,6 @@
             const subtotalValSpan = document.getElementById('checkout-subtotal-val');
             const discountContainer = document.getElementById('checkout-discount-container');
             const discountValSpan = document.getElementById('checkout-discount-val');
-            const totalValSpan = document.getElementById('checkout-total-val');
 
             if (responseData.subtotal !== undefined) {
                 const subtotal = responseData.subtotal;
@@ -339,11 +421,7 @@
                     }
                 }
 
-                const shippingCost = parseFloat('{{ $shippingCost }}');
-                const grandTotal = Math.max(0, subtotal - couponDiscount) + shippingCost;
-                if (totalValSpan) {
-                    totalValSpan.innerText = grandTotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-                }
+                calculateShipping();
             }
 
             // Sync with cart badge and drawer

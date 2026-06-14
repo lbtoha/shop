@@ -8,11 +8,11 @@
  * pill buttons, generous spacing.
  */
 @theme {
-    --color-brand: #088178;
-    --color-brand-dark: #04535c;
-    --color-brand-light: #5ed9ba;
-    --color-brand-soft: #caf8e4;
-    --color-accent: #ff8a00;
+    --color-brand: #e11d48;
+    --color-brand-dark: #be123c;
+    --color-brand-light: #fda4af;
+    --color-brand-soft: #fff1f2;
+    --color-accent: #f59e0b;
     --color-success-light: #9ee872;
     --color-ink: #161c24;
     --color-body: #212b36;
@@ -20,7 +20,7 @@
     --color-line: #dfe3e8;
     --color-canvas: #f4f6f8;
     --color-image: #f4f3f5;
-    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Outfit", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
@@ -68,21 +68,12 @@ body {
     }
 }
 
-/* Product card: Sellzy-style image zoom + slight rotate, centered slide-up action rail */
+/* Product card: Sellzy-style image zoom, centered slide-up action rail */
 .product-card .pc-image img {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .product-card:hover .pc-image img {
-    transform: scale(1.1) rotate(-3deg);
-}
-.product-card .pc-actions {
-    opacity: 0;
-    bottom: 0;
-    transition: all 0.3s ease-in-out;
-}
-.product-card:hover .pc-actions {
-    opacity: 1;
-    bottom: 0.75rem;
+    transform: scale(1.05);
 }
 
 /* Star rating */

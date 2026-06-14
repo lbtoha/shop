@@ -15,10 +15,13 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'buying_price' => 'decimal:2',
         'compare_at_price' => 'decimal:2',
         'stock' => 'integer',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'shipping_cost_dhaka' => 'decimal:2',
+        'shipping_cost_outside' => 'decimal:2',
         'views' => 'integer',
     ];
 

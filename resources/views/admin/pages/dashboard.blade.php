@@ -19,12 +19,13 @@
         </div>
 
         {{-- E-commerce summary cards --}}
-        <div class="col-span-2 grid grid-cols-2 xl:grid-cols-4 gap-4 xxl:gap-6">
+        <div class="col-span-2 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 xxl:gap-6">
             @php
                 $ecards = [
                     ['title' => __('Total Orders'), 'data' => $orderStats['total'], 'icon' => 'ph ph-shopping-bag', 'url' => route('admin.orders.index')],
                     ['title' => __('Pending Orders'), 'data' => $orderStats['pending'], 'icon' => 'ph ph-clock', 'url' => route('admin.orders.index', ['status' => 'pending'])],
                     ['title' => __('Revenue'), 'data' => amountWithSymbol($orderStats['revenue']), 'icon' => 'ph ph-currency-circle-dollar', 'url' => route('admin.orders.index')],
+                    ['title' => __('Estimated Profit'), 'data' => amountWithSymbol($orderStats['profit']), 'icon' => 'ph ph-trend-up', 'url' => route('admin.orders.index')],
                     ['title' => __('Products'), 'data' => $orderStats['products'], 'icon' => 'ph ph-package', 'url' => route('admin.products.index')],
                 ];
             @endphp

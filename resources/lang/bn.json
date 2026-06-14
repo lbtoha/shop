@@ -1,4 +1,11 @@
 {
+    "ORDER NOW": "অর্ডার করুন",
+    "ADD TO CART": "কার্টে যোগ করুন",
+    "SELECT OPTIONS": "অপশন সিলেক্ট করুন",
+    "Select options": "অপশন সিলেক্ট করুন",
+    "Unavailable combination": "অনুপলব্ধ কম্বিনেশন",
+    "In stock": "স্টকে আছে",
+    "Out of stock": "স্টকে নেই",
     "Dashboard": "ড্যাশবোর্ড",
     "Users": "ব্যবহারকারী",
     "Send Notification": "নোটিফিকেশন পাঠান",

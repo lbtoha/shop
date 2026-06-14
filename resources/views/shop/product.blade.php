@@ -14,6 +14,7 @@
         $phone = '01935100013';
         $whatsappNumber = '01710733329';
         $shareUrl = urlencode(request()->fullUrl());
+        $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
         // Variant option groups (e.g. Color => [Red, Blue], Size => [S, M, L])
         // and a JS-friendly map of "Color|Size" combos to id/price/stock.
@@ -115,6 +116,13 @@
                             <span class="bg-red-50 text-red-600 text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
                         @endif
 
+                        @if ($isFreeDelivery)
+                            <span class="bg-[#00A8D6]/10 text-[#00A8D6] text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                                <i class="ph ph-truck text-sm"></i>
+                                <span>{{ __('Free Delivery') }}</span>
+                            </span>
+                        @endif
+
                         {{-- Availability aligned to right --}}
                         <div class="ml-auto" id="variant-status">
                             @if ($hasVariants)
@@ -152,21 +160,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
-                    @else
-                        {{-- Color Selector (for simple product without database variants) --}}
-                        <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center gap-4">
-                            <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest w-20 shrink-0">
-                                {{ __('COLOR') }}
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-neutral-800 font-extrabold text-xs uppercase">{{ $product->name === 'Fuchsia Azure Delight' ? 'PINK & BLUE' : 'MULTICOLOR' }}</span>
-                                @if ($mainImage)
-                                    <button type="button" class="w-8 h-10 rounded-lg border-2 border-brand overflow-hidden focus:outline-none p-0.5 ml-2">
-                                        <img src="{{ $mainImage }}" alt="Color template" class="w-full h-full object-cover rounded-md">
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @endif
 
