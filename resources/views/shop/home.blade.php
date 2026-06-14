@@ -131,20 +131,29 @@
 {{-- ── Featured Products Slider ──────────────────────────────── --}}
 @if ($featuredProducts->isNotEmpty())
     @include('shop.partials.product-slider-section', [
-        'title'   => __('Featured Products'),
+        'title'   => $featuredTitle,
         'products' => $featuredProducts,
         'viewAll' => route('shop.index', ['featured' => 1]),
     ])
 @endif
 
-{{-- ── Women's Products Grid ─────────────────────────────────── --}}
-@if ($ladiesThreePiece->isNotEmpty())
+{{-- ── All Products (combined, toggleable in admin) ──────────── --}}
+@if ($allProducts->isNotEmpty())
     @include('shop.partials.product-section', [
-        'title'    => __("Women's Collection"),
-        'products' => $ladiesThreePiece,
-        'viewAll'  => route('shop.index', ['category' => 'womens-products']),
+        'title'    => $allTitle,
+        'products' => $allProducts,
+        'viewAll'  => route('shop.index'),
     ])
 @endif
+
+{{-- ── Category sections (configured in admin → Home Sections) ── --}}
+@foreach ($homeSections as $section)
+    @include('shop.partials.product-' . ($section['layout'] === 'slider' ? 'slider-section' : 'section'), [
+        'title'    => $section['title'],
+        'products' => $section['products'],
+        'viewAll'  => $section['viewAll'],
+    ])
+@endforeach
 
 {{-- ── Connect / Support Section ─────────────────────────────── --}}
 <section class="shop-container mt-14 sm:mt-16 mb-4">

@@ -136,6 +136,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 Route::resource('shop', Admin\Settings\ShopSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END SHOP SETTINGS -------------------------- */
 
+                /** -------------------------- HOME SECTIONS -------------------------- */
+                Route::resource('home-sections', Admin\Settings\HomeSectionController::class)->only(['index', 'store']);
+                /** -------------------------- END HOME SECTIONS -------------------------- */
+
                 /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
                 Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
                 /** -------------------------- END ORDER NOTIFICATIONS -------------------------- */

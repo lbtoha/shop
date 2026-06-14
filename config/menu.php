@@ -90,6 +90,12 @@ return [
                                 'text' => 'Currency symbol and flat shipping cost for the shop.',
                             ],
                             [
+                                'title' => 'Home Sections',
+                                'link' => 'admin.settings.home-sections.index',
+                                'icon' => 'ph ph-squares-four',
+                                'text' => 'Choose which category sections show on the storefront home page, and turn them on or off.',
+                            ],
+                            [
                                 'title' => 'Order Notifications',
                                 'link' => 'admin.settings.order-notifications.index',
                                 'icon' => 'ph ph-bell-ringing',
