@@ -25,7 +25,11 @@ class ProductCatalogSeeder extends Seeder
                         'sku' => 'wom-ready-01',
                         'images' => [
                             'https://images.unsplash.com/photo-1608748010899-18f300247112?w=700&q=80',
+                            'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=700&q=80',
+                            'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=700&q=80',
+                            'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=700&q=80',
                         ],
+                        'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         'description' => '<p>Premium quality ready-made 100% cotton Kurti. Ideal for casual outings and daily wear.</p>',
                         'variants' => [
                             ['attrs' => ['Color' => 'Rose Pink', 'Size' => '36'], 'sku' => 'wom-ready-01-36', 'stock' => 50],
@@ -246,6 +250,7 @@ class ProductCatalogSeeder extends Seeder
                     'name' => $product['name'],
                     'sku' => $product['sku'] ?? null,
                     'thumbnail' => $images[0] ?? null,
+                    'video_url' => $product['video_url'] ?? null,
                     'short_description' => "Premium quality {$product['name']} crafted for comfort and elegance.",
                     'description' => $product['description'] ?? "<p>Beautifully designed {$product['name']} made from high grade fabrics. Perfect for daily wear and formal events.</p>",
                     'price' => $product['price'],

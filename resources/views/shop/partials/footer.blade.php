@@ -115,7 +115,7 @@
                     [route('home'),            __('Home')],
                     [route('shop.index'),      __('All Products')],
                     [route('shop.cart.index'), __('Shopping Cart')],
-                    [route('shop.checkout'),   __('Checkout')],
+                    [route('shop.checkout.index'),   __('Checkout')],
                 ] as [$url, $label])
                     <li><a href="{{ $url }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ $label }}</a></li>
                 @endforeach

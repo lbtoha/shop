@@ -11,6 +11,17 @@
         }
         $gallery = $gallery->unique()->values();
         $mainImage = $gallery->first();
+
+        // Unified media list for the gallery: images first, then an optional video.
+        $videoEmbed = $product->videoEmbedUrl();
+        $media = $gallery->map(fn ($img) => ['type' => 'image', 'src' => $img])->values();
+        if ($videoEmbed) {
+            $media->push([
+                'type' => 'video',
+                'embed' => $videoEmbed,
+                'poster' => $mainImage, // play-icon thumbnail uses the main image as backdrop
+            ]);
+        }
         $phone = '01935100013';
         $whatsappNumber = '01710733329';
         $shareUrl = urlencode(request()->fullUrl());
@@ -63,24 +74,54 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             {{-- Image Gallery Column --}}
             <div class="lg:col-span-5 flex flex-col sm:flex-row gap-4 lg:sticky lg:top-24 relative">
-                {{-- Thumbnails --}}
-                @if ($gallery->count() > 1)
+                {{-- Thumbnails (images + optional video) --}}
+                @if ($media->count() > 1)
                     <div class="flex sm:flex-col gap-3 order-2 sm:order-1 overflow-x-auto sm:overflow-visible shrink-0 py-1">
-                        @foreach ($gallery as $index => $img)
-                            <button type="button" data-thumb="{{ $img }}"
-                                class="w-14 h-18 rounded-lg border-2 {{ $index === 0 ? 'border-brand ring-2 ring-brand/10' : 'border-neutral-100' }} overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
-                                <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-md">
+                        @foreach ($media as $index => $m)
+                            <button type="button"
+                                data-media-thumb="{{ $index }}"
+                                data-media-type="{{ $m['type'] }}"
+                                @if ($m['type'] === 'image') data-media-src="{{ $m['src'] }}"
+                                @else data-media-embed="{{ $m['embed'] }}" @endif
+                                class="relative w-14 h-18 rounded-lg border-2 {{ $index === 0 ? 'border-brand ring-2 ring-brand/10' : 'border-neutral-100' }} overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
+                                <img src="{{ $m['type'] === 'image' ? $m['src'] : $m['poster'] }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-md">
+                                @if ($m['type'] === 'video')
+                                    <span class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-md">
+                                        <span class="w-6 h-6 rounded-full bg-white/90 flex items-center justify-center shadow">
+                                            <i class="ph-fill ph-play text-brand text-xs ml-0.5"></i>
+                                        </span>
+                                    </span>
+                                @endif
                             </button>
                         @endforeach
                     </div>
                 @endif
-                {{-- Primary Image --}}
+                {{-- Primary Viewer --}}
                 <div id="main-image-container" class="flex-1 rounded-2xl overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative group cursor-zoom-in">
                     @if ($mainImage)
                         <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
-                        
+
+                        {{-- Video iframe holder (hidden until a video thumb is chosen) --}}
+                        <div id="main-video-wrap" class="absolute inset-0 z-20 hidden bg-black">
+                            <iframe id="main-video-frame" src="" class="w-full h-full" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen></iframe>
+                        </div>
+
                         {{-- Zoom Lens --}}
                         <div id="zoom-lens" class="absolute border border-brand/20 bg-brand/5 pointer-events-none hidden z-10 rounded-lg shadow-sm" style="width: 150px; height: 187.5px;"></div>
+
+                        {{-- Prev / Next arrows --}}
+                        @if ($media->count() > 1)
+                            <button type="button" id="gallery-prev"
+                                class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-700 hover:text-brand flex items-center justify-center shadow-md transition focus:outline-none">
+                                <i class="ph ph-caret-left text-lg"></i>
+                            </button>
+                            <button type="button" id="gallery-next"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-700 hover:text-brand flex items-center justify-center shadow-md transition focus:outline-none">
+                                <i class="ph ph-caret-right text-lg"></i>
+                            </button>
+                        @endif
                     @else
                         <div class="w-full h-full flex items-center justify-center text-neutral-300">
                             <i class="ph ph-image text-7xl"></i>
@@ -113,11 +154,11 @@
                             @php
                                 $percent = round((($product->compare_at_price - $product->price) / $product->compare_at_price) * 100);
                             @endphp
-                            <span class="bg-red-50 text-red-600 text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
+                            <span class="bg-brand-soft text-brand border border-brand-mist text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
                         @endif
 
                         @if ($isFreeDelivery)
-                            <span class="bg-[#00A8D6]/10 text-[#00A8D6] text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                            <span class="bg-accent/10 text-accent-dark border border-accent/20 text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md flex items-center gap-1">
                                 <i class="ph ph-truck text-sm"></i>
                                 <span>{{ __('Free Delivery') }}</span>
                             </span>
@@ -285,7 +326,7 @@
                         {{ __('SEE ALL') }}
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($related as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
@@ -302,7 +343,7 @@
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($recommended as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
@@ -313,23 +354,78 @@
 
     @push('scripts')
         <script>
-            // Thumbnail click -> swap main image
-            document.querySelectorAll('[data-thumb]').forEach(function (b) {
-                b.addEventListener('click', function () {
-                    var main = document.getElementById('main-product-image');
-                    var zoomResImg = document.getElementById('zoom-result-image');
-                    var src = b.getAttribute('data-thumb');
-                    if (main) main.src = src;
-                    if (zoomResImg) zoomResImg.src = src;
-                    
-                    document.querySelectorAll('[data-thumb]').forEach(function (thumbBtn) {
-                        thumbBtn.classList.remove('border-brand', 'ring-2', 'ring-brand/10');
-                        thumbBtn.classList.add('border-neutral-100');
+            // ─── Media gallery: images + optional video, thumbs + prev/next ───
+            (function () {
+                var thumbs = Array.prototype.slice.call(document.querySelectorAll('[data-media-thumb]'));
+                var mainImg = document.getElementById('main-product-image');
+                var zoomResImg = document.getElementById('zoom-result-image');
+                var videoWrap = document.getElementById('main-video-wrap');
+                var videoFrame = document.getElementById('main-video-frame');
+                var container = document.getElementById('main-image-container');
+                var prevBtn = document.getElementById('gallery-prev');
+                var nextBtn = document.getElementById('gallery-next');
+                if (!mainImg) return;
+
+                // Build the media list from the thumbnails (works with 0/1 thumbs too).
+                var media = thumbs.length
+                    ? thumbs.map(function (b) {
+                        return {
+                            type: b.getAttribute('data-media-type'),
+                            src: b.getAttribute('data-media-src'),
+                            embed: b.getAttribute('data-media-embed'),
+                        };
+                    })
+                    : [{ type: 'image', src: mainImg.getAttribute('src') }];
+
+                var current = 0;
+
+                function highlight(index) {
+                    thumbs.forEach(function (t) {
+                        t.classList.remove('border-brand', 'ring-2', 'ring-brand/10');
+                        t.classList.add('border-neutral-100');
                     });
-                    b.classList.remove('border-neutral-100');
-                    b.classList.add('border-brand', 'ring-2', 'ring-brand/10');
+                    var active = thumbs[index];
+                    if (active) {
+                        active.classList.remove('border-neutral-100');
+                        active.classList.add('border-brand', 'ring-2', 'ring-brand/10');
+                    }
+                }
+
+                function showVideo(on) {
+                    if (!videoWrap) return;
+                    videoWrap.classList.toggle('hidden', !on);
+                    if (container) container.classList.toggle('cursor-zoom-in', !on);
+                }
+
+                function select(index) {
+                    if (index < 0) index = media.length - 1;
+                    if (index >= media.length) index = 0;
+                    current = index;
+                    var item = media[index];
+
+                    if (item.type === 'video') {
+                        if (videoFrame && videoFrame.getAttribute('src') !== item.embed) {
+                            videoFrame.setAttribute('src', item.embed);
+                        }
+                        showVideo(true);
+                    } else {
+                        showVideo(false);
+                        if (videoFrame) videoFrame.setAttribute('src', ''); // stop playback
+                        if (mainImg && item.src) mainImg.src = item.src;
+                        if (zoomResImg && item.src) zoomResImg.src = item.src;
+                    }
+                    highlight(index);
+                }
+
+                thumbs.forEach(function (b, i) {
+                    b.addEventListener('click', function () { select(i); });
                 });
-            });
+                if (prevBtn) prevBtn.addEventListener('click', function () { select(current - 1); });
+                if (nextBtn) nextBtn.addEventListener('click', function () { select(current + 1); });
+
+                // Expose current-media check for the zoom feature.
+                window.__galleryIsVideo = function () { return media[current] && media[current].type === 'video'; };
+            })();
 
             // Premium Side-by-Side Hover Zoom (Desktop only)
             (function () {
@@ -349,8 +445,9 @@
                 }
 
                 function moveLens(e) {
+                    if (window.__galleryIsVideo && window.__galleryIsVideo()) return;
                     var pos = getCursorPos(e);
-                    
+
                     // Calculate lens position
                     var x = pos.x - (lens.offsetWidth / 2);
                     var y = pos.y - (lens.offsetHeight / 2);
@@ -376,10 +473,12 @@
                 }
 
                 container.addEventListener('mouseenter', function () {
+                    // Don't zoom while a video is playing in the viewer.
+                    if (window.__galleryIsVideo && window.__galleryIsVideo()) return;
                     if (window.innerWidth >= 1024) {
                         lens.classList.remove('hidden');
                         result.classList.remove('hidden');
-                        
+
                         mainImg.style.transform = 'none';
                         mainImg.style.transition = 'none';
                     }

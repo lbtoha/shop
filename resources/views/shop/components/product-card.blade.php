@@ -25,130 +25,134 @@
     $gallery = $gallery->unique()->values();
 
     $savedAmount = $hasDiscount ? ($product->compare_at_price - $product->price) : 0;
+
+    // Second image for the hover swap (falls back to primary if only one).
+    $hoverImage = $gallery->count() > 1 ? $gallery->get(1) : null;
+
+    // Decorative placeholder rating (no review data yet) — deterministic per product.
+    $ratingStars = 4 + ($product->id % 2);              // 4 or 5
+    $reviewCount = 6 + ($product->id * 7) % 90;          // 6–95
 @endphp
 
-<div class="product-card group relative flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm hover:shadow-lg hover:shadow-neutral-200/80 hover:-translate-y-1 transition-all duration-250">
+<div class="product-card group relative flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-line hover:border-brand-mist transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
 
     {{-- ── Image area ────────────────────────────────── --}}
-    <div class="relative overflow-hidden aspect-[3/4] bg-neutral-50 shrink-0">
+    <div class="relative overflow-hidden aspect-[3/4] bg-image shrink-0">
         <a href="{{ route('shop.product', $product->slug) }}" class="pc-image block w-full h-full">
             @if ($primaryImage)
                 <img src="{{ $primaryImage }}" alt="{{ $product->name }}"
-                     class="w-full h-full object-cover"
-                     loading="lazy"
-                     data-original-src="{{ $primaryImage }}">
+                     class="absolute inset-0 w-full h-full object-cover transition-all duration-500 {{ $hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-[1.04]' }}"
+                     loading="lazy">
+                @if ($hoverImage)
+                    <img src="{{ $hoverImage }}" alt="{{ $product->name }}"
+                         class="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100"
+                         loading="lazy">
+                @endif
             @else
-                <div class="w-full h-full flex items-center justify-center text-neutral-300 bg-neutral-100">
+                <div class="w-full h-full flex items-center justify-center text-subtle bg-image">
                     <i class="ph ph-image text-5xl"></i>
                 </div>
             @endif
         </a>
 
-        {{-- Discount ribbon --}}
-        @if ($hasDiscount)
-            <div class="absolute top-0 left-0 w-[72px] h-[72px] overflow-hidden z-10 pointer-events-none">
-                <div class="absolute -rotate-45 bg-brand text-white text-[12px] font-black text-center py-1 w-[88px] -left-[26px] top-[8px] shadow-md select-none tracking-wider">
+        {{-- Badges (rounded pills) --}}
+        <div class="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5">
+            @if ($hasDiscount)
+                <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-brand text-white tracking-wide">
                     -{{ $discountPercent }}%
-                </div>
-            </div>
-        @endif
-
-        {{-- New badge --}}
-        @if ($isNew && !$hasDiscount)
-            <div class="absolute top-3 left-3 z-10">
-                <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-accent text-white uppercase tracking-wider shadow-sm">
+                </span>
+            @endif
+            @if ($isNew)
+                <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-emerald-600 text-white tracking-wide">
                     {{ __('New') }}
                 </span>
+            @endif
+        </div>
+
+        {{-- Quick actions (reveal on hover) --}}
+        @if ($inStock)
+            <div class="absolute top-3 right-3 z-10 flex flex-col gap-2 translate-x-3 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                <a href="{{ route('shop.product', $product->slug) }}" aria-label="{{ __('Quick view') }}"
+                   class="w-9 h-9 rounded-full bg-white/95 text-ink flex items-center justify-center shadow-md hover:bg-ink hover:text-white transition-colors">
+                    <i class="ph ph-eye text-base"></i>
+                </a>
+                <button type="button" aria-label="{{ __('Wishlist') }}"
+                   class="w-9 h-9 rounded-full bg-white/95 text-ink flex items-center justify-center shadow-md hover:bg-ink hover:text-white transition-colors">
+                    <i class="ph ph-heart text-base"></i>
+                </button>
+                <a href="{{ route('shop.product', $product->slug) }}" aria-label="{{ __('Add to cart') }}"
+                   class="w-9 h-9 rounded-full bg-white/95 text-ink flex items-center justify-center shadow-md hover:bg-ink hover:text-white transition-colors">
+                    <i class="ph ph-shopping-bag text-base"></i>
+                </a>
             </div>
         @endif
 
         {{-- Sold out overlay --}}
         @if (!$inStock)
             <div class="absolute inset-0 bg-white/55 backdrop-blur-[1px] z-10 flex items-center justify-center">
-                <span class="text-xs font-bold px-3 py-1.5 rounded-xl bg-neutral-900/85 text-white uppercase tracking-widest shadow">
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-ink/85 text-white uppercase tracking-widest shadow">
                     {{ __('Sold Out') }}
                 </span>
             </div>
         @endif
-
-        {{-- Free delivery bar --}}
-        @if ($isFreeDelivery && $inStock)
-            <div class="absolute bottom-0 inset-x-0 z-10 bg-success/90 text-white text-[10px] font-bold tracking-widest flex items-center justify-center gap-1.5 py-1.5">
-                <i class="ph ph-truck text-sm"></i>
-                {{ __('Free Delivery') }}
-            </div>
-        @endif
     </div>
 
-    {{-- ── Body ──────────────────────────────────────── --}}
-    <div class="flex flex-col flex-1 p-3.5 sm:p-4 gap-2">
+    {{-- Delivery bar (full-width, under image) --}}
+    @if ($isFreeDelivery && $inStock)
+        <div class="bg-ink text-white text-xs font-medium flex items-center justify-center gap-1.5 py-2 tracking-widest">
+            <i class="ph ph-truck text-base"></i>
+            {{ __('Free delivery') }}
+        </div>
+    @endif
 
-        {{-- Gallery thumbnails --}}
-        @if ($gallery->count() > 1)
-            <div class="flex items-center gap-1 overflow-x-auto scrollbar-none pb-0.5 -mx-0.5 px-0.5">
-                @foreach ($gallery->take(4) as $idx => $img)
-                    <button type="button"
-                        class="w-7 h-7 rounded-md border-2 {{ $idx === 0 ? 'border-brand' : 'border-neutral-200' }} overflow-hidden shrink-0 transition-all duration-150 hover:border-brand bg-white p-0.5"
-                        onmouseover="
-                            const card = this.closest('.product-card');
-                            const mainImg = card.querySelector('.pc-image img');
-                            if (mainImg) mainImg.src = '{{ $img }}';
-                            card.querySelectorAll('button[class*=border]').forEach(b => b.classList.replace('border-brand','border-neutral-200'));
-                            this.classList.replace('border-neutral-200','border-brand');
-                        "
-                        onmouseleave="
-                            const card = this.closest('.product-card');
-                            const mainImg = card.querySelector('.pc-image img');
-                            if (mainImg) mainImg.src = mainImg.getAttribute('data-original-src');
-                            card.querySelectorAll('button[class*=border]').forEach((b, i) => {
-                                b.classList.replace('border-brand','border-neutral-200');
-                                if (i === 0) b.classList.replace('border-neutral-200','border-brand');
-                            });
-                        ">
-                        <img src="{{ $img }}" class="w-full h-full object-cover rounded-[3px]" loading="lazy">
-                    </button>
-                @endforeach
-                @if ($gallery->count() > 4)
-                    <span class="text-[10px] font-bold text-muted ml-1 shrink-0">+{{ $gallery->count() - 4 }}</span>
-                @endif
-            </div>
-        @endif
+    {{-- ── Body ──────────────────────────────────────── --}}
+    <div class="flex flex-col flex-1 p-4">
 
         {{-- Category --}}
         @if ($product->category)
-            <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-muted leading-none">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted mb-1.5">
                 {{ $product->category->name }}
             </p>
         @endif
 
         {{-- Name --}}
         <a href="{{ route('shop.product', $product->slug) }}"
-           class="text-[13px] sm:text-sm font-semibold text-ink leading-snug line-clamp-2 hover:text-brand transition-colors min-h-[2.6rem]">
+           class="text-[15px] font-medium text-ink leading-snug line-clamp-2 hover:text-brand transition-colors min-h-[2.6rem] mb-2">
             {{ $product->name }}
         </a>
 
-        {{-- Price --}}
-        <div class="flex items-baseline flex-wrap gap-1.5 mt-auto">
-            <span class="text-lg sm:text-xl font-extrabold text-ink">{{ amountWithSymbol($product->price) }}</span>
+        {{-- Rating (decorative) --}}
+        <div class="flex items-center gap-1.5 mb-3">
+            <div class="flex items-center gap-0.5">
+                @for ($s = 1; $s <= 5; $s++)
+                    <i class="ph-fill ph-star text-xs {{ $s <= $ratingStars ? 'text-gold' : 'text-line' }}"></i>
+                @endfor
+            </div>
+            <span class="text-[11px] text-muted">({{ $reviewCount }})</span>
+        </div>
+
+        {{-- Pricing --}}
+        <div class="flex items-baseline flex-wrap gap-2 mb-4">
+            <span class="text-[22px] font-semibold text-ink">{{ amountWithSymbol($product->price) }}</span>
             @if ($hasDiscount)
-                <span class="text-xs text-neutral-400 line-through">{{ amountWithSymbol($product->compare_at_price) }}</span>
-                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60 px-1.5 py-0.5 rounded-md">
+                <span class="text-sm text-subtle line-through">{{ amountWithSymbol($product->compare_at_price) }}</span>
+                <span class="text-[11px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
                     {{ __('Save') }} {{ amountWithSymbol($savedAmount) }}
                 </span>
             @endif
         </div>
 
         {{-- CTA --}}
-        <div class="pt-1">
+        <div class="mt-auto">
             @if ($inStock)
                 <a href="{{ route('shop.product', $product->slug) }}"
-                   class="w-full flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark active:scale-[0.97] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl transition-all duration-150 shadow-sm shadow-brand/20 tracking-wide">
-                    <i class="ph ph-lightning text-sm"></i>
+                   class="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark active:scale-[0.98] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 tracking-wide">
+                    <i class="ph-fill ph-lightning text-base"></i>
                     {{ __('অর্ডার করুন') }}
                 </a>
             @else
                 <button disabled
-                    class="w-full flex items-center justify-center text-xs sm:text-sm font-semibold py-2.5 rounded-xl bg-neutral-100 text-neutral-400 cursor-not-allowed tracking-wide">
+                    class="w-full py-3 rounded-xl bg-line-soft text-subtle text-sm font-semibold flex items-center justify-center cursor-not-allowed tracking-wide">
                     {{ __('Sold Out') }}
                 </button>
             @endif

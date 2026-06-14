@@ -134,6 +134,38 @@ class Product extends Model
     }
 
     /**
+     * Convert the stored YouTube/Facebook video URL into an embeddable iframe
+     * src. Returns null when there is no video or the URL isn't recognised.
+     */
+    public function videoEmbedUrl(): ?string
+    {
+        $url = trim((string) ($this->video_url ?? ''));
+        if ($url === '') {
+            return null;
+        }
+
+        // YouTube — youtu.be/<id>, watch?v=<id>, /embed/<id>, /shorts/<id>.
+        if (preg_match('~(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/)|youtu\.be/)([\w-]{11})~i', $url, $m)) {
+            return 'https://www.youtube.com/embed/'.$m[1];
+        }
+
+        // Facebook — use the official video plugin, which accepts the full URL.
+        if (preg_match('~facebook\.com|fb\.watch~i', $url)) {
+            return 'https://www.facebook.com/plugins/video.php?href='.urlencode($url).'&show_text=false';
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether this product has a playable gallery video.
+     */
+    public function hasVideo(): bool
+    {
+        return $this->videoEmbedUrl() !== null;
+    }
+
+    /**
      * Check if the product and its category hierarchy are active.
      */
     public function isActive(): bool

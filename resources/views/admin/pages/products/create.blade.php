@@ -120,6 +120,12 @@
                         @endfor
                     </div>
                 </div>
+
+                <div class="md:col-span-2">
+                    <x-admin::text-input-group name="video_url" label="{{ __('Product Video URL (optional)') }}"
+                        placeholder="{{ __('e.g. https://www.youtube.com/watch?v=… or a Facebook video link') }}" />
+                    <p class="text-xs text-neutral-400 mt-1">{{ __('Paste a YouTube or Facebook video link. It appears in the gallery with a play icon; clicking it plays the video.') }}</p>
+                </div>
             </div>
 
             {{-- ═══════════════════════════════════════════════════════════

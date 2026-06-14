@@ -123,7 +123,7 @@
                     </a>
                 </div>
             @else
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     @foreach ($products as $product)
                         <x-shop::product-card :product="$product" />
                     @endforeach

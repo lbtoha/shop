@@ -761,3 +761,76 @@ table.responsive {
     opacity: 1;
     visibility: visible;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Dashboard — modern & bold
+   ───────────────────────────────────────────────────────────── */
+
+/* Page hero / greeting band */
+.dash-hero {
+    @apply relative overflow-hidden rounded-2xl p-5 xxl:p-7 text-white;
+    background-image:
+        radial-gradient(120% 120% at 0% 0%, rgb(var(--secondary-color) / 0.55), transparent 55%),
+        linear-gradient(120deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 60%, #000));
+}
+.dash-hero::after {
+    content: "";
+    @apply absolute pointer-events-none;
+    inset: auto -3rem -6rem auto;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Bold stat card with colored icon chip + hover lift */
+.stat-card {
+    @apply relative overflow-hidden bg-neutral-0 dark:bg-neutral-904 border border-neutral-30 dark:border-neutral-500 rounded-2xl p-4 xxl:p-5 transition-all duration-300;
+}
+.stat-card:hover {
+    @apply -translate-y-1 border-transparent shadow-lg;
+}
+.stat-card .stat-chip {
+    @apply size-12 rounded-xl flex items-center justify-center text-2xl shrink-0 shadow-sm;
+}
+/* a thin colored accent bar down the left of each card */
+.stat-card .stat-accent {
+    @apply absolute left-0 top-0 h-full w-1 rounded-r;
+}
+
+/* Tinted chip color variants */
+.tint-primary   { @apply bg-primary/10 text-primary; }
+.tint-secondary { @apply bg-secondary/10 text-secondary; }
+.tint-success   { @apply bg-success/10 text-success; }
+.tint-warning   { @apply bg-warning/10 text-warning; }
+.tint-error     { @apply bg-error/10 text-error; }
+.tint-info      { @apply bg-info/10 text-info; }
+
+.bar-primary   { @apply bg-primary; }
+.bar-secondary { @apply bg-secondary; }
+.bar-success   { @apply bg-success; }
+.bar-warning   { @apply bg-warning; }
+.bar-error     { @apply bg-error; }
+.bar-info      { @apply bg-info; }
+
+/* Section panel heading */
+.panel-title {
+    @apply flex items-center gap-2 text-base font-semibold text-neutral-700 dark:text-neutral-30;
+}
+.panel-title .dot {
+    @apply size-2 rounded-full bg-primary;
+}
+
+/* Soft list row used for low-stock / status lists */
+.dash-row {
+    @apply flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition-colors duration-200;
+    @apply hover:bg-neutral-10 dark:hover:bg-neutral-903;
+}
+
+/* Quick action tile */
+.quick-action {
+    @apply flex flex-col items-center justify-center gap-2 rounded-2xl border border-neutral-30 dark:border-neutral-500 p-4 text-center transition-all duration-300;
+    @apply hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5;
+}
+.quick-action i { @apply text-2xl text-primary; }
+.quick-action span { @apply text-xs font-semibold text-neutral-600 dark:text-neutral-30; }

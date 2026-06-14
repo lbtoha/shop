@@ -8,8 +8,8 @@
 <section class="shop-container mt-14 sm:mt-16 group/slider">
 
     {{-- Heading --}}
-    <div class="flex items-center justify-between gap-4 mb-7">
-        <div class="section-heading flex-1 mb-0">
+    <div class="flex items-end justify-between gap-4 mb-6">
+        <div class="section-heading is-start mb-0">
             <h2>{{ $title }}</h2>
         </div>
         @if (isset($viewAll))
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
             480:  { slidesPerView: 2, spaceBetween: 14 },
             768:  { slidesPerView: 3, spaceBetween: 18 },
             1024: { slidesPerView: 4, spaceBetween: 20 },
-            1280: { slidesPerView: 5, spaceBetween: 20 },
+            1280: { slidesPerView: 4, spaceBetween: 24 },
         },
     });
 });

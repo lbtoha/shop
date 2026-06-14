@@ -31,6 +31,7 @@ class ProductRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'sku' => ['nullable', 'string', 'max:255', Rule::unique('products', 'sku')->ignore($productId)],
             'thumbnail' => ['nullable', 'string'],
+            'video_url' => ['nullable', 'string', 'max:500', 'url', 'regex:/(youtube\.com|youtu\.be|facebook\.com|fb\.watch)/i'],
             'short_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -49,6 +50,16 @@ class ProductRequest extends FormRequest
             'variants.*.sku' => ['nullable', 'string', 'max:255'],
             'variants.*.price_adjustment' => ['nullable', 'numeric'],
             'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'video_url.regex' => __('Please enter a valid YouTube or Facebook video URL.'),
         ];
     }
 }

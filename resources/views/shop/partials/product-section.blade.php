@@ -3,8 +3,8 @@
 <section class="shop-container mt-14 sm:mt-16">
 
     {{-- Heading --}}
-    <div class="flex items-center justify-between gap-4 mb-7">
-        <div class="section-heading flex-1 mb-0">
+    <div class="flex items-end justify-between gap-4 mb-6">
+        <div class="section-heading is-start mb-0">
             <h2>{{ $title }}</h2>
         </div>
         @if (isset($viewAll))
@@ -16,7 +16,7 @@
     </div>
 
     {{-- Grid --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
         @foreach ($products as $product)
             <x-shop::product-card :product="$product" />
         @endforeach

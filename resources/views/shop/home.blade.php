@@ -37,19 +37,19 @@
                         </h1>
 
                         {{-- Subtitle --}}
-                        <p class="text-xs sm:text-sm text-white/75 font-medium max-w-sm leading-relaxed">
+                        <p class="text-sm sm:text-base text-white/80 font-medium max-w-md leading-relaxed">
                             {{ __($banner->subtitle) }}
                         </p>
 
                         {{-- CTA --}}
-                        <div class="flex items-center gap-3 pt-1">
+                        <div class="flex items-center gap-4 pt-2">
                             <a href="{{ $banner->link ?: route('shop.index') }}"
-                               class="btn-brand text-xs sm:text-sm py-2.5 sm:py-3 px-5 sm:px-7 group/btn">
+                               class="btn-brand text-sm py-3 px-7 group/btn">
                                 <span>{{ __($banner->button_text ?: 'Shop Now') }}</span>
                                 <i class="ph ph-arrow-right transition-transform duration-200 group-hover/btn:translate-x-1"></i>
                             </a>
                             <a href="{{ route('shop.index') }}"
-                               class="text-xs sm:text-sm text-white/70 hover:text-white font-semibold underline underline-offset-4 transition-colors">
+                               class="text-sm text-white/75 hover:text-white font-semibold underline underline-offset-4 transition-colors">
                                {{ __('Browse All') }}
                             </a>
                         </div>
@@ -58,14 +58,14 @@
             </div>
         @endforeach
 
-        {{-- Controls --}}
+        {{-- Controls (always visible on touch, fade-in on desktop hover) --}}
         <button type="button" data-hero-prev
-            class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/25 hover:bg-brand text-white flex items-center justify-center backdrop-blur-sm border border-white/15 hover:border-brand transition-all duration-200 opacity-0 group-hover/hero:opacity-100 shadow-lg cursor-pointer">
-            <i class="ph ph-caret-left text-lg sm:text-xl"></i>
+            class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/25 hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-lg cursor-pointer">
+            <i class="ph ph-caret-left text-xl"></i>
         </button>
         <button type="button" data-hero-next
-            class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/25 hover:bg-brand text-white flex items-center justify-center backdrop-blur-sm border border-white/15 hover:border-brand transition-all duration-200 opacity-0 group-hover/hero:opacity-100 shadow-lg cursor-pointer">
-            <i class="ph ph-caret-right text-lg sm:text-xl"></i>
+            class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/25 hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-lg cursor-pointer">
+            <i class="ph ph-caret-right text-xl"></i>
         </button>
 
         {{-- Dots --}}
@@ -94,7 +94,7 @@
         @endphp
         @foreach ($features as $f)
             <div class="feature-card">
-                <div class="w-11 h-11 rounded-xl bg-brand text-white flex items-center justify-center shrink-0 shadow-md shadow-brand/20">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-light to-brand text-white flex items-center justify-center shrink-0 shadow-md shadow-brand/25">
                     <i class="ph {{ $f['icon'] }} text-xl"></i>
                 </div>
                 <div class="min-w-0">
@@ -108,18 +108,24 @@
     {{-- ── Shop By Category ──────────────────────────────────── --}}
     @if ($categories->isNotEmpty())
         <section class="mt-14 sm:mt-16">
-            <div class="section-heading"><h2>{{ __('Shop by Category') }}</h2></div>
-            <div class="flex flex-wrap items-start justify-center gap-6 sm:gap-10 md:gap-14">
+            <div class="section-heading">
+                <span class="eyebrow">{{ __('Browse') }}</span>
+                <h2>{{ __('Shop by Category') }}</h2>
+            </div>
+            <div class="flex flex-wrap items-start justify-center gap-6 sm:gap-10 md:gap-12">
                 @foreach ($categories as $category)
                     <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
                        class="category-pill group">
                         <div class="cp-img">
                             <img src="{{ $category->image }}" alt="{{ $category->name }}"
-                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                 class="transition-transform duration-500 group-hover:scale-110">
                         </div>
-                        <span class="text-xs sm:text-[13px] font-bold text-ink uppercase tracking-wider text-center group-hover:text-brand transition-colors duration-200 line-clamp-2 leading-snug max-w-[90px] sm:max-w-[110px]">
-                            {{ $category->name }}
-                        </span>
+                        <div class="text-center">
+                            <span class="block text-xs sm:text-[13px] font-bold text-ink uppercase tracking-wider group-hover:text-brand transition-colors duration-200 line-clamp-2 leading-snug max-w-[100px] sm:max-w-[120px]">
+                                {{ $category->name }}
+                            </span>
+                            <span class="block text-[11px] text-muted mt-0.5">{{ $category->products_count ?? 0 }} {{ __('products') }}</span>
+                        </div>
                     </a>
                 @endforeach
             </div>
