@@ -2,30 +2,45 @@
 @import "@phosphor-icons/web/regular";
 @import "@phosphor-icons/web/fill";
 
-/*
- * Storefront theme — modeled on the Sellzy template (design-html/):
- * teal-green primary (#088178), soft gray surfaces, large rounded cards,
- * pill buttons, generous spacing.
- */
 @theme {
-    --color-brand: #e11d48;
-    --color-brand-dark: #be123c;
-    --color-brand-light: #fda4af;
-    --color-brand-soft: #fff1f2;
-    --color-accent: #f59e0b;
-    --color-success-light: #9ee872;
-    --color-ink: #161c24;
-    --color-body: #212b36;
-    --color-muted: #637381;
-    --color-line: #dfe3e8;
-    --color-canvas: #f4f6f8;
-    --color-image: #f4f3f5;
-    --font-sans: "Outfit", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
+    /* ── Brand palette ── */
+    --color-brand:       #c0392b;
+    --color-brand-dark:  #96281b;
+    --color-brand-light: #e74c3c;
+    --color-brand-soft:  #fdf2f1;
+    --color-brand-mist:  #fcecea;
+
+    /* ── Accent ── */
+    --color-accent:      #e67e22;
+    --color-accent-dark: #ca6f1e;
+    --color-gold:        #f39c12;
+
+    /* ── Success / info ── */
+    --color-success:     #27ae60;
+    --color-info:        #2980b9;
+
+    /* ── Ink / text ── */
+    --color-ink:         #1a1a2e;
+    --color-body:        #2c2c54;
+    --color-muted:       #6b7280;
+    --color-subtle:      #9ca3af;
+
+    /* ── Surface / borders ── */
+    --color-line:        #e5e7eb;
+    --color-line-soft:   #f3f4f6;
+    --color-canvas:      #f8f9fa;
+    --color-surface:     #ffffff;
+    --color-image:       #f1f2f4;
+
+    /* ── Typography ── */
+    --font-sans:   "Outfit", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ── Base ─────────────────────────────────────────────────── */
 html {
-    /* Clip the off-canvas cart drawer (position:fixed) so it never adds horizontal scroll */
     overflow-x: clip;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -33,70 +48,81 @@ body {
     color: var(--color-body);
     font-family: var(--font-sans);
     overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
+/* ── Layout container ─────────────────────────────────────── */
+.shop-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 1rem;
 }
-.no-scrollbar {
+@media (min-width: 640px)  { .shop-container { padding-inline: 1.5rem; } }
+@media (min-width: 1024px) { .shop-container { padding-inline: 2.5rem; } }
+@media (min-width: 1280px) { .shop-container { padding-inline: 3.5rem; } }
+
+/* ── Section heading helper ───────────────────────────────── */
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.section-heading::before,
+.section-heading::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+}
+.section-heading h2 {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+    text-align: center;
+    padding-inline: 1rem;
+    white-space: nowrap;
+}
+@media (min-width: 640px) {
+    .section-heading h2 { font-size: 1.625rem; }
+}
+
+/* ── Scrollbar utilities ──────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.no-scrollbar,
+.scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-/* Storefront page container — single source of truth for the layout width.
- * Cap 1700px, centered on very large screens, with side padding that scales
- * smoothly across breakpoints so it stays comfortable on phone → ultrawide. */
-.shop-container {
-    width: 100%;
-    max-width: 1700px;
-    margin-inline: auto;
-    padding-inline: 1rem; /* phones */
-}
-@media (min-width: 640px) {
-    .shop-container {
-        padding-inline: 1.5rem;
-    }
-}
-@media (min-width: 1024px) {
-    .shop-container {
-        padding-inline: 2rem;
-    }
-}
-@media (min-width: 1280px) {
-    .shop-container {
-        padding-inline: 3rem;
-    }
-}
-
-/* Product card: Sellzy-style image zoom, centered slide-up action rail */
+/* ── Product card ─────────────────────────────────────────── */
 .product-card .pc-image img {
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .product-card:hover .pc-image img {
-    transform: scale(1.05);
+    transform: scale(1.06);
 }
 
-/* Star rating */
-.stars {
-    color: #ff8a00;
-    letter-spacing: 1px;
-}
-
-/* Premium Hero Carousel & Animations */
+/* ── Hero carousel ────────────────────────────────────────── */
 [data-slide] {
     will-change: opacity, z-index;
 }
 [data-slide] img {
-    transition: transform 8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 9s cubic-bezier(0.16, 1, 0.3, 1);
     transform: scale(1);
 }
 [data-slide].active img {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 .content-anim {
-    transform: translateY(2rem);
+    transform: translateY(2.5rem);
     opacity: 0;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity   0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 [data-slide].active .content-anim {
     transform: translateY(0);
@@ -106,12 +132,133 @@ button[data-hero-dot] {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.scrollbar-none::-webkit-scrollbar {
-    display: none;
+/* ── Btn variants ─────────────────────────────────────────── */
+.btn-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    background-color: var(--color-brand);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(192,57,43,.25);
 }
-/* Hide scrollbar for IE, Edge and Firefox */
-.scrollbar-none {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+.btn-brand:hover {
+    background-color: var(--color-brand-dark);
+    box-shadow: 0 6px 20px rgba(192,57,43,.35);
+    transform: translateY(-1px);
+}
+.btn-brand:active { transform: scale(0.97); }
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    border: 1.5px solid var(--color-line);
+    color: var(--color-ink);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 0.75rem;
+    background: white;
+    transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-outline:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+    box-shadow: 0 2px 8px rgba(192,57,43,.1);
+}
+
+/* ── Feature card ─────────────────────────────────────────── */
+.feature-card {
+    position: relative;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--color-line-soft);
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.125rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(192,57,43,.08);
+    border-color: rgba(192,57,43,.2);
+}
+
+/* ── Category pill ────────────────────────────────────────── */
+.category-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.25s;
+}
+.category-pill:hover { transform: translateY(-3px); }
+.category-pill .cp-img {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    overflow: hidden;
+    background: var(--color-image);
+    transition: box-shadow 0.25s, border-color 0.25s;
+}
+.category-pill:hover .cp-img {
+    box-shadow: 0 8px 24px rgba(192,57,43,.2);
+    border-color: var(--color-brand-soft);
+}
+@media (min-width: 640px) {
+    .category-pill .cp-img { width: 6.5rem; height: 6.5rem; }
+}
+
+/* ── Sidebar category link ────────────────────────────────── */
+.sidebar-cat-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-body);
+    transition: background 0.15s, color 0.15s;
+}
+.sidebar-cat-link:hover { background: var(--color-brand-soft); color: var(--color-brand); }
+.sidebar-cat-link.active { background: var(--color-brand); color: white; font-weight: 600; }
+
+/* ── Toast ────────────────────────────────────────────────── */
+.shop-toast {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 9999;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    transition: opacity 0.3s;
+    max-width: 22rem;
+}
+
+/* ── Pagination override ──────────────────────────────────── */
+nav[role="navigation"] span[aria-current] span,
+nav[role="navigation"] a:focus {
+    outline: none;
 }

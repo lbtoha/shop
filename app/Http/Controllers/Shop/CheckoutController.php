@@ -25,7 +25,7 @@ class CheckoutController extends Controller
 
         $items = $this->cart->items();
         $subtotal = $this->cart->subtotal();
-
+        
         // Calculate default shipping cost (inside Dhaka) based on items in cart
         $shippingCost = 0.0;
         foreach ($items as $line) {
@@ -80,22 +80,22 @@ class CheckoutController extends Controller
 
         $userId = auth()->id();
 
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             $phone = $validated['customer_phone'];
-            $email = $validated['customer_email'] ?? ($phone.'_bd@gmail.com');
+            $email = $validated['customer_email'] ?? ($phone . '_bd@gmail.com');
 
             // Find existing user by phone or email
             $user = \App\Models\User::where('phone', $phone)
                 ->orWhere('email', $email)
                 ->first();
 
-            if (! $user) {
+            if (!$user) {
                 // Determine a unique username
                 $baseUsername = \Illuminate\Support\Str::slug($validated['customer_name'], '_') ?: 'user';
                 $username = $baseUsername;
                 $i = 1;
                 while (\App\Models\User::where('username', $username)->exists()) {
-                    $username = $baseUsername.'_'.$i++;
+                    $username = $baseUsername . '_' . $i++;
                 }
 
                 $user = \App\Models\User::create([
@@ -122,12 +122,9 @@ class CheckoutController extends Controller
 
         OrderNotifier::orderPlaced($order);
 
-        // Remember which orders this session placed so the confirmation page and
-        // invoice download can verify the viewer is the actual buyer (not a URL
-        // guesser) — order numbers are sequential and therefore enumerable.
-        $placed = session()->get('placed_orders', []);
-        $placed[] = $order->order_number;
-        session()->put('placed_orders', array_values(array_unique($placed)));
+        // Store the just-placed order number in the session so the confirmation
+        // page can verify the viewer is the actual buyer (not a URL guesser).
+        session()->put('confirmed_order', $order->order_number);
 
         return redirect()->route('shop.checkout.confirmation', $order->order_number);
     }
@@ -144,7 +141,15 @@ class CheckoutController extends Controller
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        $this->authorizeOrderView($order);
+        // Security: ensure only the session that just placed this order can see it.
+        $confirmedInSession = session()->pull('confirmed_order');
+        if ($confirmedInSession !== $orderNumber) {
+            // Allow admins or the order's registered user to view it without the session key.
+            $isOwner = auth()->check() && auth()->id() === $order->user_id;
+            if (! $isOwner) {
+                abort(403, __('You do not have permission to view this order confirmation.'));
+            }
+        }
 
         return view('shop.confirmation', compact('order'));
     }
@@ -158,25 +163,9 @@ class CheckoutController extends Controller
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        $this->authorizeOrderView($order);
-
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('shop.invoice', compact('order'));
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf->download("invoice-{$order->order_number}.pdf");
-    }
-
-    /**
-     * Guard guest-facing order pages. Order numbers are sequential and so
-     * guessable; only the buyer's session, the order's registered owner, or an
-     * authenticated admin may view an order's details / invoice.
-     */
-    private function authorizeOrderView(Order $order): void
-    {
-        $placedInSession = in_array($order->order_number, session()->get('placed_orders', []), true);
-        $isOwner = auth()->check() && auth()->id() === $order->user_id;
-        $isAdmin = auth('admin')->check();
-
-        abort_unless($placedInSession || $isOwner || $isAdmin, 403, __('You do not have permission to view this order.'));
     }
 }
