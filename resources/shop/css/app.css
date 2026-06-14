@@ -262,3 +262,79 @@ nav[role="navigation"] span[aria-current] span,
 nav[role="navigation"] a:focus {
     outline: none;
 }
+
+/* ── Footer ───────────────────────────────────────────────── */
+.shop-footer {
+    position: relative;
+    background:
+        radial-gradient(1200px 400px at 15% -10%, rgba(192,57,43,.18), transparent 60%),
+        radial-gradient(900px 360px at 100% 0%, rgba(231,76,60,.12), transparent 55%),
+        #0d0d18;
+}
+/* dotted texture overlay */
+.shop-footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events: none;
+}
+.shop-footer > * { position: relative; z-index: 1; }
+
+/* footer column link */
+.foot-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    transition: color 0.15s;
+}
+.foot-link i { color: rgba(192,57,43,.5); font-size: 0.7rem; transition: transform 0.15s, color 0.15s; }
+.foot-link:hover { color: #fff; }
+.foot-link:hover i { color: var(--color-brand); transform: translateX(3px); }
+
+/* footer column heading with accent dash */
+.foot-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.6875rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+}
+.foot-heading::before {
+    content: "";
+    width: 0.75rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: var(--color-brand);
+}
+
+/* back-to-top */
+.back-to-top {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 60;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.875rem;
+    background: var(--color-brand);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(192,57,43,.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(1rem);
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s, background 0.2s;
+    cursor: pointer;
+}
+.back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { background: var(--color-brand-dark); transform: translateY(-2px); }

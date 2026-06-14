@@ -152,7 +152,7 @@ class AccountController extends Controller
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.pages.orders.invoice', compact('order'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('shop.invoice', compact('order'));
 
         return $pdf->download('invoice-' . $order->order_number . '.pdf');
     }
