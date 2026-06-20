@@ -11,6 +11,7 @@
     $isFreeDelivery  = ((float)($product->shipping_cost_dhaka ?? 0)) == 0
                     && ((float)($product->shipping_cost_outside ?? 0)) == 0;
     $inStock         = $product->isInStock();
+    $inWishlist      = app(\App\Services\Ecommerce\Wishlist::class)->has($product->id);
 
     // Gallery
     $gallery = collect();
@@ -34,7 +35,7 @@
     $reviewCount = 6 + ($product->id * 7) % 90;          // 6–95
 @endphp
 
-<div class="product-card group relative flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-line hover:border-brand-mist transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
+<div class="product-card group relative flex flex-col h-full bg-white rounded-b-md overflow-hidden border border-line hover:border-brand-mist transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
 
     {{-- ── Image area ────────────────────────────────── --}}
     <div class="relative overflow-hidden aspect-[3/4] bg-image shrink-0">
@@ -56,17 +57,13 @@
         </a>
 
         {{-- Badges (rounded pills) --}}
-        <div class="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5">
+        <div class="absolute -top-3 -left-9 z-10 flex flex-wrap gap-1.5">
             @if ($hasDiscount)
-                <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-brand text-white tracking-wide">
+                <span class="text-[16px] font-medium px-8 -rotate-45 pt-5 pb-2  bg-brand text-white tracking-wide">
                     -{{ $discountPercent }}%
                 </span>
             @endif
-            @if ($isNew)
-                <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-emerald-600 text-white tracking-wide">
-                    {{ __('New') }}
-                </span>
-            @endif
+
         </div>
 
         {{-- Quick actions (reveal on hover) --}}
@@ -77,8 +74,10 @@
                     <i class="ph ph-eye text-base"></i>
                 </a>
                 <button type="button" aria-label="{{ __('Wishlist') }}"
-                   class="w-9 h-9 rounded-full bg-white/95 text-ink flex items-center justify-center shadow-md hover:bg-ink hover:text-white transition-colors">
-                    <i class="ph ph-heart text-base"></i>
+                   data-wishlist-toggle="{{ route('shop.wishlist.toggle', $product->id) }}"
+                   data-product-id="{{ $product->id }}"
+                   class="wishlist-btn w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-colors {{ $inWishlist ? 'bg-brand text-white' : 'bg-white/95 text-ink hover:bg-ink hover:text-white' }}">
+                    <i class="ph {{ $inWishlist ? 'ph-fill' : '' }} ph-heart text-base"></i>
                 </button>
                 <a href="{{ route('shop.product', $product->slug) }}" aria-label="{{ __('Add to cart') }}"
                    class="w-9 h-9 rounded-full bg-white/95 text-ink flex items-center justify-center shadow-md hover:bg-ink hover:text-white transition-colors">
@@ -95,15 +94,17 @@
                 </span>
             </div>
         @endif
-    </div>
 
+        
     {{-- Delivery bar (full-width, under image) --}}
     @if ($isFreeDelivery && $inStock)
-        <div class="bg-ink text-white text-xs font-medium flex items-center justify-center gap-1.5 py-2 tracking-widest">
-            <i class="ph ph-truck text-base"></i>
+        <div class="bg-brand rounded-tr-sm absolute z-100 bottom-0  px-3  text-white text-sm font-medium flex items-center justify-center gap-1.5 py-1.5 tracking-widest">
+            <i class="ph ph-truck text-xl"></i>
             {{ __('Free delivery') }}
         </div>
     @endif
+    </div>
+
 
     {{-- ── Body ──────────────────────────────────────── --}}
     <div class="flex flex-col flex-1 p-4">
@@ -122,6 +123,7 @@
         </a>
 
         {{-- Rating (decorative) --}}
+        @if (getOption('show_ratings', 0))
         <div class="flex items-center gap-1.5 mb-3">
             <div class="flex items-center gap-0.5">
                 @for ($s = 1; $s <= 5; $s++)
@@ -130,6 +132,7 @@
             </div>
             <span class="text-[11px] text-muted">({{ $reviewCount }})</span>
         </div>
+        @endif
 
         {{-- Pricing --}}
         <div class="flex items-baseline flex-wrap gap-2 mb-4">

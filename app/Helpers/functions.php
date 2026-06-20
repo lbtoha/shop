@@ -116,7 +116,9 @@ if (! function_exists('currencySymbol')) {
 if (! function_exists('amountWithSymbol')) {
     function amountWithSymbol(float|string $amount, $code = null)
     {
-        return getOption('currency_symbol', '৳').$amount;
+        $val = (float)$amount;
+        $formatted = ($val == (int)$val) ? (int)$val : number_format($val, 2, '.', '');
+        return getOption('currency_symbol', '৳').$formatted;
     }
 }
 

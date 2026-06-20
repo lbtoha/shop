@@ -1566,5 +1566,12 @@
     "Unavailable combination": "অনুপলব্ধ সংমিশ্রণ",
     "Choose options": "অপশন নির্বাচন করুন",
     ":product (:variant) is out of stock.": ":product (:variant) স্টকে নেই।",
-    "A product option in your cart is no longer available.": "আপনার কার্টের একটি পণ্য অপশন আর উপলব্ধ নেই।"
+    "A product option in your cart is no longer available.": "আপনার কার্টের একটি পণ্য অপশন আর উপলব্ধ নেই。",
+    "My Wishlist": "আমার উইশলিস্ট",
+    "Keep track of products you love": "আপনার পছন্দের পণ্যগুলোর তালিকা রাখুন",
+    "Your wishlist is empty": "আপনার উইশলিস্ট খালি",
+    "Tap the heart icon on any product to add it here.": "যোগ করতে যেকোনো পণ্যের হার্ট আইকন ট্যাপ করুন।",
+    "Browse Products": "পণ্য ব্রাউজ করুন",
+    ":product added to wishlist.": ":product উইশলিস্টে যোগ করা হয়েছে।",
+    ":product removed from wishlist.": ":product উইশলিস্ট থেকে সরানো হয়েছে।"
 }

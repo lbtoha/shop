@@ -317,6 +317,79 @@ function initMobileMenu() {
     toggle?.addEventListener("click", () => menu?.classList.toggle("hidden"));
 }
 
+/* AJAX Wishlist Toggle */
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-wishlist-toggle]");
+    if (!btn) return;
+    e.preventDefault();
+
+    const url = btn.getAttribute("data-wishlist-toggle");
+    const productId = btn.getAttribute("data-product-id");
+
+    btn.disabled = true;
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: jsonHeaders,
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            // Update the button state
+            const icon = btn.querySelector("i");
+            if (data.added) {
+                btn.classList.remove("bg-white/95", "text-ink", "hover:bg-ink", "hover:text-white", "bg-white", "text-neutral-700", "hover:bg-neutral-50", "border-neutral-200");
+                btn.classList.add("bg-brand", "text-white", "border-brand");
+                if (icon) {
+                    icon.classList.add("ph-fill");
+                }
+            } else {
+                if (btn.classList.contains("w-12")) {
+                    btn.classList.add("bg-white", "text-neutral-700", "hover:bg-neutral-50", "border-neutral-200");
+                    btn.classList.remove("bg-brand", "text-white", "border-brand");
+                } else {
+                    btn.classList.add("bg-white/95", "text-ink", "hover:bg-ink", "hover:text-white");
+                    btn.classList.remove("bg-brand", "text-white");
+                }
+                if (icon) {
+                    icon.classList.remove("ph-fill");
+                }
+                
+                // If we are currently on the wishlist page, smoothly remove the card
+                if (window.location.pathname.endsWith("/wishlist") || window.location.pathname.includes("/wishlist")) {
+                    const card = btn.closest(".product-card");
+                    if (card) {
+                        card.style.opacity = "0";
+                        card.style.transform = "scale(0.9)";
+                        card.style.transition = "all 0.3s ease";
+                        setTimeout(() => {
+                            card.remove();
+                            // Check if grid is empty now
+                            const grid = document.querySelector(".grid");
+                            if (grid && grid.children.length === 0) {
+                                window.location.reload(); // Reload to show empty state
+                            }
+                        }, 300);
+                    }
+                }
+            }
+
+            // Update all badges with the new wishlist count
+            document.querySelectorAll("[data-wishlist-count]").forEach((badge) => {
+                badge.textContent = data.count;
+                badge.classList.toggle("hidden", !data.count);
+            });
+
+            showToast(data.message, "success");
+        } else {
+            showToast(data.message || "Could not update wishlist.", "error");
+        }
+    } catch (err) {
+        showToast("Something went wrong.", "error");
+    } finally {
+        btn.disabled = false;
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     initHero();
     initMobileMenu();

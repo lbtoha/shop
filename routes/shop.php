@@ -35,6 +35,12 @@ Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::delete('coupon', [CartController::class, 'removeCoupon'])->name('coupon.remove');
 });
 
+Route::prefix('wishlist')->as('shop.wishlist.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Shop\WishlistController::class, 'index'])->name('index');
+    Route::post('toggle/{product}', [\App\Http\Controllers\Shop\WishlistController::class, 'toggle'])->name('toggle');
+    Route::get('count', [\App\Http\Controllers\Shop\WishlistController::class, 'count'])->name('count');
+});
+
 Route::prefix('checkout')->as('shop.checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');

@@ -8,6 +8,7 @@
     $cart    = app(\App\Services\Ecommerce\Cart::class);
     $cartCount    = $cart->count();
     $cartSubtotal = $cart->subtotal();
+    $wishlistCount = app(\App\Services\Ecommerce\Wishlist::class)->count();
 @endphp
 
 {{-- ── Announcement / top bar ──────────────────────────────── --}}
@@ -61,13 +62,10 @@
                 <i class="ph ph-list text-2xl"></i>
             </button>
             <a href="{{ route('home') }}"
-               class="flex items-center gap-2 shrink-0 group">
-                <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-brand text-white font-black text-base shadow-sm shadow-brand/30 group-hover:bg-brand-dark transition-colors">
-                    {{ strtoupper(substr($company['name'], 0, 1)) }}
-                </span>
-                <span class="text-lg sm:text-xl font-extrabold tracking-tight text-ink leading-none group-hover:text-brand transition-colors">
-                    {{ $company['name'] }}
-                </span>
+               class="flex items-center shrink-0 group">
+                <img src="{{ asset('assets/logo.png') }}"
+                     alt="{{ $company['name'] }}"
+                     class="h-14 sm:h-16 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80">
             </a>
         </div>
 
@@ -82,8 +80,8 @@
                {{ __('Shop') }}
             </a>
 
-            {{-- Categories dropdown (lg only — condensed) --}}
-            <div class="relative group lg:block xl:hidden">
+            {{-- Categories dropdown --}}
+            <div class="relative group">
                 <button class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-brand-soft hover:text-brand transition-all duration-150 focus:outline-none whitespace-nowrap">
                     {{ __('Categories') }}
                     <i class="ph ph-caret-down text-xs transition-transform duration-200 group-hover:rotate-180"></i>
@@ -93,42 +91,6 @@
                         @foreach ($navCategories as $cat)
                             <a href="{{ route('shop.index', ['category' => $cat->slug]) }}"
                                class="flex items-center gap-2.5 px-4 py-2.5 text-xs hover:bg-brand-soft hover:text-brand transition-colors font-medium">
-                               <i class="ph ph-tag text-brand/50 text-base"></i>
-                               {{ $cat->name }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            {{-- Individual category links (xl+) --}}
-            @foreach ($navCategories as $index => $cat)
-                @if ($index < 3)
-                    <a href="{{ route('shop.index', ['category' => $cat->slug]) }}"
-                       class="hidden xl:block px-3 py-2 rounded-lg hover:bg-brand-soft hover:text-brand transition-all duration-150 whitespace-nowrap">
-                       {{ $cat->name }}
-                    </a>
-                @elseif ($index < 5)
-                    <a href="{{ route('shop.index', ['category' => $cat->slug]) }}"
-                       class="hidden 2xl:block px-3 py-2 rounded-lg hover:bg-brand-soft hover:text-brand transition-all duration-150 whitespace-nowrap">
-                       {{ $cat->name }}
-                    </a>
-                @endif
-            @endforeach
-
-            {{-- More dropdown (xl+) --}}
-            <div class="relative group hidden xl:block">
-                <button class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-brand-soft hover:text-brand transition-all duration-150 focus:outline-none">
-                    {{ __('More') }}
-                    <i class="ph ph-caret-down text-xs transition-transform duration-200 group-hover:rotate-180"></i>
-                </button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 w-52 pt-2 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                    <div class="bg-white border border-line rounded-2xl shadow-2xl shadow-ink/10 py-1.5 overflow-hidden">
-                        @foreach ($navCategories as $index => $cat)
-                            <a href="{{ route('shop.index', ['category' => $cat->slug]) }}"
-                               class="flex items-center gap-2.5 px-4 py-2.5 text-xs hover:bg-brand-soft hover:text-brand transition-colors font-medium
-                                      {{ $index < 3 ? 'xl:hidden' : 'block' }}
-                                      {{ $index < 5 ? '2xl:hidden' : 'block' }}">
                                <i class="ph ph-tag text-brand/50 text-base"></i>
                                {{ $cat->name }}
                             </a>
@@ -180,6 +142,24 @@
                 </a>
             @endauth
 
+            {{-- Wishlist --}}
+            <a href="{{ route('shop.wishlist.index') }}"
+                class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-brand-soft group transition-colors cursor-pointer">
+                <span class="relative">
+                    <span class="w-8 h-8 rounded-xl bg-canvas text-muted flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-200 shrink-0 border border-line group-hover:border-brand">
+                        <i class="ph ph-heart text-base"></i>
+                    </span>
+                    <span data-wishlist-count
+                        class="{{ $wishlistCount ? '' : 'hidden' }} absolute -top-1.5 -right-1.5 bg-accent text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm transition-all duration-300">
+                        {{ $wishlistCount }}
+                    </span>
+                </span>
+                <span class="hidden xl:block leading-none text-left">
+                    <span class="block text-[10px] text-subtle font-normal">{{ __('Wishlist') }}</span>
+                    <span class="block text-xs font-bold text-ink group-hover:text-brand transition-colors">{{ __('View') }}</span>
+                </span>
+            </a>
+
             {{-- Cart --}}
             <button data-cart-open
                 class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-brand-soft group transition-colors cursor-pointer">
@@ -228,6 +208,13 @@
             <a href="{{ route('shop.index') }}"
                class="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-brand-soft hover:text-brand transition-colors">
                <i class="ph ph-storefront text-base text-brand/60"></i>{{ __('Shop') }}
+            </a>
+            <a href="{{ route('shop.wishlist.index') }}"
+               class="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-brand-soft hover:text-brand transition-colors">
+               <i class="ph ph-heart text-base text-brand/60"></i>{{ __('Wishlist') }}
+               <span data-wishlist-count class="{{ $wishlistCount ? '' : 'hidden' }} ml-auto bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                   {{ $wishlistCount }}
+               </span>
             </a>
 
             @if ($navCategories->isNotEmpty())

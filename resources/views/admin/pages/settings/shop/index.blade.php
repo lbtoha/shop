@@ -13,6 +13,11 @@
 
                 <x-admin::number-input-group name="shipping_cost" :value="$settings['shipping_cost']"
                     label="Flat Shipping Cost" :with_currencySymbol="false" />
+
+                <div class="input-group">
+                    <x-admin::label for="show_ratings">{{ __('Show Product Ratings') }}</x-admin::label>
+                    <x-admin::switch name="show_ratings" id="show_ratings" :value="isset($settings['show_ratings']) ? $settings['show_ratings'] : 0" :types="[['label' => __('Disabled'), 'value' => 0], ['label' => __('Enabled'), 'value' => 1]]" />
+                </div>
             </div>
 
             <p class="text-sm text-neutral-500 mt-3">

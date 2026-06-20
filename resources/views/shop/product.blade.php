@@ -97,9 +97,9 @@
                     </div>
                 @endif
                 {{-- Primary Viewer --}}
-                <div id="main-image-container" class="flex-1 rounded-2xl overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative group cursor-zoom-in">
+                <div id="main-image-container" class="flex-1 rounded-2xl overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative">
                     @if ($mainImage)
-                        <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                        <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
 
                         {{-- Video iframe holder (hidden until a video thumb is chosen) --}}
                         <div id="main-video-wrap" class="absolute inset-0 z-20 hidden bg-black">
@@ -108,8 +108,8 @@
                                 allowfullscreen></iframe>
                         </div>
 
-                        {{-- Zoom Lens --}}
-                        <div id="zoom-lens" class="absolute border border-brand/20 bg-brand/5 pointer-events-none hidden z-10 rounded-lg shadow-sm" style="width: 150px; height: 187.5px;"></div>
+                        {{-- Zoom Lens (circular, matches reference site) --}}
+                        <div id="zoom-lens" class="absolute pointer-events-none hidden z-10 rounded-full shadow-2xl border-2" style="width:140px;height:140px;border-color:rgba(225,29,72,0.35);background:rgba(225,29,72,0.06);backdrop-filter:blur(2px);"></div>
 
                         {{-- Prev / Next arrows --}}
                         @if ($media->count() > 1)
@@ -129,11 +129,9 @@
                     @endif
                 </div>
 
-                {{-- Zoom Result Window (Desktop only, absolutely positioned relative to the gallery column) --}}
+                {{-- Zoom Result Window (Desktop only, background-image approach — no child img) --}}
                 @if ($mainImage)
-                    <div id="zoom-result" class="absolute left-[calc(100%+1.5rem)] top-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-neutral-100 bg-neutral-50 z-30 hidden pointer-events-none">
-                        <img id="zoom-result-image" src="{{ $mainImage }}" class="absolute max-w-none origin-top-left">
-                    </div>
+                    <div id="zoom-result" class="absolute left-[calc(100%+1.5rem)] top-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-neutral-100 bg-neutral-50 z-30 hidden pointer-events-none bg-no-repeat"></div>
                 @endif
             </div>
 
@@ -205,6 +203,9 @@
                     @endif
 
                     {{-- Add to Cart / Order Now actions --}}
+                    @php
+                        $inWishlist = app(\App\Services\Ecommerce\Wishlist::class)->has($product->id);
+                    @endphp
                     @if ($product->isInStock())
                         <div class="mt-5 pt-4 border-t border-neutral-100 flex flex-col sm:flex-row items-stretch gap-3">
                             <input type="hidden" id="selected-variant-id" name="variant_id" value="">
@@ -232,11 +233,27 @@
                                 <i class="ph ph-lightning text-base"></i>
                                 <span>{{ __('ORDER NOW') }}</span>
                             </button>
+
+                            {{-- Wishlist --}}
+                            <button type="button"
+                                    data-wishlist-toggle="{{ route('shop.wishlist.toggle', $product->id) }}"
+                                    data-product-id="{{ $product->id }}"
+                                    class="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
+                                <i class="ph ph-heart text-xl {{ $inWishlist ? 'ph-fill' : '' }}"></i>
+                            </button>
                         </div>
                     @else
-                        <div class="mt-5 pt-4 border-t border-neutral-100">
-                            <button disabled class="w-full bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-xl text-xs tracking-wider uppercase cursor-not-allowed">
+                        <div class="mt-5 pt-4 border-t border-neutral-100 flex items-center gap-3">
+                            <button disabled class="flex-1 bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-xl text-xs tracking-wider uppercase cursor-not-allowed">
                                 {{ __('OUT OF STOCK') }}
+                            </button>
+
+                            {{-- Wishlist --}}
+                            <button type="button"
+                                    data-wishlist-toggle="{{ route('shop.wishlist.toggle', $product->id) }}"
+                                    data-product-id="{{ $product->id }}"
+                                    class="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
+                                <i class="ph ph-heart text-xl {{ $inWishlist ? 'ph-fill' : '' }}"></i>
                             </button>
                         </div>
                     @endif
@@ -428,71 +445,53 @@
             })();
 
             // Premium Side-by-Side Hover Zoom (Desktop only)
+            // Uses background-image on the result panel — main image is NEVER touched.
             (function () {
                 var container = document.getElementById('main-image-container');
-                var mainImg = document.getElementById('main-product-image');
-                var lens = document.getElementById('zoom-lens');
-                var result = document.getElementById('zoom-result');
-                var resultImg = document.getElementById('zoom-result-image');
+                var mainImg  = document.getElementById('main-product-image');
+                var lens     = document.getElementById('zoom-lens');
+                var result   = document.getElementById('zoom-result');
 
-                if (!container || !mainImg || !lens || !result || !resultImg) return;
+                if (!container || !mainImg || !lens || !result) return;
 
-                function getCursorPos(e) {
-                    var a = mainImg.getBoundingClientRect();
-                    var x = e.clientX - a.left;
-                    var y = e.clientY - a.top;
-                    return { x: x, y: y };
-                }
+                var SCALE = 3; // zoom magnification
 
-                function moveLens(e) {
+                container.addEventListener('mousemove', function (e) {
+                    if (window.innerWidth < 1024) return;
                     if (window.__galleryIsVideo && window.__galleryIsVideo()) return;
-                    var pos = getCursorPos(e);
 
-                    // Calculate lens position
-                    var x = pos.x - (lens.offsetWidth / 2);
-                    var y = pos.y - (lens.offsetHeight / 2);
+                    // Show on first move (avoids flicker on plain mouseenter)
+                    lens.classList.remove('hidden');
+                    result.classList.remove('hidden');
+                    container.style.cursor = 'crosshair';
 
-                    var maxX = mainImg.offsetWidth - lens.offsetWidth;
-                    var maxY = mainImg.offsetHeight - lens.offsetHeight;
+                    var rect = mainImg.getBoundingClientRect();
+                    var x = e.clientX - rect.left;
+                    var y = e.clientY - rect.top;
 
-                    if (x > maxX) { x = maxX; }
-                    if (x < 0) { x = 0; }
-                    if (y > maxY) { y = maxY; }
-                    if (y < 0) { y = 0; }
+                    // Clamp lens so it stays inside the image
+                    var lensX = x - lens.offsetWidth  / 2;
+                    var lensY = y - lens.offsetHeight / 2;
+                    if (lensX < 0) lensX = 0;
+                    if (lensY < 0) lensY = 0;
+                    if (lensX > rect.width  - lens.offsetWidth)  lensX = rect.width  - lens.offsetWidth;
+                    if (lensY > rect.height - lens.offsetHeight) lensY = rect.height - lens.offsetHeight;
 
-                    lens.style.left = x + "px";
-                    lens.style.top = y + "px";
+                    lens.style.left = lensX + 'px';
+                    lens.style.top  = lensY + 'px';
 
-                    var cx = result.offsetWidth / lens.offsetWidth;
-                    var cy = result.offsetHeight / lens.offsetHeight;
-
-                    resultImg.style.width = (mainImg.offsetWidth * cx) + "px";
-                    resultImg.style.height = (mainImg.offsetHeight * cy) + "px";
-                    resultImg.style.left = "-" + (x * cx) + "px";
-                    resultImg.style.top = "-" + (y * cy) + "px";
-                }
-
-                container.addEventListener('mouseenter', function () {
-                    // Don't zoom while a video is playing in the viewer.
-                    if (window.__galleryIsVideo && window.__galleryIsVideo()) return;
-                    if (window.innerWidth >= 1024) {
-                        lens.classList.remove('hidden');
-                        result.classList.remove('hidden');
-
-                        mainImg.style.transform = 'none';
-                        mainImg.style.transition = 'none';
-                    }
+                    // Drive the result via background-image — the main image is never modified
+                    result.style.backgroundImage    = 'url(' + mainImg.src + ')';
+                    result.style.backgroundSize     = (rect.width * SCALE) + 'px ' + (rect.height * SCALE) + 'px';
+                    result.style.backgroundPosition = '-' + (lensX * SCALE) + 'px -' + (lensY * SCALE) + 'px';
                 });
 
                 container.addEventListener('mouseleave', function () {
                     lens.classList.add('hidden');
                     result.classList.add('hidden');
-                    
-                    mainImg.style.transform = '';
-                    mainImg.style.transition = '';
+                    container.style.cursor = '';
+                    // Nothing to reset on mainImg — it was never touched.
                 });
-
-                container.addEventListener('mousemove', moveLens);
             })();
 
             // Variant picker: selecting one value per option group resolves a variant.
