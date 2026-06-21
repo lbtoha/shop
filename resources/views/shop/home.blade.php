@@ -117,6 +117,7 @@
 @if ($featuredProducts->isNotEmpty())
     @include('shop.partials.product-slider-section', [
         'title'   => $featuredTitle,
+        'eyebrow' => __('Exclusive'),
         'products' => $featuredProducts,
         'viewAll' => route('shop.index', ['featured' => 1]),
     ])
@@ -126,6 +127,7 @@
 @if ($allProducts->isNotEmpty())
     @include('shop.partials.product-section', [
         'title'    => $allTitle,
+        'eyebrow' => __('Trending'),
         'products' => $allProducts,
         'viewAll'  => route('shop.index'),
     ])
@@ -135,6 +137,7 @@
 @foreach ($homeSections as $section)
     @include('shop.partials.product-' . ($section['layout'] === 'slider' ? 'slider-section' : 'section'), [
         'title'    => $section['title'],
+        'eyebrow' => __('Collection'),
         'products' => $section['products'],
         'viewAll'  => $section['viewAll'],
     ])

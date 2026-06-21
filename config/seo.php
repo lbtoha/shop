@@ -2,25 +2,25 @@
 
 return [
     // Basic Meta Tags
-    'title' => 'QuiziX | A Online Quiz and Contest Platform',
-    'description' => 'QuiziX is a modern quiz and contest platform that helps you test your knowledge and compete with others. Join now and start your quiz journey!',
-    'author' => 'QuiziX',
+    'title' => 'Premium Gallery BD | Exclusive Online Shop',
+    'description' => 'Premium Gallery BD is your ultimate destination for exquisite collections and high-quality products. Discover our premium selection today!',
+    'author' => 'Premium Gallery BD',
     'robots' => 'index, follow',
     'image' => '/uploads/images/og-image.jpg',
-    'keywords' => 'Quiz, Contest, Online, Quiziz, QuiziX, QuiziX.com, Quiziz.com',
+    'keywords' => 'Premium Gallery, Premium Gallery BD, Online Shop, E-commerce Bangladesh',
     'canonical_link' => '',
     'alternates' => [
         'canonical' => '',
     ],
     'openGraph' => [
-        'title' => 'QuiziX | A Online Quiz and Contest Platform',
-        'description' => 'QuiziX is a modern quiz and contest platform that helps you test your knowledge and compete with others. Join now and start your quiz journey!',
+        'title' => 'Premium Gallery BD | Exclusive Online Shop',
+        'description' => 'Premium Gallery BD is your ultimate destination for exquisite collections and high-quality products. Discover our premium selection today!',
         'type' => 'website',
         'url' => '',
-        'site_name' => 'QuiziX',
+        'site_name' => 'Premium Gallery BD',
         'locale' => 'en_US',
         'image' => '/uploads/images/og-image.jpg',
-        'imageAlt' => 'QuiziX',
+        'imageAlt' => 'Premium Gallery BD',
         'imageWidth' => '1200',
         'imageHeight' => '630',
     ],
@@ -28,10 +28,10 @@ return [
     // Twitter Meta Tags
     'twitter' => [
         'card' => 'summary_large_image',
-        'site' => '@QuiziX',
-        'creator' => '@QuiziX',
-        'title' => 'QuiziX | A Online Quiz and Contest Platform',
-        'description' => 'QuiziX is a modern quiz and contest platform that helps you test your knowledge and compete with others. Join now and start your quiz journey!',
+        'site' => '@PremiumGalleryBD',
+        'creator' => '@PremiumGalleryBD',
+        'title' => 'Premium Gallery BD | Exclusive Online Shop',
+        'description' => 'Premium Gallery BD is your ultimate destination for exquisite collections and high-quality products. Discover our premium selection today!',
         'image' => '/uploads/images/og-image.jpg',
     ],
 
@@ -52,7 +52,7 @@ return [
         // Mobile Viewport Optimization
         [
             'name' => 'theme-color',
-            'content' => '#FF0000',
+            'content' => '#E11D48',
         ],
         [
             'name' => 'msapplication-TileColor',
@@ -68,7 +68,7 @@ return [
         ],
         [
             'name' => 'application-name',
-            'content' => 'QuiziX',
+            'content' => 'Premium Gallery BD',
         ],
     ],
 
@@ -92,7 +92,7 @@ return [
             'content' => json_encode([
                 '@context' => 'https://schema.org',
                 '@type' => 'WebSite',
-                'name' => 'QuiziX',
+                'name' => 'Premium Gallery BD',
                 'url' => '',
                 'potentialAction' => [
                     '@type' => 'SearchAction',

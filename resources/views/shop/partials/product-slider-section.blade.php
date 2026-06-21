@@ -5,19 +5,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-<section class="shop-container mt-14 sm:mt-16 group/slider">
+<section class="shop-container mt-14  group/slider">
 
     {{-- Heading --}}
-    <div class="flex items-end justify-between gap-4 mb-6">
-        <div class="section-heading is-start mb-0">
+    <div class="relative w-full flex flex-col items-center mb-6">
+        <div class="section-heading mb-0">
+            <span class="eyebrow">{{ $eyebrow ?? __('Exclusive') }}</span>
             <h2>{{ $title }}</h2>
         </div>
-        @if (isset($viewAll))
-            <a href="{{ $viewAll }}" class="btn-outline shrink-0 hidden sm:inline-flex">
-                {{ __('View All') }}
-                <i class="ph ph-arrow-right text-sm"></i>
-            </a>
-        @endif
     </div>
 
     {{-- Slider wrapper --}}
@@ -61,9 +56,9 @@
         </div>
     </div>
 
-    {{-- View all (mobile) --}}
+    {{-- View all --}}
     @if (isset($viewAll))
-        <div class="flex justify-center mt-7 sm:hidden">
+        <div class="flex justify-center mt-8">
             <a href="{{ $viewAll }}" class="btn-outline">
                 {{ __('View All') }}
                 <i class="ph ph-arrow-right text-sm"></i>
@@ -84,9 +79,9 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         breakpoints: {
             480:  { slidesPerView: 2, spaceBetween: 14 },
-            768:  { slidesPerView: 3, spaceBetween: 18 },
-            1024: { slidesPerView: 4, spaceBetween: 20 },
-            1280: { slidesPerView: 4, spaceBetween: 24 },
+            768:  { slidesPerView: 3, spaceBetween: 16 },
+            1024: { slidesPerView: 4, spaceBetween: 16 },
+            1280: { slidesPerView: 4, spaceBetween: 16 },
         },
     });
 });

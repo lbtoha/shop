@@ -2,11 +2,11 @@
 
 return [
     'company_info' => [
-        'name' => 'Quizix',
-        'email' => 'support@quizix.com',
+        'name' => 'Premium Gallery BD',
+        'email' => 'support@premiumgallerybd.com',
         'phone' => '+123 456 789',
-        'website' => 'www.quizix.com',
-        'description' => 'We understand that business can be chaotic. That’s where we come in. We’re focused on adding some much-needed balance to the mix.',
+        'website' => 'www.premiumgallerybd.com',
+        'description' => 'Your premium destination for exquisite products and curated collections. Elevate your lifestyle with our exclusive selection.',
     ],
     'frontend_url' => 'http://localhost:3000',
     'KYC_approval_time' => '3-5 business days', // in minutes

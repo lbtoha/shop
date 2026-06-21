@@ -343,7 +343,7 @@
                         {{ __('SEE ALL') }}
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach ($related as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
@@ -360,7 +360,7 @@
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach ($recommended as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach

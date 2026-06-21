@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'title' => 'QuiziX | A Online Quiz and Contest Platform',
-    'description' => 'QuiziX is a modern quiz and contest platform that helps you test your knowledge and compete with others. Join now and start your quiz journey!',
+    'title' => 'Premium Gallery BD | Exclusive Online Shop',
+    'description' => 'Premium Gallery BD is your ultimate destination for exquisite collections and high-quality products. Discover our premium selection today!',
     'background_color' => '#FF0000',
     'theme_color' => '#FF0000',
     'icons' => [

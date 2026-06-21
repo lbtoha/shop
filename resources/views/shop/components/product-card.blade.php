@@ -35,7 +35,7 @@
     $reviewCount = 6 + ($product->id * 7) % 90;          // 6–95
 @endphp
 
-<div class="product-card group relative flex flex-col h-full bg-white rounded-b-md overflow-hidden border border-line hover:border-brand-mist transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
+<div class="product-card group relative flex flex-col h-full bg-white rounded-b-md overflow-hidden border border-line hover:border-brand-mist transition-all duration-200 ">
 
     {{-- ── Image area ────────────────────────────────── --}}
     <div class="relative overflow-hidden aspect-[3/4] bg-image shrink-0">
@@ -98,8 +98,8 @@
         
     {{-- Delivery bar (full-width, under image) --}}
     @if ($isFreeDelivery && $inStock)
-        <div class="bg-brand rounded-tr-sm absolute z-100 bottom-0  px-3  text-white text-sm font-medium flex items-center justify-center gap-1.5 py-1.5 tracking-widest">
-            <i class="ph ph-truck text-xl"></i>
+        <div class="bg-white rounded-tr-sm absolute z-10 bottom-0 px-3 text-brand text-sm font-medium flex items-center justify-center gap-1.5 py-1 tracking-widest">
+            <img src="{{ asset('assets/truck.png') }}" alt="Free delivery" class="size-6 object-contain" />
             {{ __('Free delivery') }}
         </div>
     @endif

@@ -9,31 +9,7 @@
 
 
 
-<footer class="shop-footer text-neutral-400">
-
-    {{-- ── Trust strip ─────────────────────────────────────── --}}
-    <div class="border-b border-white/[0.06] pt-20 sm:pt-24">
-        <div class="shop-container pb-7">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5">
-                @foreach ([
-                    ['icon' => 'ph-truck',                   'title' => __('Free Delivery'),    'sub' => __('On orders above ৳5000')],
-                    ['icon' => 'ph-hand-coins',              'title' => __('Cash on Delivery'), 'sub' => __('Pay when order arrives')],
-                    ['icon' => 'ph-arrow-counter-clockwise', 'title' => __('Easy Returns'),     'sub' => __('7-day return policy')],
-                    ['icon' => 'ph-shield-check',            'title' => __('100% Genuine'),     'sub' => __('Authentic products only')],
-                ] as $t)
-                    <div class="flex items-center gap-3 group">
-                        <div class="w-11 h-11 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shrink-0 group-hover:bg-brand group-hover:border-brand group-hover:scale-105 transition-all duration-300">
-                            <i class="ph {{ $t['icon'] }} text-brand-light group-hover:text-white text-xl transition-colors duration-300"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-white text-xs font-bold leading-tight">{{ $t['title'] }}</p>
-                            <p class="text-neutral-500 text-[11px] mt-0.5 leading-snug">{{ $t['sub'] }}</p>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
+<footer class="shop-footer">
 
     {{-- ── Main columns ────────────────────────────────────── --}}
     <div class="shop-container pt-14 pb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-6">
@@ -46,13 +22,13 @@
                      class="h-20 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80">
             </a>
 
-            <p class="text-sm leading-relaxed text-neutral-400 max-w-xs">
+            <p class="text-sm leading-relaxed text-muted max-w-xs">
                 {{ $company['description'] ?? __('Your trusted destination for quality products, delivered to your doorstep with care.') }}
             </p>
 
             {{-- Social --}}
             <div>
-                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500 mb-3">{{ __('Follow Us') }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-muted mb-3">{{ __('Follow Us') }}</p>
                 <div class="flex items-center gap-2.5">
                     <a href="{{ $fbLink }}" target="_blank" rel="noopener" aria-label="Facebook"
                        class="w-10 h-10 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2] border border-[#1877F2]/20 hover:border-[#1877F2] flex items-center justify-center text-[#3b82f6] hover:text-white hover:-translate-y-0.5 transition-all duration-200">
@@ -115,22 +91,22 @@
             </ul>
         </div>
 
-    
+
     </div>
 
     {{-- ── Payment / delivery badges ───────────────────────── --}}
-  
+
     {{-- ── Bottom bar ──────────────────────────────────────── --}}
-    <div class="border-t border-white/[0.06] bg-black/25">
+    <div class="border-t border-line">
         <div class="shop-container py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p class="text-xs text-neutral-500 text-center sm:text-left">
+            <p class="text-xs text-muted text-center sm:text-left">
                 &copy; {{ date('Y') }}
-                <a href="{{ route('home') }}" class="text-neutral-300 font-semibold hover:text-brand-light transition-colors">{{ $company['name'] }}</a>.
+                <a href="{{ route('home') }}" class="text-ink font-semibold hover:text-brand transition-colors">{{ $company['name'] }}</a>.
                 {{ __('All rights reserved.') }}
             </p>
-            <div class="flex items-center gap-4 text-[11px] text-neutral-600">
+            <div class="flex items-center gap-4 text-[11px] text-muted">
                 <span class="flex items-center gap-1.5"><i class="ph ph-lock-simple text-brand/60 text-xs"></i>{{ __('Secure Checkout') }}</span>
-                <span class="w-px h-3 bg-white/10"></span>
+                <span class="w-px h-3 bg-line"></span>
                 <span class="flex items-center gap-1.5"><i class="ph ph-headset text-brand/60 text-xs"></i>{{ __('24/7 Support') }}</span>
             </div>
         </div>
