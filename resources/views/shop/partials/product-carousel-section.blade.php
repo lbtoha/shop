@@ -15,14 +15,14 @@
         </div>
     </div>
 
-    <div class="relative px-0 sm:px-10">
+    <div class="relative px-0">
         <button type="button" id="{{ $sliderId }}-prev"
-            class="absolute -left-1 sm:left-0 top-[45%] -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-line shadow-md flex items-center justify-center text-ink hover:text-brand hover:border-brand hover:shadow-lg transition-all duration-200 opacity-0 group-hover/slider:opacity-100 focus:opacity-100 cursor-pointer">
-            <i class="ph ph-caret-left text-lg font-bold"></i>
+            class="absolute left-0 top-[35%] -translate-y-1/2 z-20 w-8 h-12 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white flex items-center justify-start pl-2 border border-l-0 border-brand-mist hover:border-brand transition-all duration-300 lg:opacity-0 lg:group-hover/slider:opacity-100 shadow-sm hover:shadow-md disabled:opacity-25 disabled:pointer-events-none cursor-pointer">
+            <i class="ph-bold ph-caret-left text-base"></i>
         </button>
         <button type="button" id="{{ $sliderId }}-next"
-            class="absolute -right-1 sm:right-0 top-[45%] -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-line shadow-md flex items-center justify-center text-ink hover:text-brand hover:border-brand hover:shadow-lg transition-all duration-200 opacity-0 group-hover/slider:opacity-100 focus:opacity-100 cursor-pointer">
-            <i class="ph ph-caret-right text-lg font-bold"></i>
+            class="absolute right-0 top-[35%] -translate-y-1/2 z-20 w-8 h-12 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white flex items-center justify-end pr-2 border border-r-0 border-brand-mist hover:border-brand transition-all duration-300 lg:opacity-0 lg:group-hover/slider:opacity-100 shadow-sm hover:shadow-md disabled:opacity-25 disabled:pointer-events-none cursor-pointer">
+            <i class="ph-bold ph-caret-right text-base"></i>
         </button>
 
         <div class="swiper {{ $sliderId }} overflow-hidden pb-1">
@@ -50,7 +50,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     new Swiper('.{{ $sliderId }}', {
-        slidesPerView: 2,
+        slidesPerView: 1,
         spaceBetween: 12,
         loop: {{ $products->count() > 4 ? 'true' : 'false' }},
         autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
             prevEl: '#{{ $sliderId }}-prev',
         },
         breakpoints: {
-            480:  { slidesPerView: 2, spaceBetween: 14 },
+            475:  { slidesPerView: 2, spaceBetween: 14 },
             768:  { slidesPerView: 3, spaceBetween: 16 },
             1024: { slidesPerView: 4, spaceBetween: 16 },
             1280: { slidesPerView: 4, spaceBetween: 16 },

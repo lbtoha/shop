@@ -67,9 +67,8 @@ class HomeSectionRequest extends FormRequest
             'subtitle' => trim($data['subtitle'] ?? '') ?: null,
             'source' => $data['source'],
             'layout' => $data['layout'],
-            // Category is required for the Category source and an optional
-            // filter for the Custom Product List source; irrelevant otherwise.
-            'category_id' => ($source->needsCategory() || $source->needsProducts())
+            // Category is required for the Category source; irrelevant otherwise.
+            'category_id' => $source->needsCategory()
                 ? ($data['category_id'] ?? null)
                 : null,
             'product_ids' => $source->needsProducts()

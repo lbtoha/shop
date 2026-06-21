@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@phosphor-icons/web/regular";
 @import "@phosphor-icons/web/fill";
+@import "@phosphor-icons/web/bold";
 
 @theme {
     /* ── Brand palette (crimson #E11D48) ── */
@@ -46,6 +47,9 @@
     /* ── Typography ── */
     --font-sans: "Outfit", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
     --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+    /* ── Breakpoints ── */
+    --breakpoint-xs: 475px;
 }
 
 /* ── Base ─────────────────────────────────────────────────── */
@@ -123,25 +127,7 @@ h5 {
 
 /* ── Layout container ─────────────────────────────────────── */
 .shop-container {
-    width: 100%;
-    max-width: 1440px;
-    margin-inline: auto;
-    padding-inline: 1rem;
-}
-@media (min-width: 640px) {
-    .shop-container {
-        padding-inline: 1.5rem;
-    }
-}
-@media (min-width: 1024px) {
-    .shop-container {
-        padding-inline: 2.5rem;
-    }
-}
-@media (min-width: 1280px) {
-    .shop-container {
-        padding-inline: 3.5rem;
-    }
+    @apply w-full max-w-[1440px] mx-auto px-4 ;
 }
 
 /* ── Section heading helper ───────────────────────────────── */
@@ -453,9 +439,11 @@ nav[role="navigation"] a:focus {
 
 /* ── Footer ───────────────────────────────────────────────── */
 .shop-footer {
-    position: relative;
-    background: var(--color-canvas);
-    border-top: 1px solid var(--color-line);
+    /* position: relative;
+    background: var(--color-);
+    border-top: 1px solid var(--color-line); */
+    @apply relative bg-brand/10 mt-10; 
+
 }
 .shop-footer > * {
     position: relative;
@@ -543,3 +531,20 @@ nav[role="navigation"] a:focus {
     background: var(--color-brand-dark);
     transform: translateY(-2px);
 }
+
+/* ── Hero Slide Content Animations ── */
+[data-slide] .content-anim > * {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-slide].active .content-anim > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-slide].active .content-anim > *:nth-child(1) { transition-delay: 150ms; }
+[data-slide].active .content-anim > *:nth-child(2) { transition-delay: 280ms; }
+[data-slide].active .content-anim > *:nth-child(3) { transition-delay: 400ms; }
+[data-slide].active .content-anim > *:nth-child(4) { transition-delay: 520ms; }

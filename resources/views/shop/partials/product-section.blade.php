@@ -11,7 +11,7 @@
     </div>
 
     {{-- Grid --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         @foreach ($products as $product)
             <x-shop::product-card :product="$product" />
         @endforeach

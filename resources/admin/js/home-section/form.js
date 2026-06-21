@@ -62,12 +62,6 @@ $(function () {
                     }
                 });
 
-                // Drop already-chosen products that fall outside the new category.
-                list.querySelectorAll(".selected-product-item").forEach((li) => {
-                    if (li.dataset.category && li.dataset.category !== catId) {
-                        li.remove();
-                    }
-                });
             }
 
             destroySelect2("product_picker");

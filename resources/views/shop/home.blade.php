@@ -7,7 +7,7 @@
 {{-- ── Hero Carousel ─────────────────────────────────────────── --}}
 @if ($banners->isNotEmpty())
 <div class="shop-container mt-5 sm:mt-6">
-    <div class="relative w-full h-[280px] sm:h-[420px] lg:h-[520px] rounded-2xl sm:rounded-3xl overflow-hidden group/hero bg-ink"
+    <div class="relative w-full h-[320px] xs:h-[380px] sm:h-[440px] lg:h-[520px]  overflow-hidden group/hero bg-ink"
          data-hero>
 
         {{-- Slides --}}
@@ -19,37 +19,37 @@
                          class="w-full h-full object-cover">
                 </div>
                 {{-- Layered gradient for readability --}}
-                <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent lg:from-black/85 lg:via-black/40 lg:to-transparent"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
 
                 {{-- Slide content --}}
                 <div class="absolute inset-0 flex items-center">
-                    <div class="px-6 sm:px-12 lg:px-16 space-y-3 sm:space-y-5 max-w-xl content-anim">
+                    <div class="px-6 sm:px-12 lg:px-16 space-y-2.5 xs:space-y-4 sm:space-y-5 max-w-[85%] sm:max-w-xl content-anim">
                         {{-- Eyebrow badge --}}
-                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 xs:px-3 xs:py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white">
                             <span class="w-1.5 h-1.5 rounded-full bg-brand-light animate-pulse"></span>
-                            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em]">{{ __('Special Offer') }}</span>
+                            <span class="text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em]">{{ __('Special Offer') }}</span>
                         </span>
 
                         {{-- Title --}}
-                        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight leading-[1.1] text-white">
+                        <h1 class="text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight leading-[1.1] text-white">
                             {!! str_replace(' & ', ' <span class="text-brand-light">&</span> ', e(__($banner->title))) !!}
                         </h1>
 
                         {{-- Subtitle --}}
-                        <p class="text-sm sm:text-base text-white/80 font-medium max-w-md leading-relaxed">
+                        <p class="text-xs xs:text-sm sm:text-base text-white/80 font-medium max-w-xs sm:max-w-md leading-relaxed">
                             {{ __($banner->subtitle) }}
                         </p>
 
                         {{-- CTA --}}
-                        <div class="flex items-center gap-4 pt-2">
+                        <div class="flex items-center gap-4 pt-1 sm:pt-2">
                             <a href="{{ $banner->link ?: route('shop.index') }}"
-                               class="btn-brand text-sm py-3 px-7 group/btn">
+                               class="btn-brand text-xs py-2.5 px-5 xs:text-sm xs:py-3 xs:px-7 group/btn">
                                 <span>{{ __($banner->button_text ?: 'Shop Now') }}</span>
                                 <i class="ph ph-arrow-right transition-transform duration-200 group-hover/btn:translate-x-1"></i>
                             </a>
                             <a href="{{ route('shop.index') }}"
-                               class="text-sm text-white/75 hover:text-white font-semibold underline underline-offset-4 transition-colors">
+                               class="text-xs xs:text-sm text-white/75 hover:text-white font-semibold underline underline-offset-4 transition-colors">
                                {{ __('Browse All') }}
                             </a>
                         </div>
@@ -60,19 +60,19 @@
 
         {{-- Controls (always visible on touch, fade-in on desktop hover) --}}
         <button type="button" data-hero-prev
-            class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/25 hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-lg cursor-pointer">
-            <i class="ph ph-caret-left text-xl"></i>
+            class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-12 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-start pl-2 border border-l-0 border-brand-mist hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer">
+            <i class="ph-bold ph-caret-left text-base"></i>
         </button>
         <button type="button" data-hero-next
-            class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/25 hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-lg cursor-pointer">
-            <i class="ph ph-caret-right text-xl"></i>
+            class="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-12 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-end pr-2 border border-r-0 border-brand-mist hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer">
+            <i class="ph-bold ph-caret-right text-base"></i>
         </button>
 
         {{-- Dots --}}
         <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
             @foreach ($banners as $i => $banner)
                 <button type="button" data-hero-dot="{{ $i }}"
-                    class="w-3 h-1.5 rounded-full bg-white/35 hover:bg-white/60 transition-all duration-300 cursor-pointer"
+                    class="{{ $i === 0 ? 'bg-brand w-8' : 'bg-white/35 w-3' }} h-1.5 rounded-full hover:bg-white/60 transition-all duration-300 cursor-pointer"
                     aria-label="Slide {{ $i + 1 }}"></button>
             @endforeach
         </div>

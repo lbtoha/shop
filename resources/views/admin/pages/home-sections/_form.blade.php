@@ -65,7 +65,7 @@
                 @endforeach
             </x-admin::select-option>
             <p class="text-xs text-gray-400 mt-2" data-source-hint="products" hidden>
-                {{ __('Optional. Limit this section to a single category — only products from it will show.') }}
+                {{ __('Optional. Filter the product list below by category to easily find products from different categories.') }}
             </p>
             <x-admin::input-error name="category_id" />
         </div>

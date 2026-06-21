@@ -114,12 +114,12 @@
                         {{-- Prev / Next arrows --}}
                         @if ($media->count() > 1)
                             <button type="button" id="gallery-prev"
-                                class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-700 hover:text-brand flex items-center justify-center shadow-md transition focus:outline-none">
-                                <i class="ph ph-caret-left text-lg"></i>
+                                class="absolute left-0 top-1/2 -translate-y-1/2 z-30 w-8 h-12 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white flex items-center justify-start pl-2 border border-l-0 border-brand-mist hover:border-brand transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer focus:outline-none">
+                                <i class="ph-bold ph-caret-left text-base"></i>
                             </button>
                             <button type="button" id="gallery-next"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-700 hover:text-brand flex items-center justify-center shadow-md transition focus:outline-none">
-                                <i class="ph ph-caret-right text-lg"></i>
+                                class="absolute right-0 top-1/2 -translate-y-1/2 z-30 w-8 h-12 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white flex items-center justify-end pr-2 border border-r-0 border-brand-mist hover:border-brand transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer focus:outline-none">
+                                <i class="ph-bold ph-caret-right text-base"></i>
                             </button>
                         @endif
                     @else
@@ -343,7 +343,7 @@
                         {{ __('SEE ALL') }}
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach ($related as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
@@ -360,7 +360,7 @@
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach ($recommended as $item)
                         <x-shop::product-card :product="$item" />
                     @endforeach
