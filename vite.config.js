@@ -16,6 +16,8 @@ export default defineConfig({
                 "resources/shared/css/icon-picker.css",
                 "resources/shared/js/primary-dashboard/icon-picker.js",
                 "resources/admin/js/app.js",
+                "resources/admin/js/home-section/index.js",
+                "resources/admin/js/home-section/form.js",
                 "resources/admin/js/logout.js",
                 "resources/admin/js/firebase-notification.js",
                 "resources/admin/js/settings/page-sections/team.js",

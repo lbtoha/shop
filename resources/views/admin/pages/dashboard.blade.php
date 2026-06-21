@@ -79,7 +79,7 @@
                         ['label' => __('Orders'),        'icon' => 'ph ph-shopping-bag-open','url' => route('admin.orders.index')],
                         ['label' => __('Products'),      'icon' => 'ph ph-package',          'url' => route('admin.products.index')],
                         ['label' => __('Categories'),    'icon' => 'ph ph-squares-four',     'url' => route('admin.categories.index')],
-                        ['label' => __('Home Sections'), 'icon' => 'ph ph-layout',           'url' => route('admin.settings.home-sections.index')],
+                        ['label' => __('Home Sections'), 'icon' => 'ph ph-layout',           'url' => route('admin.home-sections.index')],
                         ['label' => __('Settings'),      'icon' => 'ph ph-gear-six',         'url' => route('admin.settings.index')],
                     ];
                 @endphp

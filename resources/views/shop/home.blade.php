@@ -113,34 +113,9 @@
 
 </div>
 
-{{-- ── Featured Products Slider ──────────────────────────────── --}}
-@if ($featuredProducts->isNotEmpty())
-    @include('shop.partials.product-slider-section', [
-        'title'   => $featuredTitle,
-        'eyebrow' => __('Exclusive'),
-        'products' => $featuredProducts,
-        'viewAll' => route('shop.index', ['featured' => 1]),
-    ])
-@endif
-
-{{-- ── All Products (combined, toggleable in admin) ──────────── --}}
-@if ($allProducts->isNotEmpty())
-    @include('shop.partials.product-section', [
-        'title'    => $allTitle,
-        'eyebrow' => __('Trending'),
-        'products' => $allProducts,
-        'viewAll'  => route('shop.index'),
-    ])
-@endif
-
-{{-- ── Category sections (configured in admin → Home Sections) ── --}}
-@foreach ($homeSections as $section)
-    @include('shop.partials.product-' . ($section['layout'] === 'slider' ? 'slider-section' : 'section'), [
-        'title'    => $section['title'],
-        'eyebrow' => __('Collection'),
-        'products' => $section['products'],
-        'viewAll'  => $section['viewAll'],
-    ])
+{{-- ── Dynamic home sections (database-driven, configured in admin → Home Sections) ── --}}
+@foreach ($sections as $section)
+    <x-shop::home-section :section="$section" />
 @endforeach
 
 

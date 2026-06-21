@@ -37,6 +37,7 @@ return [
                 'parent' => 'admin/banners',
                 'submenus' => [
                     ['title' => 'Hero Banners', 'link' => 'admin.banners.index'],
+                    ['title' => 'Home Sections', 'link' => 'admin.home-sections.index'],
                 ],
             ],
             [
@@ -88,12 +89,6 @@ return [
                                 'link' => 'admin.settings.shop.index',
                                 'icon' => 'ph ph-storefront',
                                 'text' => 'Currency symbol and flat shipping cost for the shop.',
-                            ],
-                            [
-                                'title' => 'Home Sections',
-                                'link' => 'admin.settings.home-sections.index',
-                                'icon' => 'ph ph-squares-four',
-                                'text' => 'Choose which category sections show on the storefront home page, and turn them on or off.',
                             ],
                             [
                                 'title' => 'Order Notifications',

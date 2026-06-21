@@ -75,6 +75,11 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
         Route::resource('banners', Admin\Banner\BannerController::class)->except(['show']);
         Route::resource('coupons', Admin\Coupon\CouponController::class)->except(['show']);
 
+        // Dynamic home page section builder.
+        Route::post('home-sections/reorder', [Admin\HomeSection\HomeSectionController::class, 'reorder'])->name('home-sections.reorder');
+        Route::post('home-sections/{homeSection}/toggle-status', [Admin\HomeSection\HomeSectionController::class, 'toggleStatus'])->name('home-sections.toggle-status');
+        Route::resource('home-sections', Admin\HomeSection\HomeSectionController::class)->except(['show']);
+
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
             Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');
             Route::get('export', [Admin\Order\OrderController::class, 'export'])->name('export');
@@ -135,10 +140,6 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 /** -------------------------- SHOP SETTINGS -------------------------- */
                 Route::resource('shop', Admin\Settings\ShopSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END SHOP SETTINGS -------------------------- */
-
-                /** -------------------------- HOME SECTIONS -------------------------- */
-                Route::resource('home-sections', Admin\Settings\HomeSectionController::class)->only(['index', 'store']);
-                /** -------------------------- END HOME SECTIONS -------------------------- */
 
                 /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
                 Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
