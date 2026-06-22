@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow
+
+- **Always merge finished work into `main`.** Do the work on a short-lived branch, then fast-forward merge it into `main` and delete the branch (push only when asked). Don't leave completed features sitting on a side branch.
+
 ## Overview
 
 Laravel 12 (PHP 8.2+) **cash-on-delivery (COD) e-commerce** app, converted from a quiz/lottery platform: the quiz/contest/games/payment-gateway/client-API modules were stripped out, and a products/categories/orders backend plus a public Blade storefront were built on the surviving admin shell. There is **no payment gateway** (orders are paid on delivery) and **no client REST API**.
