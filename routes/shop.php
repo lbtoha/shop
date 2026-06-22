@@ -23,6 +23,9 @@ Route::get('/language/{code}', function (string $code) {
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('shop.product');
 
+// AI virtual try-on (Gemini) — generate a preview of the customer wearing a product.
+Route::post('/product/{slug}/try-on', [\App\Http\Controllers\Shop\TryOnController::class, 'generate'])->name('shop.product.try-on');
+
 Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('add/{product}', [CartController::class, 'add'])->name('add');

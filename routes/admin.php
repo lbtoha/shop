@@ -148,6 +148,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 Route::resource('payment', Admin\Settings\PaymentSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END PAYMENT SETTINGS -------------------------- */
 
+                /** -------------------------- AI SETTINGS -------------------------- */
+                Route::resource('ai', Admin\Settings\AiSettingController::class)->only(['index', 'store']);
+                /** -------------------------- END AI SETTINGS -------------------------- */
+
                 /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
                 Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
                 /** -------------------------- END ORDER NOTIFICATIONS -------------------------- */

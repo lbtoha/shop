@@ -27,6 +27,7 @@
         $whatsappNumber = getOption('whatsapp_number', '');
         $whatsappLink = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber).'?text='.rawurlencode(__('Hi, I am interested in :product', ['product' => $product->name]));
         $showCategory = (int) getOption('show_product_category', 1) === 1;
+        $tryOnEnabled = \App\Services\Ai\GeminiTryOnService::isEnabled();
         $shareUrl = urlencode(request()->fullUrl());
         $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
@@ -260,6 +261,15 @@
                                 <i class="ph ph-heart text-xl {{ $inWishlist ? 'ph-fill' : '' }}"></i>
                             </button>
                         </div>
+                    @endif
+
+                    {{-- AI Virtual Try-On --}}
+                    @if ($tryOnEnabled)
+                        <button type="button" id="btn-try-on"
+                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase shadow-sm">
+                            <i class="ph ph-sparkle text-base"></i>
+                            <span>{{ __('Try it On with AI') }}</span>
+                        </button>
                     @endif
 
                     {{-- Trust Badges --}}
@@ -637,6 +647,148 @@
         })();
         </script>
     @endpush
+
+    {{-- ─────────────── AI Virtual Try-On Modal ─────────────── --}}
+    @if ($tryOnEnabled)
+        <div id="tryon-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+                <div class="flex items-center justify-between p-5 border-b border-neutral-100 sticky top-0 bg-white">
+                    <h3 class="font-bold text-ink flex items-center gap-2">
+                        <i class="ph ph-sparkle text-purple-600"></i> {{ __('AI Virtual Try-On') }}
+                    </h3>
+                    <button type="button" id="tryon-close" class="w-8 h-8 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    <p class="text-sm text-[color:var(--color-muted)]">
+                        {{ __('Upload a clear, front-facing photo of yourself to preview') }}
+                        <span class="font-semibold text-ink">{{ $product->name }}</span>
+                        {{ __('on you. Your photo is not stored.') }}
+                    </p>
+
+                    {{-- Upload --}}
+                    <div id="tryon-upload-area">
+                        <label for="tryon-photo" class="block border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 transition">
+                            <i class="ph ph-camera text-3xl text-neutral-400"></i>
+                            <p class="text-sm font-semibold text-neutral-600 mt-2">{{ __('Choose a photo') }}</p>
+                            <p class="text-xs text-neutral-400 mt-1">{{ __('JPG, PNG or WEBP · up to 8MB') }}</p>
+                            <input type="file" id="tryon-photo" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        </label>
+                        <div id="tryon-preview-wrap" class="hidden mt-3 relative">
+                            <img id="tryon-preview" class="w-full max-h-64 object-contain rounded-xl border border-neutral-100" alt="preview">
+                            <button type="button" id="tryon-change" class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded shadow">{{ __('Change') }}</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="tryon-generate" disabled
+                        class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-3 rounded-xl text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="ph ph-magic-wand"></i>
+                        <span id="tryon-generate-text">{{ __('Generate Try-On') }}</span>
+                    </button>
+
+                    {{-- Result --}}
+                    <div id="tryon-result" class="hidden">
+                        <div class="border-t border-neutral-100 pt-4">
+                            <p class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">{{ __('Your Try-On') }}</p>
+                            <img id="tryon-result-img" class="w-full rounded-xl border border-neutral-100" alt="try-on result">
+                            <a id="tryon-download" download class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-purple-600 hover:underline">
+                                <i class="ph ph-download-simple"></i> {{ __('Download') }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <p id="tryon-error" class="hidden text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+                    <p class="text-[11px] text-neutral-400 text-center">{{ __('AI previews are approximations and may differ from the actual product.') }}</p>
+                </div>
+            </div>
+        </div>
+
+        @push('scripts')
+            <script>
+                (function () {
+                    var modal = document.getElementById('tryon-modal');
+                    if (!modal) return;
+                    var openBtn = document.getElementById('btn-try-on');
+                    var closeBtn = document.getElementById('tryon-close');
+                    var fileInput = document.getElementById('tryon-photo');
+                    var previewWrap = document.getElementById('tryon-preview-wrap');
+                    var previewImg = document.getElementById('tryon-preview');
+                    var changeBtn = document.getElementById('tryon-change');
+                    var genBtn = document.getElementById('tryon-generate');
+                    var genText = document.getElementById('tryon-generate-text');
+                    var resultBox = document.getElementById('tryon-result');
+                    var resultImg = document.getElementById('tryon-result-img');
+                    var downloadLink = document.getElementById('tryon-download');
+                    var errorBox = document.getElementById('tryon-error');
+
+                    var endpoint = @json(route('shop.product.try-on', $product->slug));
+                    var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    var selectedFile = null;
+
+                    function open() { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden'; }
+                    function close() { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }
+                    function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); }
+                    function clearError() { errorBox.classList.add('hidden'); }
+
+                    if (openBtn) openBtn.addEventListener('click', open);
+                    closeBtn.addEventListener('click', close);
+                    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+
+                    fileInput.addEventListener('change', function () {
+                        clearError();
+                        var f = fileInput.files[0];
+                        if (!f) return;
+                        if (f.size > 8 * 1024 * 1024) { showError(@json(__('That photo is too large (max 8MB).'))); fileInput.value = ''; return; }
+                        selectedFile = f;
+                        previewImg.src = URL.createObjectURL(f);
+                        previewWrap.classList.remove('hidden');
+                        genBtn.disabled = false;
+                    });
+
+                    changeBtn.addEventListener('click', function () {
+                        fileInput.value = ''; selectedFile = null;
+                        previewWrap.classList.add('hidden');
+                        genBtn.disabled = true;
+                    });
+
+                    genBtn.addEventListener('click', function () {
+                        if (!selectedFile) return;
+                        clearError();
+                        resultBox.classList.add('hidden');
+                        genBtn.disabled = true;
+                        genText.textContent = @json(__('Generating… this can take a moment'));
+
+                        var fd = new FormData();
+                        fd.append('photo', selectedFile);
+
+                        fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                            body: fd,
+                        })
+                        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+                        .then(function (res) {
+                            if (!res.ok) {
+                                showError(res.body.message || @json(__('Something went wrong. Please try again.')));
+                                return;
+                            }
+                            resultImg.src = res.body.image_url;
+                            downloadLink.href = res.body.image_url;
+                            resultBox.classList.remove('hidden');
+                            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        })
+                        .catch(function () { showError(@json(__('Network error. Please try again.'))); })
+                        .finally(function () {
+                            genBtn.disabled = false;
+                            genText.textContent = @json(__('Generate Try-On'));
+                        });
+                    });
+                })();
+            </script>
+        @endpush
+    @endif
 
     {{-- Sticky Mobile Action Bar --}}
     @if ($product->isInStock())

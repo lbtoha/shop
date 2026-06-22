@@ -97,6 +97,12 @@ return [
                                 'text' => 'Enable SSLCommerz online payment and set store credentials.',
                             ],
                             [
+                                'title' => 'AI Settings',
+                                'link' => 'admin.settings.ai.index',
+                                'icon' => 'ph ph-sparkle',
+                                'text' => 'Enable the AI virtual try-on and set the Gemini API key.',
+                            ],
+                            [
                                 'title' => 'Order Notifications',
                                 'link' => 'admin.settings.order-notifications.index',
                                 'icon' => 'ph ph-bell-ringing',
