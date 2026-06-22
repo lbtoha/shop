@@ -26,6 +26,11 @@
 
                 <x-admin::text-input-group name="whatsapp_number" :value="$settings['whatsapp_number']"
                     label="WhatsApp Number" placeholder="8801710733329" />
+
+                <div class="input-group">
+                    <x-admin::label for="show_product_category">{{ __('Show Category on Product Page') }}</x-admin::label>
+                    <x-admin::switch name="show_product_category" id="show_product_category" :value="isset($settings['show_product_category']) ? $settings['show_product_category'] : 1" :types="[['label' => __('Disabled'), 'value' => 0], ['label' => __('Enabled'), 'value' => 1]]" />
+                </div>
             </div>
 
             <p class="text-sm text-neutral-500 mt-3">

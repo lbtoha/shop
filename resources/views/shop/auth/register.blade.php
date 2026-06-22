@@ -30,14 +30,17 @@
                             class="w-full border border-neutral-200 rounded py-2 px-3 focus:outline-none focus:border-[color:var(--color-brand)]">
                     </div>
                 </div>
+                <p class="text-xs text-[color:var(--color-muted)] -mb-1">{{ __('Sign up with your email, phone, or both.') }}</p>
                 <div>
                     <label class="block text-sm font-medium mb-1">{{ __('Email') }}</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
+                    <input type="email" name="email" value="{{ old('email') }}"
+                        placeholder="{{ __('you@example.com') }}"
                         class="w-full border border-neutral-200 rounded py-2 px-3 focus:outline-none focus:border-[color:var(--color-brand)]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">{{ __('Phone') }} <span class="text-neutral-400">({{ __('optional') }})</span></label>
+                    <label class="block text-sm font-medium mb-1">{{ __('Phone') }}</label>
                     <input type="text" name="phone" value="{{ old('phone') }}"
+                        placeholder="{{ __('01XXXXXXXXX') }}"
                         class="w-full border border-neutral-200 rounded py-2 px-3 focus:outline-none focus:border-[color:var(--color-brand)]">
                 </div>
                 <div>

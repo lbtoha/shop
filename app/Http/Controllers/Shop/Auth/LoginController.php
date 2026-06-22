@@ -20,23 +20,31 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
+        $validated = $request->validate([
+            // Accept either an email or a phone number in a single field.
+            'login' => 'required|string',
             'password' => 'required|string',
         ]);
+
+        // Match the identifier against email or phone.
+        $field = filter_var($validated['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        $credentials = [
+            $field => $validated['login'],
+            'password' => $validated['password'],
+        ];
 
         $remember = (bool) $request->boolean('remember');
 
         if (! auth()->attempt($credentials, $remember)) {
             throw ValidationException::withMessages([
-                'email' => __('These credentials do not match our records.'),
+                'login' => __('These credentials do not match our records.'),
             ]);
         }
 
         if (auth()->user()->status !== UserStatusEnum::ACTIVE->value && auth()->user()->status !== UserStatusEnum::ACTIVE) {
             auth()->logout();
             throw ValidationException::withMessages([
-                'email' => __('Your account is not active. Please contact support.'),
+                'login' => __('Your account is not active. Please contact support.'),
             ]);
         }
 

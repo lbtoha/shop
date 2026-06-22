@@ -27,6 +27,7 @@ class ShopSettingController extends Controller
             'show_ratings' => getOption('show_ratings', 0),
             'whatsapp_enabled' => getOption('whatsapp_enabled', 0),
             'whatsapp_number' => getOption('whatsapp_number', ''),
+            'show_product_category' => getOption('show_product_category', 1),
         ];
 
         return view('admin.pages.settings.shop.index', compact('settings', 'buttons'));
@@ -43,6 +44,7 @@ class ShopSettingController extends Controller
             'show_ratings' => 'required|in:0,1',
             'whatsapp_enabled' => 'required|in:0,1',
             'whatsapp_number' => 'nullable|string|max:30',
+            'show_product_category' => 'required|in:0,1',
         ]);
 
         // Number is required only when the WhatsApp button is switched on.
@@ -57,6 +59,7 @@ class ShopSettingController extends Controller
             'show_ratings' => $validated['show_ratings'],
             'whatsapp_enabled' => $validated['whatsapp_enabled'],
             'whatsapp_number' => $validated['whatsapp_number'] ?? '',
+            'show_product_category' => $validated['show_product_category'],
         ]);
 
         return response()->json(['message' => __('Shop settings updated.'), 'reload' => true]);

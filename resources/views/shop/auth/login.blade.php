@@ -17,8 +17,9 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium mb-1">{{ __('Email') }}</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                    <label class="block text-sm font-medium mb-1">{{ __('Email or Phone') }}</label>
+                    <input type="text" name="login" value="{{ old('login') }}" required autofocus
+                        placeholder="{{ __('you@example.com or 01XXXXXXXXX') }}"
                         class="w-full border border-neutral-200 rounded py-2 px-3 focus:outline-none focus:border-[color:var(--color-brand)]">
                 </div>
                 <div>

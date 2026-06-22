@@ -26,16 +26,20 @@ class RegisterController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:30|unique:users,phone',
+            // Either email or phone is required; both may be given.
+            'email' => 'nullable|required_without:phone|email|max:255|unique:users,email',
+            'phone' => 'nullable|required_without:email|string|max:30|unique:users,phone',
             'password' => ['required', 'confirmed', Password::defaults()],
+        ], [
+            'email.required_without' => __('Please provide an email or a phone number.'),
+            'phone.required_without' => __('Please provide a phone number or an email.'),
         ]);
 
         $user = User::create([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'] ?? null,
-            'username' => $this->uniqueUsername($validated['email']),
-            'email' => $validated['email'],
+            'username' => $this->uniqueUsername($validated['email'] ?? $validated['phone']),
+            'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'status' => UserStatusEnum::ACTIVE->value,
@@ -47,9 +51,10 @@ class RegisterController extends Controller
         return redirect()->intended(route('shop.account.index'))->with('success', __('Welcome! Your account has been created.'));
     }
 
-    private function uniqueUsername(string $email): string
+    private function uniqueUsername(string $identifier): string
     {
-        $base = Str::slug(Str::before($email, '@'), '_') ?: 'user';
+        // Works for both email (slug of the local part) and phone numbers.
+        $base = Str::slug(Str::before($identifier, '@'), '_') ?: 'user';
         $username = $base;
         $i = 1;
         while (User::where('username', $username)->exists()) {

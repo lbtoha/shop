@@ -26,6 +26,7 @@
         $whatsappEnabled = (int) getOption('whatsapp_enabled', 0) === 1 && filled(getOption('whatsapp_number'));
         $whatsappNumber = getOption('whatsapp_number', '');
         $whatsappLink = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber).'?text='.rawurlencode(__('Hi, I am interested in :product', ['product' => $product->name]));
+        $showCategory = (int) getOption('show_product_category', 1) === 1;
         $shareUrl = urlencode(request()->fullUrl());
         $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
@@ -140,8 +141,9 @@
             {{-- Product Info & Action Column --}}
             <div class="lg:col-span-7 flex flex-col justify-between self-stretch">
                 <div>
-                    @if ($product->category)
-                        <span class="inline-block text-[10px] font-black tracking-widest text-brand uppercase bg-brand/5 px-2.5 py-1 rounded-full mb-2">{{ $product->category->name }}</span>
+                    @if ($showCategory && $product->category)
+                        <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}"
+                            class="inline-block text-[10px] font-black tracking-widest text-brand uppercase bg-brand/5 hover:bg-brand/10 px-2.5 py-1 rounded-full mb-2 transition">{{ $product->category->name }}</a>
                     @endif
                     
                     <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight leading-tight">{{ $product->name }}</h1>
@@ -299,7 +301,7 @@
                             @if ($product->sku)
                                 <div>SKU: <span class="text-neutral-800 font-extrabold uppercase">{{ $product->sku }}</span></div>
                             @endif
-                            @if ($product->category)
+                            @if ($showCategory && $product->category)
                                 <div>CATEGORY: <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="text-brand hover:underline uppercase font-extrabold">{{ $product->category->name }}</a></div>
                             @endif
                         </div>
@@ -334,8 +336,8 @@
             </section>
         @endif
 
-        {{-- Related Products Section --}}
-        @if ($related->isNotEmpty())
+        {{-- Related Products Section (same category) --}}
+        @if ($showCategory && $related->isNotEmpty())
             <section class="mt-12 border-t border-neutral-200 pt-8">
                 <div class="border-b border-neutral-200 pb-2 mb-6 flex justify-between items-end">
                     <h2 class="text-xs sm:text-sm font-bold text-brand uppercase tracking-widest relative inline-block pb-2">
