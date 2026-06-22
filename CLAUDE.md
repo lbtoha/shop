@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Workflow
 
-- **Always merge finished work into `main`.** Do the work on a short-lived branch, then fast-forward merge it into `main` and delete the branch (push only when asked). Don't leave completed features sitting on a side branch.
+- **Always merge finished work into `main` and push it.** Do the work on a short-lived branch, then fast-forward merge it into `main`, delete the branch, and `git push origin main`. Don't leave completed features sitting on a side branch or unpushed.
 
 ## Overview
 
