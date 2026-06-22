@@ -23,13 +23,19 @@ class OrderController extends Controller
 
         // KPI summary cards
         $stats = [
-            'total'   => Order::count(),
+            'total' => Order::count(),
             'pending' => Order::where('status', OrderStatusEnum::PENDING->value)->count(),
-            'today'   => Order::whereDate('created_at', today())->count(),
+            'today' => Order::whereDate('created_at', today())->count(),
             'revenue' => (float) Order::where('status', '!=', OrderStatusEnum::CANCELLED->value)->sum('total'),
         ];
 
         $buttons = [
+            [
+                'label' => __('Create Order'),
+                'icon' => 'ph ph-plus',
+                'type' => 'link',
+                'link' => route('admin.orders.create'),
+            ],
             [
                 'label' => __('Export CSV'),
                 'icon' => 'ph ph-download-simple',
@@ -168,6 +174,106 @@ class OrderController extends Controller
     }
 
     /**
+     * Show the manual order-entry form (e.g. for WhatsApp/phone orders).
+     */
+    public function create()
+    {
+        adminUserHasPermission(permission: 'create');
+
+        $buttons = [
+            [
+                'label' => __('Back'),
+                'icon' => 'ph ph-arrow-left',
+                'type' => 'link',
+                'link' => route('admin.orders.index'),
+            ],
+        ];
+
+        return view('admin.pages.orders.create', compact('buttons'));
+    }
+
+    /**
+     * JSON product search for the order-entry product picker.
+     */
+    public function productSearch(Request $request)
+    {
+        adminUserHasPermission(permission: 'create');
+
+        $term = trim((string) $request->get('q', ''));
+
+        $products = \App\Models\Product::query()
+            ->active()
+            ->with('variants')
+            ->when($term !== '', function ($query) use ($term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('name', 'like', "%{$term}%")
+                        ->orWhere('sku', 'like', "%{$term}%");
+                });
+            })
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        $results = $products->map(function (\App\Models\Product $product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
+                'stock' => (int) $product->stock,
+                'has_variants' => $product->variants->isNotEmpty(),
+                'variants' => $product->variants->map(fn ($v) => [
+                    'id' => $v->id,
+                    'name' => $v->name,
+                    'price' => $v->price(),
+                    'stock' => (int) $v->stock,
+                ])->values(),
+            ];
+        });
+
+        return response()->json(['data' => $results]);
+    }
+
+    /**
+     * Persist a manually-entered order, then redirect to its detail page.
+     */
+    public function store(Request $request, \App\Services\Ecommerce\ManualOrderService $manualOrder)
+    {
+        adminUserHasPermission(permission: 'create');
+
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_phone' => 'required|string|max:30',
+            'customer_email' => 'nullable|email|max:255',
+            'shipping_address' => 'required|string|max:1000',
+            'city' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:30',
+            'note' => 'nullable|string|max:1000',
+            'shipping_cost' => 'nullable|numeric|min:0',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer|exists:products,id',
+            'items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            $order = $manualOrder->placeOrder(
+                $validated,
+                $validated['items'],
+                (float) ($validated['shipping_cost'] ?? 0)
+            );
+        } catch (\App\Exceptions\CustomWebException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        \App\Services\Ecommerce\OrderNotifier::orderPlaced($order);
+
+        return response()->json([
+            'message' => __('Order :number created.', ['number' => $order->order_number]),
+            'redirect' => route('admin.orders.show', $order->id),
+        ]);
+    }
+
+    /**
      * Display the specified resource.
      */
     public function show(Order $order)
@@ -180,9 +286,9 @@ class OrderController extends Controller
         $buttons = [
             [
                 'label' => __('Back'),
-                'icon'  => 'ph ph-arrow-left',
-                'type'  => 'link',
-                'link'  => route('admin.orders.index'),
+                'icon' => 'ph ph-arrow-left',
+                'type' => 'link',
+                'link' => route('admin.orders.index'),
             ],
         ];
 

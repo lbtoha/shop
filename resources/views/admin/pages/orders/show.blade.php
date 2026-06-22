@@ -12,6 +12,9 @@
                 <p class="l-text font-medium">{{ __('Order') }} #{{ $order->order_number }}</p>
                 <span class="status {{ $order->status->color() }} capitalize">{{ __($order->status->label()) }}</span>
                 <span class="status {{ $order->payment_status->color() }} capitalize">{{ __($order->payment_status->label()) }}</span>
+                @if (($order->source ?? 'storefront') === 'manual')
+                    <span class="status info capitalize"><i class="ph ph-storefront"></i> {{ __('Manual') }}</span>
+                @endif
             </div>
             <span class="text-xs text-neutral-400 block mt-1">{{ $order->created_at->format('M d, Y · g:i A') }} ({{ $order->created_at->diffForHumans() }})</span>
         </div>

@@ -82,6 +82,9 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
 
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
             Route::get('/', [Admin\Order\OrderController::class, 'index'])->name('index');
+            Route::get('create', [Admin\Order\OrderController::class, 'create'])->name('create');
+            Route::post('/', [Admin\Order\OrderController::class, 'store'])->name('store');
+            Route::get('product-search', [Admin\Order\OrderController::class, 'productSearch'])->name('product-search');
             Route::get('export', [Admin\Order\OrderController::class, 'export'])->name('export');
             Route::get('{order}', [Admin\Order\OrderController::class, 'show'])->name('show');
             Route::get('{order}/invoice', [Admin\Order\OrderController::class, 'invoice'])->name('invoice');
