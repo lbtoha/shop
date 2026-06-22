@@ -66,4 +66,15 @@ class Order extends Model
     {
         return $query->where('status', $status);
     }
+
+    /**
+     * An online (SSLCommerz) order whose payment never completed and is still
+     * open can be retried from the confirmation / account pages.
+     */
+    public function isOnlinePayable(): bool
+    {
+        return $this->payment_method === 'sslcommerz'
+            && $this->payment_status === OrderPaymentStatusEnum::UNPAID
+            && $this->status !== OrderStatusEnum::CANCELLED;
+    }
 }

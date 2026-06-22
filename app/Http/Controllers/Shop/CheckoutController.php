@@ -25,7 +25,7 @@ class CheckoutController extends Controller
 
         $items = $this->cart->items();
         $subtotal = $this->cart->subtotal();
-        
+
         // Calculate default shipping cost (inside Dhaka) based on items in cart
         $shippingCost = 0.0;
         foreach ($items as $line) {
@@ -63,7 +63,15 @@ class CheckoutController extends Controller
             'zip_code' => 'nullable|string|max:30',
             'note' => 'nullable|string|max:1000',
             'shipping_area' => 'required|string|in:inside,outside',
+            'payment_method' => 'nullable|string|in:cash_on_delivery,sslcommerz',
         ]);
+
+        // Resolve the payment method. SSLCommerz is only honoured while the admin
+        // has it enabled with valid credentials; otherwise fall back to COD.
+        $paymentMethod = ($validated['payment_method'] ?? 'cash_on_delivery') === 'sslcommerz'
+            && \App\Services\Payment\SslCommerzService::isEnabled()
+            ? 'sslcommerz'
+            : 'cash_on_delivery';
 
         // Calculate dynamic shipping cost based on selected area and items in cart
         $shippingArea = $validated['shipping_area'];
@@ -80,22 +88,22 @@ class CheckoutController extends Controller
 
         $userId = auth()->id();
 
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $phone = $validated['customer_phone'];
-            $email = $validated['customer_email'] ?? ($phone . '_bd@gmail.com');
+            $email = $validated['customer_email'] ?? ($phone.'_bd@gmail.com');
 
             // Find existing user by phone or email
             $user = \App\Models\User::where('phone', $phone)
                 ->orWhere('email', $email)
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 // Determine a unique username
                 $baseUsername = \Illuminate\Support\Str::slug($validated['customer_name'], '_') ?: 'user';
                 $username = $baseUsername;
                 $i = 1;
                 while (\App\Models\User::where('username', $username)->exists()) {
-                    $username = $baseUsername . '_' . $i++;
+                    $username = $baseUsername.'_'.$i++;
                 }
 
                 $user = \App\Models\User::create([
@@ -115,9 +123,27 @@ class CheckoutController extends Controller
         }
 
         try {
-            $order = $checkout->placeOrder($validated, $userId, $shippingCost);
+            $order = $checkout->placeOrder($validated, $userId, $shippingCost, $paymentMethod);
         } catch (CustomWebException $e) {
             return redirect()->route('shop.cart.index')->with('error', $e->getMessage());
+        }
+
+        // Online payment: hand off to SSLCommerz. The order is already recorded
+        // as unpaid/pending; the gateway callback confirms it. The order-placed
+        // email is sent only once payment succeeds (see PaymentController).
+        if ($paymentMethod === 'sslcommerz') {
+            try {
+                $url = app(\App\Services\Payment\SslCommerzService::class)->initiate($order);
+
+                session()->put('confirmed_order', $order->order_number);
+
+                return redirect()->away($url);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return redirect()->route('shop.checkout.confirmation', $order->order_number)
+                    ->with('error', __('Online payment could not be started. Your order is placed as Cash on Delivery.'));
+            }
         }
 
         OrderNotifier::orderPlaced($order);

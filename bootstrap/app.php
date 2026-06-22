@@ -40,6 +40,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
+        // SSLCommerz posts back to these callbacks from its own servers (and the
+        // gateway page), so they carry no CSRF token of ours.
+        $middleware->validateCsrfTokens(except: [
+            'payment/sslcommerz/*',
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
 

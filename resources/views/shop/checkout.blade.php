@@ -167,13 +167,33 @@
                     @error('shipping_area')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="mt-6 flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-xl p-4">
-                    <input type="radio" checked readonly class="accent-[color:var(--color-brand)]">
-                    <div>
-                        <div class="font-medium text-ink">{{ __('Cash on Delivery') }}</div>
-                        <div class="text-sm text-[color:var(--color-muted)]">{{ __('Pay with cash when your order is delivered.') }}</div>
+                @php($sslcommerzEnabled = \App\Services\Payment\SslCommerzService::isEnabled())
+
+                <div class="mt-6">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">{{ __('Payment Method / পেমেন্ট পদ্ধতি') }} <span class="text-red-500">*</span></label>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-xl p-4 cursor-pointer">
+                            <input type="radio" name="payment_method" value="cash_on_delivery" checked class="accent-[color:var(--color-brand)] h-4 w-4">
+                            <div>
+                                <div class="font-medium text-ink">{{ __('Cash on Delivery') }}</div>
+                                <div class="text-sm text-[color:var(--color-muted)]">{{ __('Pay with cash when your order is delivered.') }}</div>
+                            </div>
+                            <i class="ph ph-money text-2xl text-[color:var(--color-brand)] ml-auto"></i>
+                        </label>
+
+                        @if ($sslcommerzEnabled)
+                            <label class="flex items-center gap-3 bg-white border border-[color:var(--color-line)] rounded-xl p-4 cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                                <input type="radio" name="payment_method" value="sslcommerz" class="accent-[color:var(--color-brand)] h-4 w-4">
+                                <div>
+                                    <div class="font-medium text-ink">{{ __('Pay Online (SSLCommerz)') }}</div>
+                                    <div class="text-sm text-[color:var(--color-muted)]">{{ __('Card, Mobile Banking & Internet Banking. Secured by SSLCommerz.') }}</div>
+                                </div>
+                                <img src="{{ \App\Services\Payment\SslCommerzService::logo() }}" alt="SSLCommerz"
+                                    class="h-8 w-auto ml-auto shrink-0">
+                            </label>
+                        @endif
                     </div>
-                    <i class="ph ph-money text-2xl text-[color:var(--color-brand)] ml-auto"></i>
+                    @error('payment_method')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div> {{-- end of shipping details card --}}
         </div> {{-- end of left column container --}}

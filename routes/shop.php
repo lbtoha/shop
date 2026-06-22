@@ -49,6 +49,18 @@ Route::prefix('checkout')->as('shop.checkout.')->group(function () {
 });
 
 /**
+ * SSLCommerz online-payment callbacks. CSRF-exempt (see bootstrap/app.php) — the
+ * gateway posts back from its own servers without our token.
+ */
+Route::prefix('payment/sslcommerz')->as('shop.payment.sslcommerz.')->group(function () {
+    Route::match(['get', 'post'], 'success', [\App\Http\Controllers\Shop\PaymentController::class, 'success'])->name('success');
+    Route::match(['get', 'post'], 'failed', [\App\Http\Controllers\Shop\PaymentController::class, 'failed'])->name('failed');
+    Route::match(['get', 'post'], 'cancel', [\App\Http\Controllers\Shop\PaymentController::class, 'cancel'])->name('cancel');
+    Route::post('ipn', [\App\Http\Controllers\Shop\PaymentController::class, 'ipn'])->name('ipn');
+    Route::get('retry/{orderNumber}', [\App\Http\Controllers\Shop\PaymentController::class, 'retry'])->name('retry');
+});
+
+/**
  * Customer accounts (optional — guest checkout still works).
  * Uses the default `web` session guard on the users provider.
  */

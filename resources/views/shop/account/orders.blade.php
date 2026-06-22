@@ -67,10 +67,16 @@
                                                 {{ (int)$order->total }}
                                             </td>
                                             <td class="px-4 py-4 whitespace-nowrap flex items-center justify-center gap-2">
-                                                <a href="{{ route('shop.account.order', $order->order_number) }}" 
+                                                <a href="{{ route('shop.account.order', $order->order_number) }}"
                                                     class="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold py-2 px-4 rounded transition-all">
                                                     <i class="ph ph-eye"></i> {{ __('view') }}
                                                 </a>
+                                                @if($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
+                                                    <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"
+                                                        class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded transition-all">
+                                                        <i class="ph ph-credit-card"></i> {{ __('Pay') }}
+                                                    </a>
+                                                @endif
                                                 @if($order->status->value === 'pending')
                                                     <form action="{{ route('shop.account.orders.cancel', $order->order_number) }}" method="POST" class="inline" 
                                                         onsubmit="return confirm('{{ __('Are you sure you want to cancel this order?') }}')">

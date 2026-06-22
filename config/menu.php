@@ -91,6 +91,12 @@ return [
                                 'text' => 'Currency symbol and flat shipping cost for the shop.',
                             ],
                             [
+                                'title' => 'Payment Settings',
+                                'link' => 'admin.settings.payment.index',
+                                'icon' => 'ph ph-credit-card',
+                                'text' => 'Enable SSLCommerz online payment and set store credentials.',
+                            ],
+                            [
                                 'title' => 'Order Notifications',
                                 'link' => 'admin.settings.order-notifications.index',
                                 'icon' => 'ph ph-bell-ringing',

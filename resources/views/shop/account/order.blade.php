@@ -18,7 +18,13 @@
             </div>
             
             <div class="flex items-center gap-3 self-start sm:self-auto">
-                <a href="{{ route('shop.account.orders.invoice', $order->order_number) }}" 
+                @if ($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
+                    <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-full transition-all shadow-sm">
+                        <i class="ph ph-credit-card text-sm"></i> {{ __('Pay Now') }}
+                    </a>
+                @endif
+                <a href="{{ route('shop.account.orders.invoice', $order->order_number) }}"
                     class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-xs font-bold py-2.5 px-4 rounded-full transition-all shadow-sm">
                     <i class="ph ph-file-pdf text-sm"></i> {{ __('Download Invoice') }}
                 </a>

@@ -72,6 +72,14 @@
         </div>
 
         <div class="space-y-3">
+            @if ($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
+                <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"
+                    class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 ease-in-out text-xs uppercase tracking-widest shadow-sm">
+                    <i class="ph ph-credit-card text-base"></i>
+                    <span>{{ __('PAY NOW') }} — {{ amountWithSymbol($order->total) }}</span>
+                </a>
+            @endif
+
             <a href="{{ route('shop.checkout.invoice', $order->order_number) }}" target="_blank"
                 class="w-full flex items-center justify-center gap-2 bg-[#161c24] hover:bg-[#212b36] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 ease-in-out text-xs uppercase tracking-widest shadow-sm">
                 <i class="ph ph-file-text text-base"></i>

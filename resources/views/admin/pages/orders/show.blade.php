@@ -210,6 +210,25 @@
             </div>
 
             <div class="white-box">
+                <p class="m-text font-medium mb-4">{{ __('Payment') }}</p>
+                <div class="space-y-2 s-text">
+                    <p><span class="text-xs block">{{ __('Method') }}</span>
+                        @if ($order->payment_method === 'sslcommerz')
+                            <span class="inline-flex items-center gap-1"><i class="ph ph-credit-card"></i> {{ __('SSLCommerz (Online)') }}</span>
+                        @else
+                            <span class="inline-flex items-center gap-1"><i class="ph ph-money"></i> {{ __('Cash on Delivery') }}</span>
+                        @endif
+                    </p>
+                    @if ($order->transaction_id)
+                        <p><span class="text-xs block">{{ __('Transaction ID') }}</span>{{ $order->transaction_id }}</p>
+                    @endif
+                    @if ($order->gateway_transaction_id)
+                        <p><span class="text-xs block">{{ __('Bank Transaction ID') }}</span>{{ $order->gateway_transaction_id }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="white-box">
                 <p class="m-text font-medium mb-4">{{ __('Update Order') }}</p>
                 <form action="{{ route('admin.orders.update-status', $order->id) }}" class="form-submit-edit" method="POST">
                     @csrf @method('PUT')

@@ -27,7 +27,7 @@ class CheckoutService
      *
      * @throws CustomWebException when the cart is empty or a line is out of stock
      */
-    public function placeOrder(array $details, ?int $userId = null, float $shippingCost = 0): Order
+    public function placeOrder(array $details, ?int $userId = null, float $shippingCost = 0, string $paymentMethod = 'cash_on_delivery'): Order
     {
         $items = $this->cart->items();
 
@@ -37,7 +37,7 @@ class CheckoutService
 
         $couponCode = $this->cart->couponCode();
 
-        return DB::transaction(function () use ($items, $details, $userId, $shippingCost, $couponCode) {
+        return DB::transaction(function () use ($items, $details, $userId, $shippingCost, $couponCode, $paymentMethod) {
             $subtotal = 0;
             $orderItems = [];
 
@@ -127,7 +127,7 @@ class CheckoutService
                 'city' => $details['city'] ?? null,
                 'zip_code' => $details['zip_code'] ?? null,
                 'note' => $details['note'] ?? null,
-                'payment_method' => 'cash_on_delivery',
+                'payment_method' => $paymentMethod,
                 'payment_status' => OrderPaymentStatusEnum::UNPAID->value,
                 'status' => OrderStatusEnum::PENDING->value,
                 'subtotal' => $subtotal,
