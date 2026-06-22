@@ -153,6 +153,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 Route::post('ai/test', [Admin\Settings\AiSettingController::class, 'test'])->name('ai.test');
                 /** -------------------------- END AI SETTINGS -------------------------- */
 
+                /** -------------------------- CUSTOMER AUTH SETTINGS -------------------------- */
+                Route::resource('auth', Admin\Settings\AuthSettingController::class)->only(['index', 'store']);
+                /** -------------------------- END CUSTOMER AUTH SETTINGS -------------------------- */
+
                 /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
                 Route::resource('order-notifications', Admin\Settings\OrderNotificationController::class)->only(['index', 'store']);
                 /** -------------------------- END ORDER NOTIFICATIONS -------------------------- */

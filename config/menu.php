@@ -103,6 +103,12 @@ return [
                                 'text' => 'Enable the AI virtual try-on and set the Gemini API key.',
                             ],
                             [
+                                'title' => 'Customer Auth Settings',
+                                'link' => 'admin.settings.auth.index',
+                                'icon' => 'ph ph-user-circle-check',
+                                'text' => 'Require email OTP verification on storefront signup.',
+                            ],
+                            [
                                 'title' => 'Order Notifications',
                                 'link' => 'admin.settings.order-notifications.index',
                                 'icon' => 'ph ph-bell-ringing',

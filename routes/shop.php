@@ -74,6 +74,11 @@ Route::prefix('payment/sslcommerz')->as('shop.payment.sslcommerz.')->group(funct
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisterController::class, 'create'])->name('register');
     Route::post('register', [RegisterController::class, 'store']);
+    // Signup OTP verification step (only reached when OTP is enabled).
+    Route::get('register/verify', [RegisterController::class, 'showOtp'])->name('register.otp');
+    Route::post('register/verify', [RegisterController::class, 'verifyOtp'])->name('register.otp.verify');
+    Route::post('register/verify/resend', [RegisterController::class, 'resendOtp'])
+        ->middleware('throttle:3,1')->name('register.otp.resend');
     Route::get('login', [LoginController::class, 'create'])->name('login');
     Route::post('login', [LoginController::class, 'store']);
 });
