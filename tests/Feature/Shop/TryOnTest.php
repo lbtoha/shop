@@ -95,6 +95,109 @@ it('surfaces a friendly error when gemini fails', function () {
     ])->assertStatus(502);
 });
 
+function fakeGeminiSuccess(): void
+{
+    Http::fake([
+        'example.com/*' => Http::response('IMG', 200, ['Content-Type' => 'image/jpeg']),
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [['content' => ['parts' => [
+                ['inline_data' => ['mime_type' => 'image/png', 'data' => base64_encode('OUT')]],
+            ]]]],
+        ], 200),
+    ]);
+}
+
+it('blocks guests when login is required', function () {
+    enableTryOn();
+    $this->setOptions(['ai_tryon_login_required' => 1]);
+    Storage::fake('public');
+    $product = tryOnProduct();
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+    ])->assertStatus(403);
+});
+
+it('rejects a submission that fills the honeypot', function () {
+    enableTryOn();
+    Storage::fake('public');
+    fakeGeminiSuccess();
+    $product = tryOnProduct();
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+        'website' => 'http://spam.example',
+    ])->assertStatus(422);
+
+    // The billed call never happened.
+    Http::assertNothingSent();
+});
+
+it('enforces the per-hour visitor limit', function () {
+    enableTryOn();
+    $this->setOptions(['ai_tryon_per_hour' => 2, 'ai_tryon_per_day' => 100, 'ai_tryon_daily_global' => 1000]);
+    Storage::fake('public');
+    fakeGeminiSuccess();
+    $product = tryOnProduct();
+
+    // First two succeed, third is throttled.
+    for ($i = 0; $i < 2; $i++) {
+        $this->postJson(route('shop.product.try-on', $product->slug), [
+            'photo' => UploadedFile::fake()->image("me{$i}.jpg"),
+        ])->assertOk();
+    }
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me3.jpg'),
+    ])->assertStatus(429);
+});
+
+it('enforces the site-wide daily cap', function () {
+    enableTryOn();
+    $this->setOptions(['ai_tryon_per_hour' => 100, 'ai_tryon_per_day' => 100, 'ai_tryon_daily_global' => 1]);
+    Storage::fake('public');
+    fakeGeminiSuccess();
+    $product = tryOnProduct();
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('a.jpg'),
+    ])->assertOk();
+
+    // Global cap of 1 is now reached — next visitor is blocked.
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('b.jpg'),
+    ])->assertStatus(429);
+});
+
+it('does not consume quota when generation fails', function () {
+    enableTryOn();
+    $this->setOptions(['ai_tryon_per_hour' => 1, 'ai_tryon_per_day' => 100, 'ai_tryon_daily_global' => 1000]);
+    Storage::fake('public');
+
+    // Gemini fails the first call, then succeeds on the retry (one stub set,
+    // sequenced — re-calling Http::fake() mid-test does not reliably replace).
+    Http::fake([
+        'example.com/*' => Http::response('IMG', 200, ['Content-Type' => 'image/jpeg']),
+        'generativelanguage.googleapis.com/*' => Http::sequence()
+            ->push(['error' => 'boom'], 500)
+            ->push(['candidates' => [['content' => ['parts' => [
+                ['inline_data' => ['mime_type' => 'image/png', 'data' => base64_encode('OUT')]],
+            ]]]]], 200),
+    ]);
+
+    $product = tryOnProduct();
+
+    // Failed generation (502) must not burn the single allowed attempt.
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+    ])->assertStatus(502);
+
+    // A retry is still allowed (limit not consumed) — now succeeds.
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me2.jpg'),
+    ])->assertOk();
+});
+
 function tryOnAdmin(): \App\Models\Admin
 {
     return \App\Models\Admin::create([

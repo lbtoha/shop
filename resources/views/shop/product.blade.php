@@ -699,6 +699,11 @@
                         </div>
                     </div>
 
+                    {{-- Honeypot (hidden from humans; bots tend to fill it) + form-open timestamp. --}}
+                    <input type="text" id="tryon-website" name="website" tabindex="-1" autocomplete="off"
+                        class="hidden" aria-hidden="true">
+                    <input type="hidden" id="tryon-started-at" name="form_started_at" value="">
+
                     <p id="tryon-error" class="hidden text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
                     <p class="text-[11px] text-neutral-400 text-center">{{ __('AI previews are approximations and may differ from the actual product.') }}</p>
                 </div>
@@ -727,7 +732,15 @@
                     var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     var selectedFile = null;
 
-                    function open() { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden'; }
+                    var startedAtInput = document.getElementById('tryon-started-at');
+                    var honeypotInput = document.getElementById('tryon-website');
+
+                    function open() {
+                        modal.classList.remove('hidden'); modal.classList.add('flex');
+                        document.body.style.overflow = 'hidden';
+                        // Stamp when the form opened — used server-side to reject instant bot submits.
+                        startedAtInput.value = Date.now();
+                    }
                     function close() { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }
                     function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); }
                     function clearError() { errorBox.classList.add('hidden'); }
@@ -762,6 +775,8 @@
 
                         var fd = new FormData();
                         fd.append('photo', selectedFile);
+                        fd.append('website', honeypotInput.value);
+                        fd.append('form_started_at', startedAtInput.value);
 
                         fetch(endpoint, {
                             method: 'POST',

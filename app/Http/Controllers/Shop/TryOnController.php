@@ -6,6 +6,7 @@ use App\Exceptions\CustomWebException;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\Ai\GeminiTryOnService;
+use App\Services\Ai\TryOnAbuseGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class TryOnController extends Controller
 {
-    public function __construct(private GeminiTryOnService $tryOn) {}
+    public function __construct(private GeminiTryOnService $tryOn, private TryOnAbuseGuard $guard) {}
 
     /**
      * Generate a try-on preview for a product. Returns JSON for the AJAX modal.
@@ -35,7 +36,14 @@ class TryOnController extends Controller
         $product = Product::active()->where('slug', $slug)->firstOrFail();
 
         try {
+            // Abuse checks (login gate, bot friction, per-user + global limits)
+            // run before the billed Gemini call; the counter is only consumed on
+            // a successful generation, so failures don't burn anyone's quota.
+            $this->guard->assert($request);
+
             $path = $this->tryOn->generate($request->file('photo'), $product);
+
+            $this->guard->consume($request);
         } catch (CustomWebException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 422);
         }

@@ -34,6 +34,37 @@
                 {{ __('Get a key from Google AI Studio (aistudio.google.com). When enabled, a "Try it On" button appears on every product page. Image generation is billed per request by Google — keep this off if you are not using it. Customer photos are never stored; generated previews are auto-deleted after 24 hours.') }}
             </p>
 
+            {{-- Abuse protection --}}
+            <div class="flex items-center gap-3 mt-8 mb-4 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                <i class="ph ph-shield-check text-2xl text-primary"></i>
+                <div>
+                    <h3 class="font-semibold text-lg">{{ __('Abuse Protection') }}</h3>
+                    <p class="text-sm text-neutral-500">{{ __('Limit how often the (billed) try-on can run, to prevent spam from draining your Google budget.') }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 xxl:gap-6">
+                <div class="input-group">
+                    <x-admin::label for="ai_tryon_login_required">{{ __('Require Login') }}</x-admin::label>
+                    <x-admin::switch name="ai_tryon_login_required" id="ai_tryon_login_required"
+                        :value="(int) $settings['ai_tryon_login_required']"
+                        :types="[['label' => __('Guests allowed'), 'value' => 0], ['label' => __('Login required'), 'value' => 1]]" />
+                </div>
+
+                <x-admin::number-input-group name="ai_tryon_daily_global" :value="$settings['ai_tryon_daily_global']"
+                    label="Site-wide Daily Limit" :with_currencySymbol="false" />
+
+                <x-admin::number-input-group name="ai_tryon_per_hour" :value="$settings['ai_tryon_per_hour']"
+                    label="Per Visitor / Hour" :with_currencySymbol="false" />
+
+                <x-admin::number-input-group name="ai_tryon_per_day" :value="$settings['ai_tryon_per_day']"
+                    label="Per Visitor / Day" :with_currencySymbol="false" />
+            </div>
+
+            <p class="text-sm text-neutral-500 mt-3">
+                {{ __('Per-visitor limits are tracked by account (or IP for guests). The site-wide daily limit is a hard ceiling across all visitors that resets at midnight. A coarse 10/minute throttle also applies automatically.') }}
+            </p>
+
             <div id="ai-test-result" class="hidden mt-4 text-sm rounded-lg px-3 py-2"></div>
 
             <div class="flex items-center justify-end gap-3 mt-4">

@@ -24,7 +24,11 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('shop.product');
 
 // AI virtual try-on (Gemini) — generate a preview of the customer wearing a product.
-Route::post('/product/{slug}/try-on', [\App\Http\Controllers\Shop\TryOnController::class, 'generate'])->name('shop.product.try-on');
+// A coarse per-IP throttle is the cheap first line; finer per-user/global limits
+// live in TryOnAbuseGuard (the billed call sits behind both).
+Route::post('/product/{slug}/try-on', [\App\Http\Controllers\Shop\TryOnController::class, 'generate'])
+    ->middleware('throttle:10,1')
+    ->name('shop.product.try-on');
 
 Route::prefix('cart')->as('shop.cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
