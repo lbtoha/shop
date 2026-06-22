@@ -40,6 +40,8 @@
 
     @include('shop.partials.cart-drawer')
 
+    @include('shop.partials.whatsapp-float')
+
     @stack('scripts')
 </body>
 

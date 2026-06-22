@@ -23,7 +23,9 @@
             ]);
         }
         $phone = '01935100013';
-        $whatsappNumber = '01710733329';
+        $whatsappEnabled = (int) getOption('whatsapp_enabled', 0) === 1 && filled(getOption('whatsapp_number'));
+        $whatsappNumber = getOption('whatsapp_number', '');
+        $whatsappLink = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber).'?text='.rawurlencode(__('Hi, I am interested in :product', ['product' => $product->name]));
         $shareUrl = urlencode(request()->fullUrl());
         $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
@@ -283,9 +285,11 @@
                             <a href="tel:{{ $phone }}" class="font-extrabold text-brand hover:underline flex items-center gap-1">
                                 <i class="ph ph-phone text-base"></i> {{ $phone }}
                             </a>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsappNumber) }}" target="_blank" rel="noopener" class="font-extrabold text-emerald-600 hover:underline flex items-center gap-1">
-                                <i class="ph ph-whatsapp-logo text-base"></i> {{ $whatsappNumber }}
-                            </a>
+                            @if ($whatsappEnabled)
+                                <a href="{{ $whatsappLink }}" target="_blank" rel="noopener" class="font-extrabold text-emerald-600 hover:underline flex items-center gap-1">
+                                    <i class="ph ph-whatsapp-logo text-base"></i> {{ $whatsappNumber }}
+                                </a>
+                            @endif
                         </div>
                     </div>
 
@@ -651,4 +655,8 @@
             </button>
         </div>
     @endif
+
 @endsection
+
+{{-- Pre-fill the site-wide WhatsApp button with this product (see shop.partials.whatsapp-float). --}}
+@section('wa_message'){{ __('Hi, I am interested in :product', ['product' => $product->name]) }}@overwrite

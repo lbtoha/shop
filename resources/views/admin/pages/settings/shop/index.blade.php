@@ -18,7 +18,19 @@
                     <x-admin::label for="show_ratings">{{ __('Show Product Ratings') }}</x-admin::label>
                     <x-admin::switch name="show_ratings" id="show_ratings" :value="isset($settings['show_ratings']) ? $settings['show_ratings'] : 0" :types="[['label' => __('Disabled'), 'value' => 0], ['label' => __('Enabled'), 'value' => 1]]" />
                 </div>
+
+                <div class="input-group">
+                    <x-admin::label for="whatsapp_enabled">{{ __('WhatsApp Contact Button') }}</x-admin::label>
+                    <x-admin::switch name="whatsapp_enabled" id="whatsapp_enabled" :value="isset($settings['whatsapp_enabled']) ? $settings['whatsapp_enabled'] : 0" :types="[['label' => __('Disabled'), 'value' => 0], ['label' => __('Enabled'), 'value' => 1]]" />
+                </div>
+
+                <x-admin::text-input-group name="whatsapp_number" :value="$settings['whatsapp_number']"
+                    label="WhatsApp Number" placeholder="8801710733329" />
             </div>
+
+            <p class="text-sm text-neutral-500 mt-3">
+                {{ __('When enabled, a WhatsApp contact button shows on every product page. Use the full international number without "+" (e.g. 8801710733329).') }}
+            </p>
 
             <p class="text-sm text-neutral-500 mt-3">
                 {{ __('Flat shipping cost is added to every cash-on-delivery order at checkout. Set 0 for free shipping.') }}
