@@ -28,6 +28,7 @@
         $whatsappLink = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber).'?text='.rawurlencode(__('Hi, I am interested in :product', ['product' => $product->name]));
         $showCategory = (int) getOption('show_product_category', 1) === 1;
         $tryOnEnabled = \App\Services\Ai\GeminiTryOnService::isEnabled();
+        $tryOnCaptcha = $tryOnEnabled && \App\Services\Ai\TryOnAbuseGuard::captchaEnabled();
         $shareUrl = urlencode(request()->fullUrl());
         $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
@@ -682,6 +683,10 @@
                         </div>
                     </div>
 
+                    @if ($tryOnCaptcha)
+                        <div id="tryon-recaptcha" class="flex justify-center"></div>
+                    @endif
+
                     <button type="button" id="tryon-generate" disabled
                         class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-3 rounded-xl text-sm uppercase tracking-wider flex items-center justify-center gap-2">
                         <i class="ph ph-magic-wand"></i>
@@ -735,11 +740,38 @@
                     var startedAtInput = document.getElementById('tryon-started-at');
                     var honeypotInput = document.getElementById('tryon-website');
 
+                    // reCAPTCHA (rendered only when the extension is enabled).
+                    var captchaEnabled = @json($tryOnCaptcha);
+                    var captchaSiteKey = @json($tryOnCaptcha ? config('extension.recaptcha.site_key') : null);
+                    var captchaWidgetId = null;
+
+                    function renderCaptcha() {
+                        if (!captchaEnabled || captchaWidgetId !== null) return;
+                        // The reCAPTCHA script loads async — if it isn't ready yet, retry briefly.
+                        if (!(window.grecaptcha && window.grecaptcha.render)) {
+                            setTimeout(renderCaptcha, 300);
+                            return;
+                        }
+                        captchaWidgetId = window.grecaptcha.render('tryon-recaptcha', { sitekey: captchaSiteKey });
+                    }
+
+                    function captchaToken() {
+                        if (!captchaEnabled || captchaWidgetId === null || !window.grecaptcha) return '';
+                        return window.grecaptcha.getResponse(captchaWidgetId) || '';
+                    }
+
+                    function resetCaptcha() {
+                        if (captchaEnabled && captchaWidgetId !== null && window.grecaptcha) {
+                            window.grecaptcha.reset(captchaWidgetId);
+                        }
+                    }
+
                     function open() {
                         modal.classList.remove('hidden'); modal.classList.add('flex');
                         document.body.style.overflow = 'hidden';
                         // Stamp when the form opened — used server-side to reject instant bot submits.
                         startedAtInput.value = Date.now();
+                        renderCaptcha();
                     }
                     function close() { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }
                     function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); }
@@ -769,6 +801,13 @@
                     genBtn.addEventListener('click', function () {
                         if (!selectedFile) return;
                         clearError();
+
+                        var token = captchaToken();
+                        if (captchaEnabled && !token) {
+                            showError(@json(__('Please complete the verification first.')));
+                            return;
+                        }
+
                         resultBox.classList.add('hidden');
                         genBtn.disabled = true;
                         genText.textContent = @json(__('Generating… this can take a moment'));
@@ -777,6 +816,7 @@
                         fd.append('photo', selectedFile);
                         fd.append('website', honeypotInput.value);
                         fd.append('form_started_at', startedAtInput.value);
+                        if (captchaEnabled) fd.append('recaptcha_token', token);
 
                         fetch(endpoint, {
                             method: 'POST',
@@ -798,10 +838,15 @@
                         .finally(function () {
                             genBtn.disabled = false;
                             genText.textContent = @json(__('Generate Try-On'));
+                            // A reCAPTCHA token is single-use — reset so the next try needs a fresh check.
+                            resetCaptcha();
                         });
                     });
                 })();
             </script>
+            @if ($tryOnCaptcha)
+                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            @endif
         @endpush
     @endif
 

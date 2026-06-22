@@ -5,6 +5,7 @@ namespace App\Services\Ai;
 use App\Exceptions\CustomWebException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**
@@ -12,14 +13,22 @@ use Illuminate\Support\Facades\RateLimiter;
  *
  *   1. login gate            — optionally require an account
  *   2. honeypot + min-time   — trivial bot friction (no DB/cache hit)
- *   3. per-user/IP limits    — N per hour AND M per day (RateLimiter)
- *   4. global daily cap      — site-wide ceiling on Google spend
+ *   3. reCAPTCHA             — when the Google reCAPTCHA extension is enabled
+ *   4. per-user/IP limits    — N per hour AND M per day (RateLimiter)
+ *   5. global daily cap      — site-wide ceiling on Google spend
  *
  * Only `consume()` increments counters — call it after the limits pass but
  * before the billed Gemini request, so failed generations don't burn quota.
  */
 class TryOnAbuseGuard
 {
+    /** Whether the storefront should render the reCAPTCHA widget in the modal. */
+    public static function captchaEnabled(): bool
+    {
+        return (bool) config('extension.recaptcha.is_enabled')
+            && filled(config('extension.recaptcha.site_key'));
+    }
+
     /**
      * Run every read-only check. Throws CustomWebException (HTTP 429/403/422) on
      * the first failure. Does NOT increment any counter.
@@ -30,6 +39,7 @@ class TryOnAbuseGuard
     {
         $this->assertLoggedInIfRequired($request);
         $this->assertNotBot($request);
+        $this->assertCaptcha($request);
         $this->assertWithinUserLimits($request);
         $this->assertWithinGlobalCap();
     }
@@ -72,6 +82,37 @@ class TryOnAbuseGuard
             if ($elapsedMs >= 0 && $elapsedMs < 1500) {
                 throw new CustomWebException(__('Please take a moment before submitting.'), 422);
             }
+        }
+    }
+
+    /**
+     * Verify the Google reCAPTCHA token server-side when the extension is on.
+     * We verify explicitly here (rather than via RecaptchaValidationRule, which
+     * skips JSON/AJAX requests) so the AJAX try-on can't bypass the captcha.
+     */
+    private function assertCaptcha(Request $request): void
+    {
+        if (! self::captchaEnabled()) {
+            return;
+        }
+
+        $token = $request->input('recaptcha_token');
+
+        if (blank($token)) {
+            throw new CustomWebException(__('Please complete the verification and try again.'), 422);
+        }
+
+        $verified = Http::asForm()
+            ->timeout(15)
+            ->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => config('extension.recaptcha.secret_key'),
+                'response' => $token,
+                'remoteip' => $request->ip(),
+            ])
+            ->json('success');
+
+        if (! $verified) {
+            throw new CustomWebException(__('Verification failed. Please try again.'), 422);
         }
     }
 

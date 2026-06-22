@@ -27,6 +27,9 @@ function enableTryOn(): void
         'ai_tryon_api_key' => 'AIzaTESTKEY',
         'ai_tryon_model' => 'gemini-3.1-flash-image',
     ]);
+
+    // Most tests exercise the non-captcha path; captcha tests opt back in.
+    config()->set('extension.recaptcha.is_enabled', false);
 }
 
 it('returns 422 when try-on is disabled', function () {
@@ -196,6 +199,67 @@ it('does not consume quota when generation fails', function () {
     $this->postJson(route('shop.product.try-on', $product->slug), [
         'photo' => UploadedFile::fake()->image('me2.jpg'),
     ])->assertOk();
+});
+
+it('requires a recaptcha token when the extension is enabled', function () {
+    enableTryOn();
+    config()->set('extension.recaptcha.is_enabled', true);
+    config()->set('extension.recaptcha.site_key', 'SITE');
+    config()->set('extension.recaptcha.secret_key', 'SECRET');
+    Storage::fake('public');
+    fakeGeminiSuccess();
+    $product = tryOnProduct();
+
+    // No token → blocked before Gemini is ever called.
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+    ])->assertStatus(422);
+
+    Http::assertNothingSent();
+});
+
+it('accepts a valid recaptcha token', function () {
+    enableTryOn();
+    config()->set('extension.recaptcha.is_enabled', true);
+    config()->set('extension.recaptcha.site_key', 'SITE');
+    config()->set('extension.recaptcha.secret_key', 'SECRET');
+    Storage::fake('public');
+
+    Http::fake([
+        'google.com/recaptcha/*' => Http::response(['success' => true], 200),
+        'example.com/*' => Http::response('IMG', 200, ['Content-Type' => 'image/jpeg']),
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [['content' => ['parts' => [
+                ['inline_data' => ['mime_type' => 'image/png', 'data' => base64_encode('OUT')]],
+            ]]]],
+        ], 200),
+    ]);
+
+    $product = tryOnProduct();
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+        'recaptcha_token' => 'valid-token',
+    ])->assertOk();
+});
+
+it('rejects an invalid recaptcha token', function () {
+    enableTryOn();
+    config()->set('extension.recaptcha.is_enabled', true);
+    config()->set('extension.recaptcha.site_key', 'SITE');
+    config()->set('extension.recaptcha.secret_key', 'SECRET');
+    Storage::fake('public');
+
+    Http::fake([
+        'google.com/recaptcha/*' => Http::response(['success' => false], 200),
+    ]);
+
+    $product = tryOnProduct();
+
+    $this->postJson(route('shop.product.try-on', $product->slug), [
+        'photo' => UploadedFile::fake()->image('me.jpg'),
+        'recaptcha_token' => 'bad-token',
+    ])->assertStatus(422);
 });
 
 function tryOnAdmin(): \App\Models\Admin
