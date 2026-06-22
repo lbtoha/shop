@@ -41,6 +41,59 @@ class GeminiTryOnService
     }
 
     /**
+     * Ping Gemini with the given key/model to confirm they work, without
+     * generating a (billed) image. Sends a tiny text+image request and checks
+     * that an image part comes back.
+     *
+     * @return array{ok: bool, message: string}
+     */
+    public function testConnection(?string $apiKey = null, ?string $model = null): array
+    {
+        $apiKey = $apiKey ?: self::apiKey();
+        $model = $model ?: self::model();
+
+        if (blank($apiKey)) {
+            return ['ok' => false, 'message' => __('No API key configured.')];
+        }
+
+        // 1x1 transparent PNG — gives the image model something to edit so the
+        // probe exercises the real image pipeline cheaply.
+        $pixel = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAYAAAS1zNAAAAAASUVORK5CYII=');
+
+        try {
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'x-goog-api-key' => $apiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post(sprintf(self::ENDPOINT, $model), [
+                    'contents' => [[
+                        'parts' => [
+                            ['text' => 'Return this image unchanged.'],
+                            ['inline_data' => ['mime_type' => 'image/png', 'data' => base64_encode($pixel)]],
+                        ],
+                    ]],
+                    'generationConfig' => ['responseModalities' => ['TEXT', 'IMAGE']],
+                ]);
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'message' => __('Could not reach Gemini: :error', ['error' => $e->getMessage()])];
+        }
+
+        if ($response->failed()) {
+            $apiMessage = data_get($response->json(), 'error.message', $response->body());
+
+            return ['ok' => false, 'message' => __('Gemini rejected the request: :error', ['error' => mb_strimwidth((string) $apiMessage, 0, 200, '…')])];
+        }
+
+        $hasImage = collect(data_get($response->json(), 'candidates.0.content.parts', []))
+            ->contains(fn ($part) => filled($part['inline_data']['data'] ?? $part['inlineData']['data'] ?? null));
+
+        return $hasImage
+            ? ['ok' => true, 'message' => __('Connection OK — Gemini returned an image. Try-on is ready.')]
+            : ['ok' => false, 'message' => __('Connected, but the model did not return an image. Check that ":model" supports image output.', ['model' => $model])];
+    }
+
+    /**
      * Generate a try-on image: the customer wearing/using the product.
      *
      * @return string The public-disk path of the generated image (e.g. tryon/abc.png).

@@ -95,6 +95,59 @@ it('surfaces a friendly error when gemini fails', function () {
     ])->assertStatus(502);
 });
 
+function tryOnAdmin(): \App\Models\Admin
+{
+    return \App\Models\Admin::create([
+        'first_name' => 'Super',
+        'last_name' => 'Admin',
+        'email' => 'ai-admin-'.uniqid().'@example.com',
+        'password' => bcrypt('password'),
+        'admin_role_id' => null,
+    ]);
+}
+
+it('reports a successful gemini connection test', function () {
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [[
+                'content' => ['parts' => [
+                    ['inline_data' => ['mime_type' => 'image/png', 'data' => base64_encode('IMG')]],
+                ]],
+            ]],
+        ], 200),
+    ]);
+
+    $this->actingAs(tryOnAdmin(), 'admin')
+        ->postJson(route('admin.settings.ai.test'), [
+            'ai_tryon_api_key' => 'AIzaTESTKEY',
+            'ai_tryon_model' => 'gemini-3.1-flash-image',
+        ])
+        ->assertOk()
+        ->assertJsonFragment(['message' => 'Connection OK — Gemini returned an image. Try-on is ready.']);
+});
+
+it('reports a failed gemini connection test', function () {
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response(['error' => ['message' => 'API key not valid']], 400),
+    ]);
+
+    $this->actingAs(tryOnAdmin(), 'admin')
+        ->postJson(route('admin.settings.ai.test'), [
+            'ai_tryon_api_key' => 'BADKEY',
+            'ai_tryon_model' => 'gemini-3.1-flash-image',
+        ])
+        ->assertStatus(422);
+});
+
+it('test connection fails when no key is provided', function () {
+    $this->setOptions(['ai_tryon_api_key' => '']);
+
+    $this->actingAs(tryOnAdmin(), 'admin')
+        ->postJson(route('admin.settings.ai.test'), [])
+        ->assertStatus(422)
+        ->assertJsonFragment(['message' => 'No API key configured.']);
+});
+
 it('prunes old try-on images', function () {
     Storage::fake('public');
     Storage::disk('public')->put('tryon/old.png', 'x');

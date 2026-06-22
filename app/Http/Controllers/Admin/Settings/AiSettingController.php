@@ -57,4 +57,26 @@ class AiSettingController extends Controller
 
         return response()->json(['message' => __('AI settings updated.'), 'reload' => true]);
     }
+
+    /**
+     * Live "Test Connection" — pings Gemini with the key/model currently in the
+     * form (falling back to the saved values) so the admin can confirm it works
+     * before relying on it. This makes one real, billed Gemini request.
+     */
+    public function test(Request $request, \App\Services\Ai\GeminiTryOnService $tryOn)
+    {
+        adminUserHasPermission(permission: 'edit');
+
+        $validated = $request->validate([
+            'ai_tryon_api_key' => 'nullable|string|max:255',
+            'ai_tryon_model' => 'nullable|string|max:100',
+        ]);
+
+        $result = $tryOn->testConnection(
+            $validated['ai_tryon_api_key'] ?? null,
+            $validated['ai_tryon_model'] ?? null,
+        );
+
+        return response()->json(['message' => $result['message']], $result['ok'] ? 200 : 422);
+    }
 }

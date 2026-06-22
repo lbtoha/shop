@@ -34,11 +34,62 @@
                 {{ __('Get a key from Google AI Studio (aistudio.google.com). When enabled, a "Try it On" button appears on every product page. Image generation is billed per request by Google — keep this off if you are not using it. Customer photos are never stored; generated previews are auto-deleted after 24 hours.') }}
             </p>
 
-            <div class="flex items-center justify-end mt-4">
+            <div id="ai-test-result" class="hidden mt-4 text-sm rounded-lg px-3 py-2"></div>
+
+            <div class="flex items-center justify-end gap-3 mt-4">
+                <button type="button" id="ai-test-btn"
+                    class="inline-flex items-center gap-2 border border-neutral-200 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-semibold py-2.5 px-4 rounded-md transition">
+                    <i class="ph ph-plugs-connected"></i>
+                    <span id="ai-test-text">{{ __('Test Connection') }}</span>
+                </button>
                 <x-admin::primary-button type="submit">
                     {{ __('Save') }}
                 </x-admin::primary-button>
             </div>
         </form>
     </div>
+
+    @push('scripts')
+        <script>
+            (function () {
+                var btn = document.getElementById('ai-test-btn');
+                if (!btn) return;
+                var text = document.getElementById('ai-test-text');
+                var box = document.getElementById('ai-test-result');
+                var endpoint = @json(route('admin.settings.ai.test'));
+                var csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                function show(msg, ok) {
+                    box.textContent = msg;
+                    box.className = 'mt-4 text-sm rounded-lg px-3 py-2 ' +
+                        (ok ? 'bg-success/10 text-success border border-success/20'
+                            : 'bg-error/10 text-error border border-error/20');
+                    box.classList.remove('hidden');
+                }
+
+                btn.addEventListener('click', function () {
+                    box.classList.add('hidden');
+                    btn.disabled = true;
+                    text.textContent = @json(__('Testing…'));
+
+                    var fd = new FormData();
+                    fd.append('ai_tryon_api_key', document.querySelector('[name="ai_tryon_api_key"]').value);
+                    fd.append('ai_tryon_model', document.querySelector('[name="ai_tryon_model"]').value);
+
+                    fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                        body: fd,
+                    })
+                    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+                    .then(function (res) { show(res.body.message || (res.ok ? 'OK' : 'Failed'), res.ok); })
+                    .catch(function () { show(@json(__('Network error. Please try again.')), false); })
+                    .finally(function () {
+                        btn.disabled = false;
+                        text.textContent = @json(__('Test Connection'));
+                    });
+                });
+            })();
+        </script>
+    @endpush
 </x-admin-app-layout>

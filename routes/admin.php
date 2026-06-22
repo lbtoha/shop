@@ -150,6 +150,7 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
 
                 /** -------------------------- AI SETTINGS -------------------------- */
                 Route::resource('ai', Admin\Settings\AiSettingController::class)->only(['index', 'store']);
+                Route::post('ai/test', [Admin\Settings\AiSettingController::class, 'test'])->name('ai.test');
                 /** -------------------------- END AI SETTINGS -------------------------- */
 
                 /** -------------------------- ORDER NOTIFICATIONS -------------------------- */
