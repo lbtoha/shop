@@ -29,7 +29,7 @@ class AdminAuthMiddleware
             return redirect()->route('admin.dashboard');
         }
 
-        if ($this->hasUrlPermission()) {
+        if ($this->isDeniedForCurrentUrl()) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -37,33 +37,30 @@ class AdminAuthMiddleware
     }
 
     /**
-     * Check recursively if the logged-in admin has permission
-     * for the current URL.
+     * Whether the logged-in admin is denied access to the current URL.
      *
-     * @param  array  $menus
-     * @return bool
+     * An admin is denied when the current URL maps to a known admin menu that is
+     * NOT in their role's authorized menus. Admins with no role (admin_role_id
+     * null) are superusers and are never denied.
      */
-    private function hasUrlPermission()
+    private function isDeniedForCurrentUrl(): bool
     {
         $admin = auth()->guard('admin')->user();
 
         if (! $admin->admin_role_id) {
-            return true;
+            return false; // Superuser — full access.
         }
 
         $authorized_menus = $admin->role->module_caps ?? [];
         $menus = array_map(fn ($menu) => $menu['link'], getMenuCaps(config('menu.admin.menu')));
 
-        $hasPermission = false;
-
         foreach ($menus as $link) {
             $url = route($link);
             if (isCurrentUrlMatched($url) && ! in_array($link, $authorized_menus)) {
-                $hasPermission = true;
-                break;
+                return true; // Current URL is a menu this admin isn't authorized for.
             }
         }
 
-        return $hasPermission;
+        return false;
     }
 }
