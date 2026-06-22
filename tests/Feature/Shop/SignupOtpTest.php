@@ -106,12 +106,66 @@ it('phone-only signup still works when OTP is disabled', function () {
     $this->assertDatabaseHas('users', ['phone' => '01799988877']);
 });
 
+function enableSmsGateway(): void
+{
+    test()->setOptions([
+        'sms_gateway' => json_encode([
+            'is_enabled' => true,
+            'method' => 'GET',
+            'url' => 'https://sms.example.com/send',
+            'params' => ['to' => '{to}', 'msg' => '{message}'],
+        ]),
+    ]);
+}
+
+it('sends an SMS OTP for a phone-only signup when the gateway is configured', function () {
+    $this->setOptions(['signup_otp_enabled' => 1]);
+    enableSmsGateway();
+    \Illuminate\Support\Facades\Http::fake([
+        'sms.example.com/*' => \Illuminate\Support\Facades\Http::response('OK', 200),
+    ]);
+
+    $this->post(route('register'), [
+        'first_name' => 'Phone User',
+        'phone' => '01711100000',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ])->assertRedirect(route('register.otp'));
+
+    // No account yet; an SMS was dispatched to the gateway.
+    $this->assertDatabaseMissing('users', ['phone' => '01711100000']);
+    \Illuminate\Support\Facades\Http::assertSent(fn ($req) => str_contains($req->url(), 'sms.example.com'));
+});
+
+it('creates a phone account after a correct SMS OTP and marks phone verified', function () {
+    $this->setOptions(['signup_otp_enabled' => 1]);
+    enableSmsGateway();
+    \Illuminate\Support\Facades\Http::fake([
+        'sms.example.com/*' => \Illuminate\Support\Facades\Http::response('OK', 200),
+    ]);
+
+    $this->post(route('register'), [
+        'first_name' => 'Phone User',
+        'phone' => '01722200000',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ]);
+
+    $otp = pendingOtp();
+
+    $this->post(route('register.otp.verify'), ['otp' => $otp])
+        ->assertRedirect(route('shop.account.index'));
+
+    $this->assertDatabaseHas('users', ['phone' => '01722200000']);
+    $this->assertAuthenticated();
+    expect(\App\Models\User::where('phone', '01722200000')->value('phone_verified_at'))->not->toBeNull();
+});
+
 it('resends a fresh OTP', function () {
     $this->setOptions(['signup_otp_enabled' => 1]);
     Notification::fake();
 
     $this->post(route('register'), registerPayload(['email' => 'resend@example.com']));
-    $first = pendingOtp();
 
     $this->post(route('register.otp.resend'))->assertRedirect();
 

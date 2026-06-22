@@ -7,12 +7,14 @@
         <div class="bg-white border border-neutral-100 rounded p-8">
             <div class="text-center mb-6">
                 <div class="w-14 h-14 rounded-full bg-[color:var(--color-brand-soft)] flex items-center justify-center mx-auto mb-3">
-                    <i class="ph ph-envelope-open text-2xl text-[color:var(--color-brand)]"></i>
+                    <i class="ph {{ $channel === 'phone' ? 'ph-chat-circle-text' : 'ph-envelope-open' }} text-2xl text-[color:var(--color-brand)]"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-ink mb-1">{{ __('Verify your email') }}</h1>
+                <h1 class="text-2xl font-bold text-ink mb-1">
+                    {{ $channel === 'phone' ? __('Verify your phone') : __('Verify your email') }}
+                </h1>
                 <p class="text-sm text-[color:var(--color-muted)]">
                     {{ __('Enter the code we sent to') }}
-                    <span class="font-semibold text-ink">{{ $email }}</span>
+                    <span class="font-semibold text-ink">{{ $destination }}</span>
                 </p>
             </div>
 

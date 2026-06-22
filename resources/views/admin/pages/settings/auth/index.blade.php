@@ -23,7 +23,7 @@
             </div>
 
             <p class="text-sm text-neutral-500 mt-3">
-                {{ __('When enabled, customers signing up with an email receive a verification code by email and must enter it to finish registration. Code length and expiry are set under System Settings → General. Note: phone verification needs an SMS gateway (not configured) — customers registering with only a phone are asked to use an email while this is on.') }}
+                {{ __('When enabled, customers receive a verification code and must enter it to finish registration. Email signups get an emailed code; phone-only signups get an SMS code when an SMS gateway is configured under Settings → Order Notifications (otherwise they are asked to use an email). Code length and expiry are set under System Settings → General.') }}
             </p>
 
             <div class="flex items-center justify-end mt-4">

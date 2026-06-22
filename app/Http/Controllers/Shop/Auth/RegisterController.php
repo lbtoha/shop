@@ -6,6 +6,7 @@ use App\Enums\UserStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\RegistrationEmailOTP;
+use App\Services\Notification\SmsGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -47,30 +48,55 @@ class RegisterController extends Controller
             return $this->createAndLogin($request, $validated);
         }
 
-        // OTP on, but the customer gave only a phone: SMS delivery isn't wired
-        // up, so we can't verify them. Ask for an email instead of stranding them.
-        if (blank($validated['email'] ?? null)) {
+        // Pick the delivery channel: email when an address was given, otherwise
+        // SMS (only if the gateway is configured). A phone-only signup with no
+        // SMS gateway can't be verified — ask for an email instead of stranding.
+        $email = $validated['email'] ?? null;
+        $phone = $validated['phone'] ?? null;
+
+        if (filled($email)) {
+            $channel = 'email';
+            $destination = $email;
+        } elseif (filled($phone) && SmsGateway::isEnabled()) {
+            $channel = 'phone';
+            $destination = $phone;
+        } else {
             throw ValidationException::withMessages([
                 'email' => __('Email verification is required to sign up. Please provide an email address.'),
             ]);
         }
 
         // Stash the pending registration server-side (never trust it from the
-        // client on the verify step) and email a one-time code.
+        // client on the verify step) and deliver a one-time code.
         $token = (string) Str::uuid();
-        $otp = $this->generateOtp();
+        $otp = (string) $this->generateOtp();
 
         Cache::put(self::PENDING_PREFIX.$token, [
             'data' => $validated,
-            'otp' => (string) $otp,
-            'email' => $validated['email'],
+            'otp' => $otp,
+            'channel' => $channel,
+            'destination' => $destination,
         ], now()->addMinutes($this->otpMinutes()));
 
-        Notification::route('mail', $validated['email'])->notify(new RegistrationEmailOTP((string) $otp));
+        $this->sendOtp($channel, $destination, $otp);
 
         $request->session()->put('signup_otp_token', $token);
 
-        return redirect()->route('register.otp')->with('success', __('We sent a verification code to :email.', ['email' => $validated['email']]));
+        return redirect()->route('register.otp')
+            ->with('success', __('We sent a verification code to :destination.', ['destination' => $destination]));
+    }
+
+    /** Deliver the OTP over the chosen channel (email notification or SMS gateway). */
+    private function sendOtp(string $channel, string $destination, string $otp): void
+    {
+        if ($channel === 'phone') {
+            $minutes = $this->otpMinutes();
+            SmsGateway::send($destination, __('Your verification code is :otp. It expires in :minutes minute(s).', ['otp' => $otp, 'minutes' => $minutes]));
+
+            return;
+        }
+
+        Notification::route('mail', $destination)->notify(new RegistrationEmailOTP($otp));
     }
 
     /** Show the OTP entry screen for the pending registration. */
@@ -82,7 +108,10 @@ class RegisterController extends Controller
             return redirect()->route('register')->with('error', __('Your verification session expired. Please sign up again.'));
         }
 
-        return view('shop.auth.verify-otp', ['email' => $pending['email']]);
+        return view('shop.auth.verify-otp', [
+            'destination' => $pending['destination'],
+            'channel' => $pending['channel'],
+        ]);
     }
 
     /** Verify the OTP and create the account. */
@@ -111,8 +140,9 @@ class RegisterController extends Controller
         Cache::forget(self::PENDING_PREFIX.$token);
         $request->session()->forget('signup_otp_token');
 
+        // Mark whichever channel was actually verified.
         $data = $pending['data'];
-        $data['email_verified_at'] = now();
+        $data[$pending['channel'] === 'phone' ? 'phone_verified_at' : 'email_verified_at'] = now();
 
         return $this->createAndLogin($request, $data);
     }
@@ -127,13 +157,13 @@ class RegisterController extends Controller
             return redirect()->route('register')->with('error', __('Your verification session expired. Please sign up again.'));
         }
 
-        $otp = $this->generateOtp();
-        $pending['otp'] = (string) $otp;
+        $otp = (string) $this->generateOtp();
+        $pending['otp'] = $otp;
         Cache::put(self::PENDING_PREFIX.$token, $pending, now()->addMinutes($this->otpMinutes()));
 
-        Notification::route('mail', $pending['email'])->notify(new RegistrationEmailOTP((string) $otp));
+        $this->sendOtp($pending['channel'], $pending['destination'], $otp);
 
-        return back()->with('success', __('A new code has been sent to :email.', ['email' => $pending['email']]));
+        return back()->with('success', __('A new code has been sent to :destination.', ['destination' => $pending['destination']]));
     }
 
     /**
@@ -150,6 +180,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'status' => UserStatusEnum::ACTIVE->value,
             'email_verified_at' => $data['email_verified_at'] ?? null,
+            'phone_verified_at' => $data['phone_verified_at'] ?? null,
         ]);
 
         auth()->login($user);
