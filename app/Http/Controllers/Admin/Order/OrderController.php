@@ -170,7 +170,9 @@ class OrderController extends Controller
             ],
         ];
 
-        return view('admin.pages.orders.index', compact('tab_buttons', 'orders', 'columns', 'stats', 'buttons'));
+        $steadfastEnabled = \App\Services\Ecommerce\SteadfastService::isEnabled();
+
+        return view('admin.pages.orders.index', compact('tab_buttons', 'orders', 'columns', 'stats', 'buttons', 'steadfastEnabled'));
     }
 
     /**
@@ -427,6 +429,56 @@ class OrderController extends Controller
             'message' => __('Consignment created on Steadfast.'),
             'redirect' => route('admin.orders.show', $order->id),
         ]);
+    }
+
+    /**
+     * Dispatch several orders to Steadfast at once from the list page. Each is
+     * attempted independently; the response summarises how many succeeded and
+     * surfaces the first few failures.
+     */
+    public function bulkSendToSteadfast(Request $request)
+    {
+        adminUserHasPermission(permission: 'edit');
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ]);
+
+        if (! \App\Services\Ecommerce\SteadfastService::isEnabled()) {
+            return response()->json(['message' => __('Steadfast courier is not configured.')], 422);
+        }
+
+        $orders = Order::whereIn('id', $validated['ids'])->get();
+
+        $sent = 0;
+        $skipped = 0;
+        $errors = [];
+
+        foreach ($orders as $order) {
+            if ($order->courier_consignment_id) {
+                $skipped++;
+
+                continue;
+            }
+
+            try {
+                \App\Services\Ecommerce\SteadfastService::createConsignment($order);
+                $sent++;
+            } catch (\Throwable $e) {
+                $errors[] = '#'.$order->order_number.': '.$e->getMessage();
+            }
+        }
+
+        $message = __(':sent sent', ['sent' => $sent]);
+        if ($skipped) {
+            $message .= ', '.__(':skipped already dispatched', ['skipped' => $skipped]);
+        }
+        if ($errors) {
+            $message .= '. '.__(':failed failed', ['failed' => count($errors)]).': '.implode(' | ', array_slice($errors, 0, 3));
+        }
+
+        return response()->json(['message' => $message, 'reload' => true]);
     }
 
     /**

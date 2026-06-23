@@ -167,6 +167,16 @@ export function toastConfirm(config) {
         });
 }
 
+// Expose the toast helpers globally so inline page scripts (which aren't bundled
+// by Vite and therefore can't `import`) can call them — e.g. bulk actions on the
+// orders list and the various `typeof toastSuccess === 'function'` guarded calls.
+if (typeof window !== "undefined") {
+    window.toastAlert = toastAlert;
+    window.toastConfirm = toastConfirm;
+    window.toastSuccess = toastSuccess;
+    window.toastError = toastError;
+}
+
 function showSessionToast() {
     const toastElement = document.getElementById("session-toast");
     if (toastElement) {

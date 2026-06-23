@@ -140,6 +140,42 @@ class SteadfastService
     }
 
     /**
+     * Delivery statuses that are final — no point polling Steadfast again.
+     */
+    public const TERMINAL_STATUSES = ['delivered', 'partial_delivered', 'cancelled', 'returned'];
+
+    /**
+     * Refresh the delivery status of every order that has an open (non-terminal)
+     * Steadfast consignment. Returns the number of orders synced. Used by the
+     * scheduled `steadfast:sync` command.
+     */
+    public static function syncOpenConsignments(int $limit = 100): int
+    {
+        if (! self::isEnabled()) {
+            return 0;
+        }
+
+        $orders = Order::query()
+            ->whereNotNull('courier_consignment_id')
+            ->where(function ($q) {
+                $q->whereNull('courier_status')
+                    ->orWhereNotIn('courier_status', self::TERMINAL_STATUSES);
+            })
+            ->limit($limit)
+            ->get();
+
+        $synced = 0;
+
+        foreach ($orders as $order) {
+            if (self::refreshStatus($order) !== null) {
+                $synced++;
+            }
+        }
+
+        return $synced;
+    }
+
+    /**
      * Current merchant COD balance, or null if it can't be fetched.
      */
     public static function balance(): ?float
@@ -159,5 +195,45 @@ class SteadfastService
         $balance = $response->json('current_balance');
 
         return is_numeric($balance) ? (float) $balance : null;
+    }
+
+    /**
+     * Verify the given credentials (falling back to the saved ones) by calling
+     * /get_balance. Returns ['ok' => bool, 'message' => string] for the admin
+     * "Test connection" button. Does not require the integration to be enabled.
+     */
+    public static function testConnection(?string $apiKey = null, ?string $secretKey = null, ?string $baseUrl = null): array
+    {
+        $apiKey = $apiKey ?: getOption('steadfast_api_key');
+        $secretKey = $secretKey ?: getOption('steadfast_secret_key');
+        $baseUrl = rtrim(($baseUrl ?: getOption('steadfast_base_url')) ?: self::DEFAULT_BASE_URL, '/');
+
+        if (! $apiKey || ! $secretKey) {
+            return ['ok' => false, 'message' => __('Enter both the Api-Key and Secret-Key first.')];
+        }
+
+        try {
+            $response = Http::baseUrl($baseUrl)
+                ->acceptJson()
+                ->timeout(20)
+                ->withHeaders(['Api-Key' => $apiKey, 'Secret-Key' => $secretKey])
+                ->get('/get_balance');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return ['ok' => false, 'message' => __('Could not reach Steadfast. Check the base URL and your connection.')];
+        }
+
+        if ($response->status() === 401 || $response->json('status') === 401) {
+            return ['ok' => false, 'message' => __('Invalid Api-Key or Secret-Key.')];
+        }
+
+        $balance = $response->json('current_balance');
+
+        if (! $response->successful() || ! is_numeric($balance)) {
+            return ['ok' => false, 'message' => __('Steadfast rejected the request. Please re-check your credentials.')];
+        }
+
+        return ['ok' => true, 'message' => __('Connected. Current COD balance: :amount', ['amount' => amountWithSymbol((float) $balance)])];
     }
 }

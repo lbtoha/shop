@@ -68,4 +68,27 @@ class SteadfastSettingController extends Controller
 
         return response()->json(['message' => __('Steadfast courier settings updated.'), 'reload' => true]);
     }
+
+    /**
+     * Live "Test connection" — verifies the Api-Key/Secret-Key currently in the
+     * form (falling back to saved values) against the Steadfast balance endpoint.
+     */
+    public function test(Request $request)
+    {
+        adminUserHasPermission(permission: 'edit');
+
+        $validated = $request->validate([
+            'steadfast_api_key' => 'nullable|string|max:255',
+            'steadfast_secret_key' => 'nullable|string|max:255',
+            'steadfast_base_url' => 'nullable|string|max:255',
+        ]);
+
+        $result = SteadfastService::testConnection(
+            $validated['steadfast_api_key'] ?? null,
+            $validated['steadfast_secret_key'] ?? null,
+            $validated['steadfast_base_url'] ?? null,
+        );
+
+        return response()->json(['message' => $result['message']], $result['ok'] ? 200 : 422);
+    }
 }
