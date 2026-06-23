@@ -27,6 +27,23 @@ class SteadfastService
             && getOption('steadfast_secret_key');
     }
 
+    /**
+     * Whether orders should be dispatched to Steadfast automatically when they
+     * reach the configured trigger status (requires the integration enabled).
+     */
+    public static function isAutoSendEnabled(): bool
+    {
+        return self::isEnabled() && (int) getOption('steadfast_auto_send', 0) === 1;
+    }
+
+    /**
+     * The order status that triggers automatic consignment creation.
+     */
+    public static function autoSendStatus(): string
+    {
+        return getOption('steadfast_auto_send_status') ?: 'processing';
+    }
+
     private static function baseUrl(): string
     {
         return rtrim(getOption('steadfast_base_url') ?: self::DEFAULT_BASE_URL, '/');

@@ -334,7 +334,9 @@ class OrderController extends Controller
         }
 
         if ($statusChanged) {
-            \App\Services\Ecommerce\OrderNotifier::statusUpdated($order->fresh());
+            $order = $order->fresh();
+            \App\Services\Ecommerce\OrderNotifier::statusUpdated($order);
+            $this->maybeAutoSendToSteadfast($order);
         }
 
         return response()->json([
@@ -370,12 +372,41 @@ class OrderController extends Controller
             return response()->json(['message' => $th->getMessage()], 400);
         }
 
-        \App\Services\Ecommerce\OrderNotifier::statusUpdated($order->fresh());
+        $order = $order->fresh();
+        \App\Services\Ecommerce\OrderNotifier::statusUpdated($order);
+        $this->maybeAutoSendToSteadfast($order);
 
         return response()->json([
             'message' => __('Order moved to :status', ['status' => __($next->label())]),
             'redirect' => route('admin.orders.show', $order->id),
         ]);
+    }
+
+    /**
+     * When Steadfast auto-dispatch is enabled and the order has just reached the
+     * configured trigger status, create a consignment automatically. Failure is
+     * swallowed (reported) so it never blocks the status update — the admin can
+     * still send manually from the order page.
+     */
+    private function maybeAutoSendToSteadfast(Order $order): void
+    {
+        if ($order->courier_consignment_id) {
+            return; // already dispatched
+        }
+
+        if (! \App\Services\Ecommerce\SteadfastService::isAutoSendEnabled()) {
+            return;
+        }
+
+        if ($order->status->value !== \App\Services\Ecommerce\SteadfastService::autoSendStatus()) {
+            return;
+        }
+
+        try {
+            \App\Services\Ecommerce\SteadfastService::createConsignment($order);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /**

@@ -26,6 +26,8 @@ class SteadfastSettingController extends Controller
             'steadfast_api_key' => getOption('steadfast_api_key', ''),
             'steadfast_secret_key' => getOption('steadfast_secret_key', ''),
             'steadfast_base_url' => getOption('steadfast_base_url', 'https://portal.packzy.com/api/v1'),
+            'steadfast_auto_send' => getOption('steadfast_auto_send', 0),
+            'steadfast_auto_send_status' => getOption('steadfast_auto_send_status', 'processing'),
         ];
 
         // Show the live COD balance when credentials are valid.
@@ -43,6 +45,8 @@ class SteadfastSettingController extends Controller
             'steadfast_api_key' => 'nullable|string|max:255',
             'steadfast_secret_key' => 'nullable|string|max:255',
             'steadfast_base_url' => 'required|url|max:255',
+            'steadfast_auto_send' => 'required|in:0,1',
+            'steadfast_auto_send_status' => ['required', 'in:'.implode(',', \App\Enums\OrderStatusEnum::values())],
         ]);
 
         // Keys are required only when the integration is switched on.
@@ -58,6 +62,8 @@ class SteadfastSettingController extends Controller
             'steadfast_api_key' => $validated['steadfast_api_key'] ?? '',
             'steadfast_secret_key' => $validated['steadfast_secret_key'] ?? '',
             'steadfast_base_url' => rtrim($validated['steadfast_base_url'], '/'),
+            'steadfast_auto_send' => $validated['steadfast_auto_send'],
+            'steadfast_auto_send_status' => $validated['steadfast_auto_send_status'],
         ]);
 
         return response()->json(['message' => __('Steadfast courier settings updated.'), 'reload' => true]);
