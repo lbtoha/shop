@@ -90,6 +90,8 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
             Route::get('{order}/invoice', [Admin\Order\OrderController::class, 'invoice'])->name('invoice');
             Route::put('{order}/status', [Admin\Order\OrderController::class, 'updateStatus'])->name('update-status');
             Route::put('{order}/advance', [Admin\Order\OrderController::class, 'advanceStatus'])->name('advance');
+            Route::post('{order}/steadfast', [Admin\Order\OrderController::class, 'sendToSteadfast'])->name('steadfast');
+            Route::post('{order}/steadfast/refresh', [Admin\Order\OrderController::class, 'refreshSteadfastStatus'])->name('steadfast.refresh');
             Route::delete('{order}', [Admin\Order\OrderController::class, 'destroy'])->name('destroy');
         });
         /** -------------------------- End E-COMMERCE -------------------------- */
@@ -147,6 +149,10 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 /** -------------------------- PAYMENT SETTINGS -------------------------- */
                 Route::resource('payment', Admin\Settings\PaymentSettingController::class)->only(['index', 'store']);
                 /** -------------------------- END PAYMENT SETTINGS -------------------------- */
+
+                /** -------------------------- STEADFAST COURIER SETTINGS -------------------------- */
+                Route::resource('steadfast', Admin\Settings\SteadfastSettingController::class)->only(['index', 'store']);
+                /** -------------------------- END STEADFAST COURIER SETTINGS -------------------------- */
 
                 /** -------------------------- AI SETTINGS -------------------------- */
                 Route::resource('ai', Admin\Settings\AiSettingController::class)->only(['index', 'store']);

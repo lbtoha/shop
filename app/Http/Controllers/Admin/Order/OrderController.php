@@ -379,6 +379,45 @@ class OrderController extends Controller
     }
 
     /**
+     * Create a Steadfast courier consignment for the order.
+     */
+    public function sendToSteadfast(Order $order)
+    {
+        adminUserHasPermission(permission: 'edit');
+        protectOnDemo($order);
+
+        try {
+            \App\Services\Ecommerce\SteadfastService::createConsignment($order);
+        } catch (\App\Exceptions\CustomWebException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'message' => __('Consignment created on Steadfast.'),
+            'redirect' => route('admin.orders.show', $order->id),
+        ]);
+    }
+
+    /**
+     * Refresh the Steadfast delivery status for the order.
+     */
+    public function refreshSteadfastStatus(Order $order)
+    {
+        adminUserHasPermission(permission: 'edit');
+
+        if (! $order->courier_consignment_id) {
+            return response()->json(['message' => __('This order has no Steadfast consignment.')], 422);
+        }
+
+        \App\Services\Ecommerce\SteadfastService::refreshStatus($order);
+
+        return response()->json([
+            'message' => __('Delivery status refreshed.'),
+            'redirect' => route('admin.orders.show', $order->id),
+        ]);
+    }
+
+    /**
      * Download a PDF invoice for the order.
      */
     public function invoice(Order $order)

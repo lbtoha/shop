@@ -27,6 +27,18 @@
                 <i class="ph ph-file-pdf"></i><span class="text-xs font-medium">{{ __('Invoice') }}</span>
             </a>
 
+            {{-- Steadfast courier: dispatch a consignment when enabled and not yet sent --}}
+            @if (\App\Services\Ecommerce\SteadfastService::isEnabled() && ! $order->courier_consignment_id && ! $isCancelled)
+                <button type="button" class="action-confirm-btn flex items-center gap-1 rounded bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 text-xs font-semibold cursor-pointer"
+                    action="{{ route('admin.orders.steadfast', $order->id) }}"
+                    method="POST"
+                    title="{{ __('Send to Steadfast?') }}"
+                    text="{{ __('Create a Steadfast COD consignment for this order?') }}">
+                    <i class="ph ph-truck text-sm"></i>
+                    <span>{{ __('Send to Steadfast') }}</span>
+                </button>
+            @endif
+
             {{-- Quick Payment Status Update Button --}}
             @if ($order->payment_status->value === 'unpaid')
                 <button type="button" class="action-confirm-btn flex items-center gap-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 text-xs font-semibold cursor-pointer"
@@ -230,6 +242,31 @@
                     @endif
                 </div>
             </div>
+
+            @if ($order->courier_consignment_id)
+                <div class="white-box">
+                    <p class="m-text font-medium mb-4 flex items-center gap-2"><i class="ph ph-truck text-primary"></i> {{ __('Steadfast Courier') }}</p>
+                    <div class="space-y-2 s-text">
+                        <p><span class="text-xs block">{{ __('Consignment ID') }}</span>{{ $order->courier_consignment_id }}</p>
+                        @if ($order->courier_tracking_code)
+                            <p><span class="text-xs block">{{ __('Tracking Code') }}</span>
+                                <a href="https://steadfast.com.bd/t/{{ $order->courier_tracking_code }}" target="_blank" rel="noopener" class="text-primary">{{ $order->courier_tracking_code }}</a>
+                            </p>
+                        @endif
+                        @if ($order->courier_status)
+                            <p><span class="text-xs block">{{ __('Delivery Status') }}</span><span class="capitalize">{{ str_replace('_', ' ', $order->courier_status) }}</span></p>
+                        @endif
+                    </div>
+                    <button type="button" class="action-confirm-btn mt-4 flex items-center gap-1 rounded bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 px-3 py-1.5 text-xs font-semibold cursor-pointer"
+                        action="{{ route('admin.orders.steadfast.refresh', $order->id) }}"
+                        method="POST"
+                        title="{{ __('Refresh Status?') }}"
+                        text="{{ __('Fetch the latest delivery status from Steadfast?') }}">
+                        <i class="ph ph-arrows-clockwise text-sm"></i>
+                        <span>{{ __('Refresh Status') }}</span>
+                    </button>
+                </div>
+            @endif
 
             <div class="white-box">
                 <p class="m-text font-medium mb-4">{{ __('Update Order') }}</p>

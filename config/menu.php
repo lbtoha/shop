@@ -97,6 +97,12 @@ return [
                                 'text' => 'Enable SSLCommerz online payment and set store credentials.',
                             ],
                             [
+                                'title' => 'Steadfast Courier',
+                                'link' => 'admin.settings.steadfast.index',
+                                'icon' => 'ph ph-truck',
+                                'text' => 'Connect Steadfast to dispatch COD consignments for orders.',
+                            ],
+                            [
                                 'title' => 'AI Settings',
                                 'link' => 'admin.settings.ai.index',
                                 'icon' => 'ph ph-sparkle',
