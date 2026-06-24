@@ -133,10 +133,10 @@
                   class="hidden md:flex items-center relative">
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="{{ __('Search products…') }}"
-                    class="w-36 lg:w-44 xl:w-52 border border-line rounded-full py-2 pl-4 pr-10 text-xs text-ink placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 transition-all duration-200 bg-canvas focus:bg-white">
+                    class="w-36 lg:w-44 xl:w-56 h-9.5 sm:h-11 border border-line rounded-full pl-5 pr-11 sm:pr-12 text-xs sm:text-sm text-ink placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 transition-all duration-200 bg-canvas focus:bg-white">
                 <button type="submit"
-                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center transition-colors">
-                    <i class="ph-bold ph-magnifying-glass text-xs"></i>
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6.5 h-6.5 sm:w-8 sm:h-8 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center transition-all duration-200">
+                    <i class="ph-bold ph-magnifying-glass text-xs sm:text-sm"></i>
                 </button>
             </form>
 

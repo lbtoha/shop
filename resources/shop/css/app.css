@@ -598,3 +598,26 @@ nav[role="navigation"] a:focus {
     color: var(--color-info) !important;
 }
 
+/* ── Floating Cart Button ── */
+#floating-cart {
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 0.3s ease, 
+                box-shadow 0.3s ease;
+    box-shadow: 0 10px 30px rgba(225, 29, 72, 0.35);
+}
+
+#floating-cart:hover {
+    box-shadow: 0 15px 35px rgba(225, 29, 72, 0.5);
+}
+
+@keyframes cart-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+#floating-cart i {
+    animation: cart-bounce 3s ease-in-out infinite;
+}
+
+

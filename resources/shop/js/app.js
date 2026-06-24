@@ -415,18 +415,8 @@ function initFloatingCart() {
     const floatCart = document.getElementById("floating-cart");
     if (!floatCart) return;
 
-    const handleScroll = () => {
-        if (window.scrollY > 200) {
-            floatCart.classList.remove("translate-y-20", "opacity-0", "pointer-events-none");
-            floatCart.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
-        } else {
-            floatCart.classList.add("translate-y-20", "opacity-0", "pointer-events-none");
-            floatCart.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
-        }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    floatCart.classList.remove("translate-y-20", "opacity-0", "pointer-events-none");
+    floatCart.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
