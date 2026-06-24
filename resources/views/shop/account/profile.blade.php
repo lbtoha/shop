@@ -26,10 +26,10 @@
                 @endif
 
                 {{-- Profile Info Card --}}
-                <div class="bg-white border border-neutral-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <div class="bg-white border border-neutral-200/60 rounded-2xl p-6 sm:p-8">
                     {{-- User Profile Header --}}
                     <div class="flex items-center gap-4 mb-8 pb-6 border-b border-neutral-100">
-                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[color:var(--color-brand)] to-[color:var(--color-brand-dark)] text-white flex items-center justify-center font-bold text-2xl shadow-md">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[color:var(--color-brand)] to-[color:var(--color-brand-dark)] text-white flex items-center justify-center font-bold text-2xl">
                             {{ strtoupper(substr($user->first_name ?? 'U', 0, 1)) }}
                         </div>
                         <div>
@@ -51,7 +51,7 @@
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">{{ __('Name') }}</label>
                                 <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}" required
-                                    class="w-full border border-[color:var(--color-line)] rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
+                                    class="w-full border border-[color:var(--color-line)] rounded-md py-3 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
                                 @error('first_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
 
@@ -59,7 +59,7 @@
                             <div class="sm:col-span-1">
                                 <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">{{ __('Email') }}</label>
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                    class="w-full border border-[color:var(--color-line)] rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
+                                    class="w-full border border-[color:var(--color-line)] rounded-md py-3 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
                                 @error('email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
 
@@ -67,7 +67,7 @@
                             <div class="sm:col-span-1">
                                 <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">{{ __('Phone number') }}</label>
                                 <input type="text" value="{{ $user->phone ?? __('N/A') }}" readonly
-                                    class="w-full border border-[color:var(--color-line)] bg-neutral-50 rounded-xl py-3 px-4 text-sm text-neutral-500 cursor-not-allowed outline-none select-none">
+                                    class="w-full border border-[color:var(--color-line)] bg-neutral-50 rounded-md py-3 px-4 text-sm text-neutral-500 cursor-not-allowed outline-none select-none">
                             </div>
 
                             {{-- New password --}}
@@ -75,7 +75,7 @@
                                 <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">{{ __('New password') }}</label>
                                 <div class="relative">
                                     <input type="password" id="new_password" name="password"
-                                        class="w-full border border-[color:var(--color-line)] rounded-xl py-3 pl-4 pr-11 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
+                                        class="w-full border border-[color:var(--color-line)] rounded-md py-3 pl-4 pr-11 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
                                     <button type="button" onclick="togglePasswordVisibility('new_password', this)"
                                         class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[color:var(--color-brand)] p-1 transition-colors">
                                         <i class="ph ph-eye text-lg"></i>
@@ -89,7 +89,7 @@
                                 <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">{{ __('Confirm password') }}</label>
                                 <div class="relative">
                                     <input type="password" id="confirm_password" name="password_confirmation"
-                                        class="w-full border border-[color:var(--color-line)] rounded-xl py-3 pl-4 pr-11 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
+                                        class="w-full border border-[color:var(--color-line)] rounded-md py-3 pl-4 pr-11 text-sm focus:outline-none focus:border-[color:var(--color-brand)] focus:ring-1 focus:ring-[color:var(--color-brand)] transition-colors">
                                     <button type="button" onclick="togglePasswordVisibility('confirm_password', this)"
                                         class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[color:var(--color-brand)] p-1 transition-colors">
                                         <i class="ph ph-eye text-lg"></i>
@@ -100,7 +100,7 @@
 
                         {{-- Update Button --}}
                         <div class="pt-4">
-                            <button type="submit" class="bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-bold text-sm py-3 px-8 rounded-full shadow-lg shadow-brand/10 transition-all hover:shadow-xl hover:shadow-brand/20">
+                            <button type="submit" class="bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-bold text-sm py-3 px-8 rounded-md transition-all">
                                 {{ __('Update') }}
                             </button>
                         </div>

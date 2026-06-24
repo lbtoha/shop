@@ -23,7 +23,7 @@
 
             {{-- Mobile filter toggle --}}
             <button type="button" id="filter-toggle"
-                class="lg:hidden w-full flex items-center justify-between gap-2 bg-white border border-line rounded-xl px-4 py-3 text-sm font-semibold text-ink mb-3 shadow-sm">
+                class="lg:hidden w-full flex items-center justify-between gap-2 bg-white border border-line rounded-md px-4 py-3 text-sm font-semibold text-ink mb-3">
                 <span class="flex items-center gap-2">
                     <i class="ph ph-faders text-brand text-base"></i>
                     {{ __('Filter & Categories') }}
@@ -35,7 +35,7 @@
             <div id="filter-panel" class="hidden lg:block space-y-4">
 
                 {{-- Category filter --}}
-                <div class="bg-white rounded-2xl border border-line shadow-sm overflow-hidden">
+                <div class="bg-white rounded-md border border-line overflow-hidden">
                     <div class="flex items-center gap-2 px-4 py-3.5 border-b border-line-soft">
                         <i class="ph ph-squares-four text-brand text-base"></i>
                         <h3 class="text-sm font-bold text-ink">{{ __('Categories') }}</h3>
@@ -61,7 +61,7 @@
                 </div>
 
                 {{-- Price range note --}}
-                <div class="bg-brand-soft border border-brand/10 rounded-2xl p-4 text-center">
+                <div class="bg-brand-soft border border-brand/10 rounded-md p-4 text-center">
                     <i class="ph ph-hand-coins text-brand text-2xl mb-1 block"></i>
                     <p class="text-xs font-semibold text-brand">{{ __('Cash on Delivery') }}</p>
                     <p class="text-[11px] text-brand/70 mt-0.5">{{ __('Pay when your order arrives') }}</p>
@@ -87,7 +87,7 @@
                     @if (request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
                     @if (request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
                     <select name="sort" onchange="this.form.submit()"
-                        class="border border-line rounded-xl py-2 pl-3 pr-8 text-xs sm:text-sm font-medium text-ink bg-white focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all appearance-none cursor-pointer shadow-sm">
+                        class="border border-line rounded-md py-2 pl-3 pr-8 text-xs sm:text-sm font-medium text-ink bg-white focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all appearance-none cursor-pointer">
                         <option value="newest"     @selected(!request('sort') || request('sort') === 'newest')>{{ __('Newest First') }}</option>
                         <option value="oldest"     @selected(request('sort') === 'oldest')>{{ __('Oldest First') }}</option>
                         <option value="price_low"  @selected(request('sort') === 'price_low')>{{ __('Price: Low → High') }}</option>
@@ -112,8 +112,8 @@
 
             {{-- Grid --}}
             @if ($products->isEmpty())
-                <div class="flex flex-col items-center justify-center bg-white border border-line rounded-2xl py-20 px-8 text-center shadow-sm">
-                    <div class="w-16 h-16 rounded-2xl bg-canvas flex items-center justify-center mb-4">
+                <div class="flex flex-col items-center justify-center bg-white border border-line rounded-md py-20 px-8 text-center">
+                    <div class="w-16 h-16 rounded-md bg-canvas flex items-center justify-center mb-4">
                         <i class="ph ph-package text-3xl text-muted"></i>
                     </div>
                     <h3 class="text-base font-bold text-ink mb-1">{{ __('No products found') }}</h3>
@@ -131,7 +131,7 @@
 
                 {{-- Pagination --}}
                 <div class="mt-8">
-                    {{ $products->links() }}
+                    {{ $products->links('shop.partials.pagination') }}
                 </div>
             @endif
         </div>

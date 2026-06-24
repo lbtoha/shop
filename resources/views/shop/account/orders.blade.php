@@ -12,19 +12,19 @@
             <div class="lg:col-span-3">
                 {{-- Flash Message Alert --}}
                 @if (session('success'))
-                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 mb-4 text-sm flex items-center gap-3">
+                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md p-4 mb-4 text-sm flex items-center gap-3">
                         <i class="ph ph-check-circle text-xl text-emerald-600"></i>
                         <span>{{ session('success') }}</span>
                     </div>
                 @endif
                 @if (session('error'))
-                    <div class="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 mb-4 text-sm flex items-center gap-3">
+                    <div class="bg-rose-50 border border-rose-200 text-rose-800 rounded-md p-4 mb-4 text-sm flex items-center gap-3">
                         <i class="ph ph-warning-circle text-xl text-rose-600"></i>
                         <span>{{ session('error') }}</span>
                     </div>
                 @endif
 
-                <div class="bg-white border border-neutral-200/80 rounded-2xl overflow-hidden shadow-sm">
+                <div class="bg-white border border-neutral-200/80 rounded-md overflow-hidden">
                     @if ($orders->isEmpty())
                         <div class="p-8 text-center text-[color:var(--color-muted)]">
                             <i class="ph ph-package text-4xl block mb-2"></i>
@@ -70,6 +70,10 @@
                                                 <a href="{{ route('shop.account.order', $order->order_number) }}"
                                                     class="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold py-2 px-4 rounded transition-all">
                                                     <i class="ph ph-eye"></i> {{ __('view') }}
+                                                </a>
+                                                <a href="{{ route('shop.track', ['order_number' => $order->order_number, 'phone' => $order->customer_phone]) }}"
+                                                    class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded transition-all">
+                                                    <i class="ph ph-map-pin"></i> {{ __('Track') }}
                                                 </a>
                                                 @if($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
                                                     <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"

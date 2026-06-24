@@ -20,14 +20,14 @@
     <main class="flex-1">
         @if (session('success'))
             <div class="shop-container mt-4">
-                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-md">
                     {{ session('success') }}
                 </div>
             </div>
         @endif
         @if (session('error'))
             <div class="shop-container mt-4">
-                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
                     {{ session('error') }}
                 </div>
             </div>
@@ -41,6 +41,8 @@
     @include('shop.partials.cart-drawer')
 
     @include('shop.partials.whatsapp-float')
+
+    @include('shop.partials.cart-float')
 
     @stack('scripts')
 </body>

@@ -3,7 +3,9 @@
     $address          = config('application_info.address');
     $footerCategories = \App\Models\Category::active()->whereNull('parent_id')->orderBy('sort_order')->take(6)->get();
     $fbLink           = collect(config('application_info.social_medias', []))->firstWhere('name', 'Facebook')['link'] ?? '#';
-    $waNumber         = preg_replace('/\D/', '', $company['phone'] ?? '');
+    $instaLink        = collect(config('application_info.social_medias', []))->firstWhere('name', 'Instagram')['link'] ?? '#';
+    $ytLink           = collect(config('application_info.social_medias', []))->firstWhere('name', 'Youtube')['link'] ?? '#';
+    $waNumber         = preg_replace('/\D/', '', ((int) getOption('whatsapp_enabled', 0) === 1 ? getOption('whatsapp_number') : null) ?: ($company['phone'] ?? ''));
 @endphp
 
 
@@ -31,19 +33,19 @@
                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-muted mb-3">{{ __('Follow Us') }}</p>
                 <div class="flex items-center gap-2.5">
                     <a href="{{ $fbLink }}" target="_blank" rel="noopener" aria-label="Facebook"
-                       class="w-10 h-10 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2] border border-[#1877F2]/20 hover:border-[#1877F2] flex items-center justify-center text-[#3b82f6] hover:text-white hover:-translate-y-0.5 transition-all duration-200">
+                       class="w-10 h-10 rounded-md bg-[#1877F2]/10 hover:bg-[#1877F2] border border-[#1877F2]/20 hover:border-[#1877F2] flex items-center justify-center text-[#3b82f6] hover:text-white hover:-translate-y-0.5 transition-all duration-200">
                         <i class="ph ph-facebook-logo text-base"></i>
                     </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="Instagram"
-                       class="w-10 h-10 rounded-xl bg-pink-500/10 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 border border-pink-500/20 hover:border-pink-500 flex items-center justify-center text-pink-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
+                    <a href="{{ $instaLink }}" target="_blank" rel="noopener" aria-label="Instagram"
+                       class="w-10 h-10 rounded-md bg-pink-500/10 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 border border-pink-500/20 hover:border-pink-500 flex items-center justify-center text-pink-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
                         <i class="ph ph-instagram-logo text-base"></i>
                     </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="YouTube"
-                       class="w-10 h-10 rounded-xl bg-red-600/10 hover:bg-red-600 border border-red-600/20 hover:border-red-600 flex items-center justify-center text-red-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
+                    <a href="{{ $ytLink }}" target="_blank" rel="noopener" aria-label="YouTube"
+                       class="w-10 h-10 rounded-md bg-red-600/10 hover:bg-red-600 border border-red-600/20 hover:border-red-600 flex items-center justify-center text-red-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
                         <i class="ph ph-youtube-logo text-base"></i>
                     </a>
                     <a href="https://wa.me/{{ $waNumber }}" target="_blank" rel="noopener" aria-label="WhatsApp"
-                       class="w-10 h-10 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 flex items-center justify-center text-emerald-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
+                       class="w-10 h-10 rounded-md bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 flex items-center justify-center text-emerald-400 hover:text-white hover:-translate-y-0.5 transition-all duration-200">
                         <i class="ph ph-whatsapp-logo text-base"></i>
                     </a>
                 </div>
@@ -59,6 +61,7 @@
                     [route('shop.index'),      __('All Products')],
                     [route('shop.cart.index'), __('Shopping Cart')],
                     [route('shop.checkout.index'),   __('Checkout')],
+                    [route('shop.track'),      __('Track Order')],
                 ] as [$url, $label])
                     <li><a href="{{ $url }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ $label }}</a></li>
                 @endforeach
@@ -76,6 +79,7 @@
                     <li><a href="{{ route('login') }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ __('Sign In') }}</a></li>
                     <li><a href="{{ route('register') }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ __('Create Account') }}</a></li>
                 @endauth
+                <li><a href="{{ route('shop.track') }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ __('Track Order') }}</a></li>
             </ul>
         </div>
 
@@ -115,7 +119,7 @@
 
 {{-- ── Back to top ─────────────────────────────────────────── --}}
 <button type="button" id="back-to-top" class="back-to-top" aria-label="{{ __('Back to top') }}">
-    <i class="ph ph-arrow-up text-lg"></i>
+    <i class="ph-bold ph-arrow-up text-xl"></i>
 </button>
 
 @push('scripts')

@@ -149,13 +149,13 @@
         <div class="mt-auto">
             @if ($inStock)
                 <a href="{{ route('shop.product', $product->slug) }}"
-                   class="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark active:scale-[0.98] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 tracking-wide">
+                   class="w-full py-3 rounded-md bg-brand hover:bg-brand-dark active:scale-[0.98] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 tracking-wide">
                     <i class="ph-fill ph-lightning text-base"></i>
                     {{ __('অর্ডার করুন') }}
                 </a>
             @else
                 <button disabled
-                    class="w-full py-3 rounded-xl bg-line-soft text-subtle text-sm font-semibold flex items-center justify-center cursor-not-allowed tracking-wide">
+                    class="w-full py-3 rounded-md bg-line-soft text-subtle text-sm font-semibold flex items-center justify-center cursor-not-allowed tracking-wide">
                     {{ __('Sold Out') }}
                 </button>
             @endif

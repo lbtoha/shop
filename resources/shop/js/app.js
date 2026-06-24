@@ -390,7 +390,48 @@ document.addEventListener("click", async (e) => {
     }
 });
 
+/* Sticky header shadow toggle on scroll */
+function initHeaderScroll() {
+    const header = document.getElementById("main-header");
+    if (!header) return;
+
+    const handleScroll = () => {
+        if (window.scrollY > 10) {
+            header.classList.remove("shadow-none");
+            header.classList.add("shadow-[0_2px_12px_rgba(0,0,0,.06)]");
+        } else {
+            header.classList.remove("shadow-[0_2px_12px_rgba(0,0,0,.06)]");
+            header.classList.add("shadow-none");
+        }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Run immediately in case the page loads scrolled
+    handleScroll();
+}
+
+/* Floating cart scroll visibility */
+function initFloatingCart() {
+    const floatCart = document.getElementById("floating-cart");
+    if (!floatCart) return;
+
+    const handleScroll = () => {
+        if (window.scrollY > 200) {
+            floatCart.classList.remove("translate-y-20", "opacity-0", "pointer-events-none");
+            floatCart.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
+        } else {
+            floatCart.classList.add("translate-y-20", "opacity-0", "pointer-events-none");
+            floatCart.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+        }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     initHero();
     initMobileMenu();
+    initHeaderScroll();
+    initFloatingCart();
 });

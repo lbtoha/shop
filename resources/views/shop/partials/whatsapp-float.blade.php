@@ -14,7 +14,7 @@
 @if ($waEnabled)
     <a href="https://wa.me/{{ $waNumberFloat }}{{ $waText }}" target="_blank" rel="noopener"
         aria-label="{{ __('Contact us on WhatsApp') }}"
-        class="fixed right-4 bottom-24 lg:bottom-6 z-50 w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5">
+        class="fixed left-4 bottom-6 z-50 w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5">
         <i class="ph-fill ph-whatsapp-logo text-3xl"></i>
     </a>
 @endif

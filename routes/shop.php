@@ -22,6 +22,7 @@ Route::get('/language/{code}', function (string $code) {
 
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('shop.product');
+Route::get('/track-order', [\App\Http\Controllers\Shop\OrderTrackingController::class, 'show'])->name('shop.track');
 
 // AI virtual try-on (Gemini) — generate a preview of the customer wearing a product.
 // A coarse per-IP throttle is the cheap first line; finer per-user/global limits

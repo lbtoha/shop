@@ -12,7 +12,7 @@
             {{-- Shipping / customer details & Items list --}}
             <div class="lg:col-span-2 space-y-6">
                 {{-- Review Items Card --}}
-                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-6">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Review Your Items') }}</h3>
                     <div class="divide-y divide-[color:var(--color-line)]">
                         @foreach ($items as $line)
@@ -24,7 +24,7 @@
                                 data-shipping-dhaka="{{ $product->shipping_cost_dhaka }}"
                                 data-shipping-outside="{{ $product->shipping_cost_outside }}">
                                 {{-- Image --}}
-                                <a href="{{ route('shop.product', $product->slug) }}" target="_blank" class="w-16 h-20 shrink-0 rounded-lg bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center border border-neutral-100">
+                                <a href="{{ route('shop.product', $product->slug) }}" target="_blank" class="w-16 h-20 shrink-0 rounded-md bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center border border-neutral-100">
                                     @if ($product->thumbnail)
                                         <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                     @else
@@ -47,10 +47,10 @@
 
                                 {{-- Quantity Controls (Red minus, input, Green plus matching layout) --}}
                                 <div class="flex items-center gap-1">
-                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#d93c4a] hover:bg-[#c32f3c] text-white font-bold rounded-lg transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', -1)">−</button>
+                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#d93c4a] hover:bg-[#c32f3c] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', -1)">−</button>
                                     <input type="number" readonly value="{{ $line['quantity'] }}" min="1" max="{{ $maxQty }}"
-                                        class="w-12 h-8 text-center border border-neutral-200 rounded-lg text-sm font-semibold focus:outline-none qty-input bg-white" id="qty-input-{{ $line['key'] }}">
-                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#28a745] hover:bg-[#218838] text-white font-bold rounded-lg transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', 1)">+</button>
+                                        class="w-12 h-8 text-center border border-neutral-200 rounded-md text-sm font-semibold focus:outline-none qty-input bg-white" id="qty-input-{{ $line['key'] }}">
+                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#28a745] hover:bg-[#218838] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', 1)">+</button>
                                 </div>
 
                                 {{-- Subtotal --}}
@@ -66,18 +66,18 @@
                 </div>
 
                 {{-- Shipping Details Card --}}
-                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-6">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Shipping Details') }}</h3>
 
                 {{-- Previous Ordered Address Block (Concept Image Mockup) --}}
                 @if ($previousOrder)
-                    <div class="mb-6 p-4 border border-emerald-600/30 bg-emerald-50/5 rounded-2xl" id="saved-address-section">
+                    <div class="mb-6 p-4 border border-emerald-600/30 bg-emerald-50/5 rounded-md" id="saved-address-section">
                         <label class="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">
                             {{ __('পূর্বের অর্ডারকৃত নাম ও ঠিকানা সিলেক্ট করুন অথবা নতুন ঠিকানা দিন *') }}
                         </label>
                         
                         <div id="saved-address-card" 
-                            class="relative border-2 border-emerald-600 bg-emerald-50/20 rounded-xl p-4 cursor-pointer transition-all duration-200 shadow-sm">
+                            class="relative border-2 border-emerald-600 bg-emerald-50/20 rounded-md p-4 cursor-pointer transition-all duration-200 shadow-sm">
                             <div class="space-y-2 text-sm text-neutral-800">
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-neutral-900">{{ __('Name:') }}</span>
@@ -98,14 +98,14 @@
                             </div>
                             
                             <button type="button" id="btn-edit-saved" 
-                                class="absolute right-3 bottom-3 inline-flex items-center gap-1 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition-all shadow-sm">
+                                class="absolute right-3 bottom-3 inline-flex items-center gap-1 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold py-1.5 px-3 rounded-md transition-all shadow-sm">
                                 <i class="ph ph-pencil-simple text-xs"></i> {{ __('Edit') }}
                             </button>
                         </div>
 
                         <div class="mt-4">
                             <button type="button" id="btn-add-new-address" 
-                                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
                                 <i class="ph ph-plus text-xs"></i> {{ __('নতুন ঠিকানা যোগ করুন') }}
                             </button>
                         </div>
@@ -116,25 +116,25 @@
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1">{{ __('Full Name') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="customer_name" value="{{ old('customer_name', auth()->check() ? auth()->user()->full_name : '') }}" required
-                            class="w-full border border-[color:var(--color-line)] rounded-lg py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
+                            class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1">{{ __('Phone') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="customer_phone" value="{{ old('customer_phone', auth()->check() ? auth()->user()->phone : '') }}" required
-                            class="w-full border border-[color:var(--color-line)] rounded-lg py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
+                            class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium mb-1">{{ __('Email') }} <span class="text-neutral-400">({{ __('optional') }})</span></label>
                         <input type="email" name="customer_email" value="{{ old('customer_email', auth()->check() ? auth()->user()->email : '') }}"
-                            class="w-full border border-[color:var(--color-line)] rounded-lg py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
+                            class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium mb-1">{{ __('Shipping Address') }} <span class="text-red-500">*</span></label>
                         <textarea name="shipping_address" rows="3" required
-                            class="w-full border border-[color:var(--color-line)] rounded-lg py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">{{ old('shipping_address', auth()->check() ? auth()->user()->address : '') }}</textarea>
+                            class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">{{ old('shipping_address', auth()->check() ? auth()->user()->address : '') }}</textarea>
                         @error('shipping_address')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -142,7 +142,7 @@
                 <div class="mt-4">
                     <label class="block text-sm font-semibold text-neutral-700 mb-2">{{ __('Delivery Area / ডেলিভারি এলাকা') }} <span class="text-red-500">*</span></label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-xl cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-md cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
                             <div class="flex items-center gap-3">
                                 <input type="radio" name="shipping_area" value="inside" checked class="accent-[color:var(--color-brand)] h-4 w-4" onchange="calculateShipping()">
                                 <div>
@@ -153,7 +153,7 @@
                             <span class="font-bold text-neutral-900 text-sm" id="shipping-inside-preview">{{ currencySymbol() }}0</span>
                         </label>
                         
-                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-xl cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                        <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-md cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
                             <div class="flex items-center gap-3">
                                 <input type="radio" name="shipping_area" value="outside" class="accent-[color:var(--color-brand)] h-4 w-4" onchange="calculateShipping()">
                                 <div>
@@ -172,7 +172,7 @@
                 <div class="mt-6">
                     <label class="block text-sm font-semibold text-neutral-700 mb-2">{{ __('Payment Method / পেমেন্ট পদ্ধতি') }} <span class="text-red-500">*</span></label>
                     <div class="space-y-3">
-                        <label class="flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-xl p-4 cursor-pointer">
+                        <label class="flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-md p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="cash_on_delivery" checked class="accent-[color:var(--color-brand)] h-4 w-4">
                             <div>
                                 <div class="font-medium text-ink">{{ __('Cash on Delivery') }}</div>
@@ -182,7 +182,7 @@
                         </label>
 
                         @if ($sslcommerzEnabled)
-                            <label class="flex items-center gap-3 bg-white border border-[color:var(--color-line)] rounded-xl p-4 cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
+                            <label class="flex items-center gap-3 bg-white border border-[color:var(--color-line)] rounded-md p-4 cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
                                 <input type="radio" name="payment_method" value="sslcommerz" class="accent-[color:var(--color-brand)] h-4 w-4">
                                 <div>
                                     <div class="font-medium text-ink">{{ __('Pay Online (SSLCommerz)') }}</div>
@@ -200,7 +200,7 @@
 
             {{-- Order summary --}}
             <div class="lg:col-span-1">
-                <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-6 sticky top-24">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6 sticky top-24">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Your Order') }}</h3>
                     <div class="space-y-3 max-h-64 overflow-y-auto" id="checkout-summary-items">
                         @foreach ($items as $line)
@@ -238,7 +238,7 @@
                     </div>
 
                     <button type="submit"
-                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-black py-3.5 rounded-xl transition-all duration-300 text-sm tracking-wider uppercase shadow-md hover:shadow-lg hover:-translate-y-0.5 transform flex items-center justify-center gap-2">
+                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-black py-3.5 rounded-md transition-all duration-300 text-sm tracking-wider uppercase flex items-center justify-center gap-2">
                         <i class="ph ph-shopping-bag text-base"></i>
                         <span>{{ __('Place Order') }}</span>
                     </button>

@@ -20,16 +20,20 @@
             <div class="flex items-center gap-3 self-start sm:self-auto">
                 @if ($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
                     <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"
-                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-full transition-all shadow-sm">
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
                         <i class="ph ph-credit-card text-sm"></i> {{ __('Pay Now') }}
                     </a>
                 @endif
+                <a href="{{ route('shop.track', ['order_number' => $order->order_number, 'phone' => $order->customer_phone]) }}"
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
+                    <i class="ph ph-map-pin text-sm"></i> {{ __('Track Order') }}
+                </a>
                 <a href="{{ route('shop.account.orders.invoice', $order->order_number) }}"
-                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-xs font-bold py-2.5 px-4 rounded-full transition-all shadow-sm">
+                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
                     <i class="ph ph-file-pdf text-sm"></i> {{ __('Download Invoice') }}
                 </a>
                 <a href="{{ route('shop.account.orders') }}" 
-                    class="inline-flex items-center gap-2 border border-neutral-200/80 hover:bg-neutral-50 text-neutral-700 text-xs font-bold py-2.5 px-4 rounded-full transition-all shadow-sm">
+                    class="inline-flex items-center gap-2 border border-neutral-200/80 hover:bg-neutral-50 text-neutral-700 text-xs font-bold py-2.5 px-4 rounded-md transition-all">
                     <i class="ph ph-arrow-left"></i> {{ __('Back to Orders') }}
                 </a>
             </div>
@@ -40,7 +44,7 @@
 
             <div class="lg:col-span-3 space-y-6">
                 {{-- Order Summary Metadata Card --}}
-                <div class="bg-white border border-neutral-200/60 rounded-3xl p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm shadow-sm">
+                <div class="bg-white border border-neutral-200/60 rounded-md p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
                     <div>
                         <div class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1.5">{{ __('Status') }}</div>
                         <span class="inline-block text-white text-[11px] font-bold px-2.5 py-0.5 rounded capitalize
@@ -73,7 +77,7 @@
                 </div>
 
                 {{-- Order Items Details List --}}
-                <div class="bg-white border border-neutral-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <div class="bg-white border border-neutral-200/60 rounded-md p-6 sm:p-8">
                     <h3 class="text-lg font-bold text-ink mb-6 pb-4 border-b border-neutral-100 flex items-center gap-2">
                         <i class="ph ph-shopping-bag text-xl text-[color:var(--color-brand)]"></i>
                         {{ __('Items in Order') }}
@@ -94,9 +98,9 @@
                                     <a href="{{ route('shop.product', $product->slug) }}" class="block shrink-0 group">
                                         @if($imageUrl)
                                             <img src="{{ $imageUrl }}" alt="{{ $item->product_name }}" 
-                                                class="w-16 h-16 object-cover rounded-xl border border-neutral-100 group-hover:opacity-90 transition-opacity">
+                                                class="w-16 h-16 object-cover rounded-md border border-neutral-100 group-hover:opacity-90 transition-opacity">
                                         @else
-                                            <div class="w-16 h-16 bg-neutral-50 rounded-xl border border-neutral-100 flex items-center justify-center text-neutral-300 group-hover:bg-neutral-100 transition-colors">
+                                            <div class="w-16 h-16 bg-neutral-50 rounded-md border border-neutral-100 flex items-center justify-center text-neutral-300 group-hover:bg-neutral-100 transition-colors">
                                                 <i class="ph ph-image text-3xl"></i>
                                             </div>
                                         @endif
@@ -104,9 +108,9 @@
                                 @else
                                     <div class="shrink-0">
                                         @if($imageUrl)
-                                            <img src="{{ $imageUrl }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded-xl border border-neutral-100">
+                                            <img src="{{ $imageUrl }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded-md border border-neutral-100">
                                         @else
-                                            <div class="w-16 h-16 bg-neutral-50 rounded-xl border border-neutral-100 flex items-center justify-center text-neutral-300">
+                                            <div class="w-16 h-16 bg-neutral-50 rounded-md border border-neutral-100 flex items-center justify-center text-neutral-300">
                                                 <i class="ph ph-image text-3xl"></i>
                                             </div>
                                         @endif

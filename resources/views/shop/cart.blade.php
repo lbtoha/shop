@@ -7,11 +7,11 @@
         <h1 class="text-2xl font-bold text-[color:var(--color-ink)] mb-6">{{ __('Shopping Cart') }}</h1>
 
         @if ($items->isEmpty())
-            <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-14 text-center">
+            <div class="bg-white border border-[color:var(--color-line)] rounded-md p-14 text-center">
                 <i class="ph ph-shopping-cart text-6xl text-neutral-300 block mb-4"></i>
                 <p class="text-[color:var(--color-muted)] mb-5">{{ __('Your cart is empty.') }}</p>
                 <a href="{{ route('shop.index') }}"
-                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium px-6 py-3 rounded-full transition">
+                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium px-6 py-3 rounded-md transition">
                     {{ __('Continue Shopping') }} <i class="ph ph-arrow-right"></i>
                 </a>
             </div>
@@ -21,9 +21,9 @@
                     @foreach ($items as $line)
                         @php($product = $line['product'])
                         @php($maxQty = $line['variant'] ? $line['variant']->stock : $product->stock)
-                        <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4">
+                        <div class="bg-white border border-[color:var(--color-line)] rounded-md p-4 flex flex-col sm:flex-row items-center gap-4">
                             <a href="{{ route('shop.product', $product->slug) }}"
-                                class="w-24 h-24 shrink-0 rounded-xl bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
+                                class="w-24 h-24 shrink-0 rounded-md bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
                                 @if ($product->thumbnail)
                                     <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 @else
@@ -41,7 +41,7 @@
                                 <div class="mt-3 flex items-center gap-4 flex-wrap">
                                     <form method="POST" action="{{ route('shop.cart.update', $line['key']) }}" class="flex items-center gap-2" data-qty-wrap>
                                         @csrf @method('PUT')
-                                        <div class="flex items-center border border-[color:var(--color-line)] rounded-full overflow-hidden">
+                                        <div class="flex items-center border border-[color:var(--color-line)] rounded-md overflow-hidden">
                                             <button type="button" data-step="-1" class="px-3 py-1.5 text-lg hover:bg-neutral-50">−</button>
                                             <input type="number" name="quantity" value="{{ $line['quantity'] }}" min="1" max="{{ $maxQty }}"
                                                 class="w-12 text-center py-1.5 focus:outline-none">
@@ -66,12 +66,12 @@
 
                 {{-- Summary --}}
                 <div class="lg:col-span-1">
-                    <div class="bg-white border border-[color:var(--color-line)] rounded-2xl p-6 sticky top-28">
+                    <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6 sticky top-28">
                         <h3 class="font-bold text-[color:var(--color-ink)] mb-4">{{ __('Order Summary') }}</h3>
 
                         {{-- Coupon --}}
                         @if ($couponCode && $couponDiscount > 0)
-                            <div class="flex items-center justify-between gap-2 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-xl px-3 py-2.5 mb-4">
+                            <div class="flex items-center justify-between gap-2 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-md px-3 py-2.5 mb-4">
                                 <div class="flex items-center gap-2 min-w-0">
                                     <i class="ph ph-tag text-[color:var(--color-brand)]"></i>
                                     <span class="text-sm font-medium text-[color:var(--color-ink)] truncate">{{ $couponCode }}</span>
@@ -85,8 +85,8 @@
                             <form method="POST" action="{{ route('shop.cart.coupon.apply') }}" class="flex items-center gap-2 mb-4">
                                 @csrf
                                 <input type="text" name="code" value="{{ old('code') }}" placeholder="{{ __('Coupon code') }}"
-                                    class="flex-1 min-w-0 border border-[color:var(--color-line)] rounded-full py-2 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)]">
-                                <button type="submit" class="shrink-0 bg-[color:var(--color-ink)] hover:opacity-90 text-white text-sm font-medium px-4 py-2 rounded-full transition">{{ __('Apply') }}</button>
+                                    class="flex-1 min-w-0 border border-[color:var(--color-line)] rounded-md py-2 px-4 text-sm focus:outline-none focus:border-[color:var(--color-brand)]">
+                                <button type="submit" class="shrink-0 bg-[color:var(--color-ink)] hover:opacity-90 text-white text-sm font-medium px-4 py-2 rounded-md transition">{{ __('Apply') }}</button>
                             </form>
                         @endif
 
@@ -110,7 +110,7 @@
                             <span>{{ amountWithSymbol(max(0, $subtotal - $couponDiscount)) }}</span>
                         </div>
                         <a href="{{ route('shop.checkout.index') }}"
-                            class="mt-5 flex items-center justify-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 rounded-full transition">
+                            class="mt-5 flex items-center justify-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white font-medium py-3 rounded-md transition">
                             {{ __('Proceed to Checkout') }} <i class="ph ph-arrow-right"></i>
                         </a>
                         <a href="{{ route('shop.index') }}" class="mt-3 block text-center text-sm text-[color:var(--color-brand)] hover:underline">

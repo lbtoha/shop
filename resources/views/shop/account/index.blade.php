@@ -11,13 +11,13 @@
 
             <div class="lg:col-span-3 space-y-6">
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div class="bg-white border border-neutral-100 rounded p-4">
+                    <div class="bg-white border border-neutral-100 rounded-2xl p-4">
                         <div class="text-2xl font-bold text-[color:var(--color-brand)]">{{ $orderCount }}</div>
                         <div class="text-sm text-[color:var(--color-muted)]">{{ __('Total Orders') }}</div>
                     </div>
                 </div>
 
-                <div class="bg-white border border-neutral-100 rounded">
+                <div class="bg-white border border-neutral-100 rounded-2xl">
                     <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
                         <h2 class="font-semibold text-ink">{{ __('Recent Orders') }}</h2>
                         <a href="{{ route('shop.account.orders') }}" class="text-sm text-[color:var(--color-brand)] hover:underline">{{ __('View All') }}</a>

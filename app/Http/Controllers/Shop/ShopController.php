@@ -48,7 +48,7 @@ class ShopController extends Controller
             default => $query->latest(),
         };
 
-        $products = $query->paginate(12)->withQueryString();
+        $products = $query->paginate(9)->withQueryString();
 
         return view('shop.shop', compact('products', 'categories', 'activeCategory'));
     }

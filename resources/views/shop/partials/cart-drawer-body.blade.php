@@ -1,13 +1,13 @@
 {{-- Inner content of the slide-in cart drawer. Re-rendered on every cart change. --}}
 @if ($items->isEmpty())
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16">
-        <div class="w-24 h-24 rounded-2xl bg-[color:var(--color-image)] flex items-center justify-center mb-5">
+        <div class="w-24 h-24 rounded-md bg-[color:var(--color-image)] flex items-center justify-center mb-5">
             <i class="ph ph-shopping-bag text-4xl text-neutral-400"></i>
         </div>
         <h4 class="text-lg font-semibold text-[color:var(--color-ink)]">{{ __('Your cart is empty') }}</h4>
         <p class="text-sm text-[color:var(--color-muted)] mt-1">{{ __('Add some items to get started!') }}</p>
         <a href="{{ route('shop.index') }}" data-cart-close
-            class="mt-6 inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-sm font-medium px-5 py-2.5 rounded-full">
+            class="mt-6 inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-sm font-medium px-5 py-2.5 rounded-md">
             {{ __('Start Shopping') }} <i class="ph ph-arrow-right"></i>
         </a>
     </div>
@@ -16,8 +16,8 @@
     <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         @foreach ($items as $line)
             @php($product = $line['product'])
-            <div class="flex gap-3 border border-[color:var(--color-line)] rounded-2xl p-3">
-                <a href="{{ route('shop.product', $product->slug) }}" class="w-16 h-16 shrink-0 rounded-xl bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
+            <div class="flex gap-3 border border-[color:var(--color-line)] rounded-md p-3">
+                <a href="{{ route('shop.product', $product->slug) }}" class="w-16 h-16 shrink-0 rounded-md bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center">
                     @if ($product->thumbnail)
                         <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                     @else
@@ -32,7 +32,7 @@
                     <div class="text-xs text-[color:var(--color-muted)] mt-0.5">{{ amountWithSymbol($line['unit_price']) }} {{ __('each') }}</div>
                     <div class="flex items-center justify-between mt-2">
                         {{-- Qty stepper (AJAX) --}}
-                        <div class="flex items-center border border-[color:var(--color-line)] rounded-full overflow-hidden text-sm">
+                        <div class="flex items-center border border-[color:var(--color-line)] rounded-md overflow-hidden text-sm">
                             <button type="button" data-cart-qty="{{ route('shop.cart.update', $line['key']) }}" data-delta="-1" class="px-2.5 py-1 hover:bg-neutral-50">−</button>
                             <span class="px-2 min-w-[1.5rem] text-center" data-qty>{{ $line['quantity'] }}</span>
                             <button type="button" data-cart-qty="{{ route('shop.cart.update', $line['key']) }}" data-delta="1" class="px-2.5 py-1 hover:bg-neutral-50">+</button>
@@ -65,10 +65,10 @@
         </div>
         <p class="text-xs text-[color:var(--color-muted)] mt-2">{{ __('Shipping calculated at checkout') }}</p>
 
-        <a href="{{ route('shop.checkout.index') }}" class="mt-4 flex items-center justify-center gap-2 bg-[color:var(--color-ink)] hover:bg-black text-white font-medium py-3 rounded-full">
+        <a href="{{ route('shop.checkout.index') }}" class="mt-4 flex items-center justify-center gap-2 bg-[color:var(--color-ink)] hover:bg-black text-white font-medium py-3 rounded-md">
             {{ __('Checkout') }}
         </a>
-        <a href="{{ route('shop.index') }}" data-cart-close class="mt-2 flex items-center justify-center bg-[color:var(--color-brand-soft)] hover:bg-[color:var(--color-brand-light)] text-[color:var(--color-brand-dark)] font-medium py-3 rounded-full">
+        <a href="{{ route('shop.index') }}" data-cart-close class="mt-2 flex items-center justify-center bg-[color:var(--color-brand-soft)] hover:bg-[color:var(--color-brand-light)] text-[color:var(--color-brand-dark)] font-medium py-3 rounded-md">
             {{ __('Continue Shopping') }}
         </a>
         <button type="button" data-cart-clear="{{ route('shop.cart.clear') }}" class="mt-2 w-full text-center text-sm text-red-500 hover:text-red-600 font-medium py-1.5">

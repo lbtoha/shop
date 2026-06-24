@@ -10,10 +10,10 @@ return [
     ],
     'frontend_url' => 'http://localhost:3000',
     'KYC_approval_time' => '3-5 business days', // in minutes
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
     'theme' => [
-        'primary_color' => '#008744',
-        'secondary_color' => '#FFA700',
+        'primary_color' => '#e11d48',
+        'secondary_color' => '#b8893f',
     ],
     'logo_favicon' => [
         'logo_light' => '/assets/client/logo.svg',

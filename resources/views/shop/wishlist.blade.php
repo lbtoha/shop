@@ -23,13 +23,13 @@
 
     {{-- Grid or Empty State --}}
     @if ($items->isEmpty())
-        <div class="flex flex-col items-center justify-center bg-white border border-line rounded-2xl py-20 px-8 text-center shadow-sm">
-            <div class="w-16 h-16 rounded-2xl bg-brand-soft flex items-center justify-center mb-4">
+        <div class="flex flex-col items-center justify-center bg-white border border-line rounded-md py-20 px-8 text-center">
+            <div class="w-16 h-16 rounded-md bg-brand-soft flex items-center justify-center mb-4">
                 <i class="ph ph-heart text-3xl text-brand"></i>
             </div>
             <h3 class="text-base font-bold text-ink mb-1">{{ __('Your wishlist is empty') }}</h3>
             <p class="text-sm text-muted mb-5">{{ __('Tap the heart icon on any product to add it here.') }}</p>
-            <a href="{{ route('shop.index') }}" class="py-3 px-6 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold tracking-wide transition-colors">
+            <a href="{{ route('shop.index') }}" class="py-3 px-6 rounded-md bg-brand hover:bg-brand-dark text-white text-xs font-semibold tracking-wide transition-colors">
                 {{ __('Browse Products') }}
             </a>
         </div>

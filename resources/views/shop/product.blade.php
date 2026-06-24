@@ -22,7 +22,7 @@
                 'poster' => $mainImage, // play-icon thumbnail uses the main image as backdrop
             ]);
         }
-        $phone = '01935100013';
+        $phone = getOption('whatsapp_number') ?: (config('application_info.company_info.phone') ?: '01935100013');
         $whatsappEnabled = (int) getOption('whatsapp_enabled', 0) === 1 && filled(getOption('whatsapp_number'));
         $whatsappNumber = getOption('whatsapp_number', '');
         $whatsappLink = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber).'?text='.rawurlencode(__('Hi, I am interested in :product', ['product' => $product->name]));
@@ -88,7 +88,7 @@
                                 data-media-type="{{ $m['type'] }}"
                                 @if ($m['type'] === 'image') data-media-src="{{ $m['src'] }}"
                                 @else data-media-embed="{{ $m['embed'] }}" @endif
-                                class="relative w-14 h-18 rounded-lg border-2 {{ $index === 0 ? 'border-brand ring-2 ring-brand/10' : 'border-neutral-100' }} overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
+                                class="relative w-14 h-18 rounded-md border-2 {{ $index === 0 ? 'border-brand ring-2 ring-brand/10' : 'border-neutral-100' }} overflow-hidden hover:border-brand transition focus:outline-none p-0.5 shrink-0">
                                 <img src="{{ $m['type'] === 'image' ? $m['src'] : $m['poster'] }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-md">
                                 @if ($m['type'] === 'video')
                                     <span class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-md">
@@ -102,7 +102,7 @@
                     </div>
                 @endif
                 {{-- Primary Viewer --}}
-                <div id="main-image-container" class="flex-1 rounded-2xl overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative">
+                <div id="main-image-container" class="flex-1 rounded-md overflow-hidden bg-neutral-50 aspect-[4/5] max-h-[500px] shadow-sm order-1 sm:order-2 relative">
                     @if ($mainImage)
                         <img id="main-product-image" src="{{ $mainImage }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
 
@@ -136,7 +136,7 @@
 
                 {{-- Zoom Result Window (Desktop only, background-image approach — no child img) --}}
                 @if ($mainImage)
-                    <div id="zoom-result" class="absolute left-[calc(100%+1.5rem)] top-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-neutral-100 bg-neutral-50 z-30 hidden pointer-events-none bg-no-repeat"></div>
+                    <div id="zoom-result" class="absolute left-[calc(100%+1.5rem)] top-0 w-full h-full rounded-md overflow-hidden shadow-2xl border border-neutral-100 bg-neutral-50 z-30 hidden pointer-events-none bg-no-repeat"></div>
                 @endif
             </div>
 
@@ -198,7 +198,7 @@
                                     <div class="flex items-center gap-2 flex-wrap" data-option-group="{{ $groupName }}">
                                         @foreach ($values as $val)
                                             <button type="button" data-option-value="{{ $val }}"
-                                                class="h-10 min-w-[40px] px-3 rounded-lg border border-neutral-200 text-sm font-bold text-neutral-800 flex items-center justify-center bg-white hover:border-neutral-800 transition-all duration-200 focus:outline-none">
+                                                class="h-10 min-w-[40px] px-3 rounded-md border border-neutral-200 text-sm font-bold text-neutral-800 flex items-center justify-center bg-white hover:border-neutral-800 transition-all duration-200 focus:outline-none">
                                                 {{ $val }}
                                             </button>
                                         @endforeach
@@ -217,7 +217,7 @@
                             <input type="hidden" id="selected-variant-id" name="variant_id" value="">
 
                             {{-- Quantity Stepper --}}
-                            <div data-qty-wrap class="flex items-center justify-between border border-neutral-200 rounded-xl px-1.5 shrink-0 bg-neutral-50/50">
+                            <div data-qty-wrap class="flex items-center justify-between border border-neutral-200 rounded-md px-1.5 shrink-0 bg-neutral-50/50">
                                 <button type="button" data-step="-1" class="w-8 h-10 text-lg font-bold text-neutral-500 hover:text-brand transition">−</button>
                                 <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->effectiveStock() }}"
                                     class="w-8 text-center py-2 text-sm font-black text-neutral-800 focus:outline-none bg-transparent select-none">
@@ -227,7 +227,7 @@
                             {{-- Add to Cart --}}
                             <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
                                 @if ($hasVariants) disabled @endif
-                                class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-shopping-cart-simple text-base"></i>
                                 <span>{{ __('ADD TO CART') }}</span>
                             </button>
@@ -235,7 +235,7 @@
                             {{-- Order Now --}}
                             <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
                                 @if ($hasVariants) disabled @endif
-                                class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-lightning text-base"></i>
                                 <span>{{ __('ORDER NOW') }}</span>
                             </button>
@@ -244,13 +244,13 @@
                             <button type="button"
                                     data-wishlist-toggle="{{ route('shop.wishlist.toggle', $product->id) }}"
                                     data-product-id="{{ $product->id }}"
-                                    class="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
+                                    class="w-12 h-12 rounded-md flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
                                 <i class="ph ph-heart text-xl {{ $inWishlist ? 'ph-fill' : '' }}"></i>
                             </button>
                         </div>
                     @else
                         <div class="mt-5 pt-4 border-t border-neutral-100 flex items-center gap-3">
-                            <button disabled class="flex-1 bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-xl text-xs tracking-wider uppercase cursor-not-allowed">
+                            <button disabled class="flex-1 bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-md text-xs tracking-wider uppercase cursor-not-allowed">
                                 {{ __('OUT OF STOCK') }}
                             </button>
 
@@ -258,7 +258,7 @@
                             <button type="button"
                                     data-wishlist-toggle="{{ route('shop.wishlist.toggle', $product->id) }}"
                                     data-product-id="{{ $product->id }}"
-                                    class="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
+                                    class="w-12 h-12 rounded-md flex items-center justify-center border transition-all duration-200 shrink-0 {{ $inWishlist ? 'bg-brand text-white border-brand' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50' }}">
                                 <i class="ph ph-heart text-xl {{ $inWishlist ? 'ph-fill' : '' }}"></i>
                             </button>
                         </div>
@@ -267,34 +267,34 @@
                     {{-- AI Virtual Try-On --}}
                     @if ($tryOnEnabled)
                         <button type="button" id="btn-try-on"
-                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-black py-2.5 px-5 rounded-xl transition-all duration-200 text-xs tracking-wider uppercase shadow-sm">
+                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase shadow-sm">
                             <i class="ph ph-sparkle text-base"></i>
                             <span>{{ __('Try it On with AI') }}</span>
                         </button>
                     @endif
 
                     {{-- Trust Badges --}}
-                    <div class="mt-4 bg-neutral-50/50 rounded-xl p-2.5 grid grid-cols-3 gap-2 text-center text-neutral-500">
-                        <div class="flex items-center justify-center gap-1.5">
+                    <div class="mt-4 bg-neutral-50/50 rounded-md p-2.5 grid grid-cols-3 gap-2 text-center text-neutral-500">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5">
                             <i class="ph ph-truck text-lg text-neutral-700"></i>
-                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Fast Delivery') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Fast Delivery') }}</span>
                         </div>
-                        <div class="flex items-center justify-center gap-1.5 border-x border-neutral-200">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-x border-neutral-200">
                             <i class="ph ph-shield-check text-lg text-neutral-700"></i>
-                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Secure Checkout') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Secure Checkout') }}</span>
                         </div>
-                        <div class="flex items-center justify-center gap-1.5">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5">
                             <i class="ph ph-arrow-counter-clockwise text-lg text-neutral-700"></i>
-                            <span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-600">{{ __('Easy Returns') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Easy Returns') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div>
                     {{-- Support & WhatsApp Bar --}}
-                    <div class="mt-4 bg-neutral-50 rounded-xl p-3 flex items-center justify-between text-sm">
+                    <div class="mt-4 bg-neutral-50 rounded-md p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
                         <span class="text-neutral-500 font-extrabold uppercase tracking-wider text-xs">{{ __('Need Help?') }}</span>
-                        <div class="flex items-center gap-4">
+                        <div class="flex flex-col xs:flex-row items-start xs:items-center gap-2.5 xs:gap-4 flex-wrap">
                             <a href="tel:{{ $phone }}" class="font-extrabold text-brand hover:underline flex items-center gap-1">
                                 <i class="ph ph-phone text-base"></i> {{ $phone }}
                             </a>
@@ -652,7 +652,7 @@
     {{-- ─────────────── AI Virtual Try-On Modal ─────────────── --}}
     @if ($tryOnEnabled)
         <div id="tryon-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="bg-white rounded-md w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="flex items-center justify-between p-5 border-b border-neutral-100 sticky top-0 bg-white">
                     <h3 class="font-bold text-ink flex items-center gap-2">
                         <i class="ph ph-sparkle text-purple-600"></i> {{ __('AI Virtual Try-On') }}
@@ -671,14 +671,14 @@
 
                     {{-- Upload --}}
                     <div id="tryon-upload-area">
-                        <label for="tryon-photo" class="block border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 transition">
+                        <label for="tryon-photo" class="block border-2 border-dashed border-neutral-200 rounded-md p-6 text-center cursor-pointer hover:border-purple-400 transition">
                             <i class="ph ph-camera text-3xl text-neutral-400"></i>
                             <p class="text-sm font-semibold text-neutral-600 mt-2">{{ __('Choose a photo') }}</p>
                             <p class="text-xs text-neutral-400 mt-1">{{ __('JPG, PNG or WEBP · up to 8MB') }}</p>
                             <input type="file" id="tryon-photo" accept="image/jpeg,image/png,image/webp" class="hidden">
                         </label>
                         <div id="tryon-preview-wrap" class="hidden mt-3 relative">
-                            <img id="tryon-preview" class="w-full max-h-64 object-contain rounded-xl border border-neutral-100" alt="preview">
+                            <img id="tryon-preview" class="w-full max-h-64 object-contain rounded-md border border-neutral-100" alt="preview">
                             <button type="button" id="tryon-change" class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded shadow">{{ __('Change') }}</button>
                         </div>
                     </div>
@@ -688,7 +688,7 @@
                     @endif
 
                     <button type="button" id="tryon-generate" disabled
-                        class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-3 rounded-xl text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                        class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-3 rounded-md text-sm uppercase tracking-wider flex items-center justify-center gap-2">
                         <i class="ph ph-magic-wand"></i>
                         <span id="tryon-generate-text">{{ __('Generate Try-On') }}</span>
                     </button>
@@ -697,7 +697,7 @@
                     <div id="tryon-result" class="hidden">
                         <div class="border-t border-neutral-100 pt-4">
                             <p class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">{{ __('Your Try-On') }}</p>
-                            <img id="tryon-result-img" class="w-full rounded-xl border border-neutral-100" alt="try-on result">
+                            <img id="tryon-result-img" class="w-full rounded-md border border-neutral-100" alt="try-on result">
                             <a id="tryon-download" download class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-purple-600 hover:underline">
                                 <i class="ph ph-download-simple"></i> {{ __('Download') }}
                             </a>
@@ -709,7 +709,7 @@
                         class="hidden" aria-hidden="true">
                     <input type="hidden" id="tryon-started-at" name="form_started_at" value="">
 
-                    <p id="tryon-error" class="hidden text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+                    <p id="tryon-error" class="hidden text-sm text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-2"></p>
                     <p class="text-[11px] text-neutral-400 text-center">{{ __('AI previews are approximations and may differ from the actual product.') }}</p>
                 </div>
             </div>
@@ -854,7 +854,7 @@
     @if ($product->isInStock())
         <div id="sticky-action-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-neutral-100 p-4 z-40 flex items-center justify-between gap-4 lg:hidden shadow-2xl translate-y-full transition-transform duration-300">
             <div class="flex items-center gap-3 min-w-0">
-                <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-neutral-100 bg-neutral-50">
+                <div class="w-12 h-12 rounded-md overflow-hidden shrink-0 border border-neutral-100 bg-neutral-50">
                     <img src="{{ $mainImage ?? '' }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 </div>
                 <div class="min-w-0 leading-tight">
@@ -863,7 +863,7 @@
                 </div>
             </div>
             <button type="button" id="btn-sticky-buy"
-                class="bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-xl transition duration-200 text-xs tracking-wider uppercase shadow-md shrink-0 flex items-center gap-2">
+                class="bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-md transition duration-200 text-xs tracking-wider uppercase shadow-md shrink-0 flex items-center gap-2">
                 <i class="ph ph-lightning text-base"></i>
                 <span id="sticky-btn-text">{{ $hasVariants ? __('SELECT OPTIONS') : __('ORDER NOW') }}</span>
             </button>
