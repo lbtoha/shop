@@ -19,7 +19,7 @@
         {{-- Brand --}}
         <div class="sm:col-span-2 lg:col-span-4 space-y-6">
             <a href="{{ route('home') }}" class="inline-flex items-center group">
-                <img src="{{ asset('assets/logo.png') }}"
+                <img src="{{ asset(config('application_info.logo_favicon.logo_light', 'assets/logo.png')) }}"
                      alt="{{ $company['name'] }}"
                      class="h-20 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80">
             </a>

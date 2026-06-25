@@ -5,7 +5,7 @@
             class="space-y-4 xl:space-y-6 form-submit-edit">
             @csrf
             <x-admin::text-input-group value="{{ $seoSettings['title'] ?? '' }}" name="title" label="Title"
-                placeholder="Quiz" />
+                placeholder="Premium Gallery BD" />
             <x-admin::text-input-group value="{{ $seoSettings['author'] ?? '' }}" name="author" label="Author"
                 placeholder="John Doe" />
             <x-admin::text-input-group value="{{ $seoSettings['canonical_link'] ?? '' }}" name="canonical_link"

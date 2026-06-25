@@ -91,7 +91,7 @@
                 <span class="eyebrow">{{ __('Browse') }}</span>
                 <h2>{{ __('Shop by Category') }}</h2>
             </div>
-            <div class="flex flex-wrap items-start justify-center gap-6 sm:gap-10 md:gap-12">
+            <div class="flex flex-wrap items-start justify-center gap-6 sm:gap-10 md:gap-12 mt-3 sm:mt-6">
                 @foreach ($categories as $category)
                     <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
                        class="category-pill group">

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 /**
  * @OA\Info(
- *     title="Quiz API Documentation",
+ *     title="Premium Gallery BD API Documentation",
  *     version="1.0.0",
- *     description="Quiz API Documentation.",
+ *     description="API Documentation for Premium Gallery BD Storefront.",
  *
  *     @OA\Contact(
- *         email="mdsafiul0073@gamil.com"
+ *         email="support@premiumgallerybd.com"
  *     ),
  *
  *     @OA\License(
@@ -20,5 +20,5 @@ namespace App\Http\Controllers;
  */
 abstract class Controller
 {
-    protected const TOKEN_NAME = 'quiz-007';
+    protected const TOKEN_NAME = 'pgbd-007';
 }

@@ -84,7 +84,7 @@
             </button>
             <a href="{{ route('home') }}"
                class="flex items-center shrink-0 group">
-                <img src="{{ asset('assets/logo.png') }}"
+                <img src="{{ asset(config('application_info.logo_favicon.logo_light', 'assets/logo.png')) }}"
                      alt="{{ $company['name'] }}"
                      class="h-14 sm:h-16 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80">
             </a>

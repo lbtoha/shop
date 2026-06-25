@@ -1,9 +1,9 @@
 @setup
-    $APP_ID = 'quiz';
-    $REPO_URL = 'git@github.com:Softivus-Laravel/quiz-backend.git';
-    $REPO_BRANCH = 'demo';
+    $APP_ID = 'premiumgallerybd';
+    $REPO_URL = '';
+    $REPO_BRANCH = 'main';
     $user = 'deployer';
-    $WORK_DIR = '/var/www/quiz/admin';
+    $WORK_DIR = '/var/www/premiumgallerybd';
 
     function logMessage($message) {
     return "echo '\033[32m" .$message. "\033[0m';\n";

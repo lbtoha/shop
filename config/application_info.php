@@ -16,9 +16,9 @@ return [
         'secondary_color' => '#b8893f',
     ],
     'logo_favicon' => [
-        'logo_light' => '/assets/client/logo.svg',
-        'logo_dark' => '/assets/client/logo.svg',
-        'favicon' => '/assets/client/logo.svg',
+        'logo_light' => '/assets/logo.png',
+        'logo_dark' => '/assets/logo.png',
+        'favicon' => '/assets/logo.png',
     ],
     'address' => [
         'country' => 'United States',
@@ -118,33 +118,6 @@ return [
         ],
     ],
 
-    'quiz_ranking_levels' => [
-        [
-            'min_score' => 0,
-            'max_score' => 99,
-            'title' => 'Newbie',
-        ],
-        [
-            'min_score' => 100,
-            'max_score' => 199,
-            'title' => 'Beginner',
-        ],
-        [
-            'min_score' => 200,
-            'max_score' => 499,
-            'title' => 'Intermediate',
-        ],
-        [
-            'min_score' => 500,
-            'max_score' => 999,
-            'title' => 'Advanced',
-        ],
-        [
-            'min_score' => 1000,
-            'max_score' => 9999,
-            'title' => 'Expert Quiz Master',
-        ],
-    ],
     'footer_text' => 'All rights reserved.',
     'auth_left_sidebar_image' => '/assets/client/sign-in-img.webp',
     'mobile_app' => [

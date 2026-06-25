@@ -12,7 +12,7 @@ class ApplicationUpdateController extends Controller
 
     public function __construct(Version $version)
     {
-        $version->setup('quiz', null);
+        $version->setup('premiumgallerybd', null);
 
         $this->version = $version;
     }
