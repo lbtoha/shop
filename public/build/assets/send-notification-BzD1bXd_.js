@@ -1,0 +1,1 @@
+import{e}from"./editor-B2rCP8aJ.js";import{b as t}from"./select2-Rwveio9E.js";import"./quill-globals-lbhF1OkO.js";import"./_commonjsHelpers-D6-XlEtG.js";import"./helper-B0cegqFZ.js";import"./moment-CWGZoW8q.js";import"./jquery-CQoUbI_f.js";e();t("template_id1");t("template_id2");t("user_send_type1");t("user_send_type2");

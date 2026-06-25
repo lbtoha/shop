@@ -1,0 +1,1 @@
+import"./moment-CWGZoW8q.js";function a(e,n){let t=new URL(window.location.href);t.searchParams.set(e,n),window.history.pushState({},"",t)}function o(e){return new URL(window.location.href).searchParams.get(e)}function i(){const e=window.location.pathname,n="admin";return e.includes(n)?"/"+n:""}export{i as a,o as g,a as s};

@@ -1,0 +1,1 @@
+import{$ as o}from"./jquery-CQoUbI_f.js";import"./_commonjsHelpers-D6-XlEtG.js";o(function(){o("#perPageAction").on("change",function(){let e=new URL(window.location.href);e.searchParams.set("per_page",this.value),window.location.href=e.href})});

@@ -1,0 +1,1 @@
+import{a as i}from"./file-manager-6jL7CUa0.js";import{$ as r}from"./jquery-CQoUbI_f.js";import"./helper-B0cegqFZ.js";import"./moment-CWGZoW8q.js";import"./_commonjsHelpers-D6-XlEtG.js";r(function(){i("avatar","image")});
