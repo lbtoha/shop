@@ -15,7 +15,7 @@
     @vite(['resources/shop/css/app.css', 'resources/shop/js/app.js'])
 </head>
 
-<body class="min-h-screen flex flex-col overflow-x-hidden">
+<body class="min-h-screen flex flex-col overflow-x-hidden pb-[60px] lg:pb-0">
     @include('shop.partials.header')
 
     <main class="flex-1">
@@ -44,6 +44,10 @@
     @include('shop.partials.whatsapp-float')
 
     @include('shop.partials.cart-float')
+
+    @include('shop.partials.mobile-nav')
+
+    @include('shop.partials.mobile-menu')
 
     @stack('scripts')
 </body>

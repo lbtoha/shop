@@ -55,6 +55,7 @@ function openCart() {
         o.classList.remove("opacity-0", "invisible");
     }
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 }
 
 function closeCart() {
@@ -64,6 +65,7 @@ function closeCart() {
         o.classList.add("opacity-0", "invisible");
     }
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
 }
 
 function renderDrawer(html, count) {
@@ -310,11 +312,61 @@ function initHero() {
     startAutoPlay();
 }
 
-/* Mobile menu */
+/* Mobile menu drawer */
 function initMobileMenu() {
-    const toggle = document.querySelector("[data-menu-toggle]");
     const menu = document.querySelector("[data-mobile-menu]");
-    toggle?.addEventListener("click", () => menu?.classList.toggle("hidden"));
+    const overlay = document.querySelector("[data-menu-overlay]");
+    const toggles = document.querySelectorAll("[data-menu-toggle]");
+    const closeBtn = document.querySelector("[data-menu-close]");
+
+    function openMenu() {
+        if (!menu) return;
+        menu.classList.remove("-translate-x-full");
+        if (overlay) {
+            overlay.classList.remove("opacity-0", "invisible");
+        }
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+    }
+
+    function closeMenu() {
+        if (!menu) return;
+        menu.classList.add("-translate-x-full");
+        if (overlay) {
+            overlay.classList.add("opacity-0", "invisible");
+        }
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+    }
+
+    toggles.forEach((toggle) => {
+        toggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (menu.classList.contains("-translate-x-full")) {
+                openMenu();
+            } else {
+                closeMenu();
+            }
+        });
+    });
+
+    closeBtn?.addEventListener("click", closeMenu);
+    overlay?.addEventListener("click", closeMenu);
+
+    // Search Toggle in bottom bar opens and focuses
+    const searchToggle = document.querySelector("[data-search-toggle]");
+    if (searchToggle && menu) {
+        searchToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            openMenu();
+            const searchInput = menu.querySelector('input[name="search"]');
+            if (searchInput) {
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 300);
+            }
+        });
+    }
 }
 
 /* AJAX Wishlist Toggle */

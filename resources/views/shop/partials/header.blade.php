@@ -12,21 +12,37 @@
 @endphp
 
 {{-- ── Announcement / top bar ──────────────────────────────── --}}
-<div class="bg-gradient-to-r from-ink/95 via-ink to-ink/95 border-b border-white/5 text-white/90 text-xs">
+<div class="hidden sm:block bg-gradient-to-r from-ink/95 via-ink to-ink/95 border-b border-white/5 text-white/90 text-xs">
     <div class="shop-container flex items-center justify-between h-10">
-        {{-- Left: promo text with pulsing live indicator --}}
-        <div class="flex items-center gap-2 text-white/75 font-semibold tracking-wider text-[10px] sm:text-[11px] uppercase">
-            <span class="flex h-1.5 w-1.5 relative shrink-0">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-light opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-light"></span>
-            </span>
-            <i class="ph-bold ph-truck text-brand-light text-xs shrink-0"></i>
-            <span class="truncate">{{ __('Free delivery on orders above ৳5000') }}</span>
+        {{-- Left: Social Media Links --}}
+        <div class="flex items-center gap-3">
+            @foreach (config('application_info.social_medias', []) as $social)
+                @if(!empty($social['link']) && $social['link'] !== '#')
+                    <a href="{{ $social['link'] }}" target="_blank" rel="noopener" 
+                       class="text-white/60 hover:text-brand-light transition-all duration-200 flex items-center hover:scale-110" 
+                       title="{{ __($social['name']) }}">
+                        <i class="{{ $social['icon'] }} text-xs sm:text-sm"></i>
+                    </a>
+                @endif
+            @endforeach
+            @php
+                $companyTemp = config('application_info.company_info');
+                $waNumberTemp = preg_replace('/\D/', '', ((int) getOption('whatsapp_enabled', 0) === 1 ? getOption('whatsapp_number') : null) ?: ($companyTemp['phone'] ?? ''));
+            @endphp
+            @if(!empty($waNumberTemp))
+                <a href="https://wa.me/{{ $waNumberTemp }}" target="_blank" rel="noopener" 
+                   class="text-white/60 hover:text-brand-light transition-all duration-200 flex items-center hover:scale-110" 
+                   title="WhatsApp">
+                    <i class="ph ph-whatsapp-logo text-xs sm:text-sm"></i>
+                </a>
+            @endif
         </div>
 
         {{-- Right: language + auth --}}
         <div class="flex items-center gap-4">
-            @php($locale = app()->getLocale())
+            @php
+            $locale = app()->getLocale();
+            @endphp
             
             {{-- Modern Language Toggle Pill --}}
             <div class="hidden sm:flex items-center gap-0.5 bg-white/5 p-0.5 rounded-md border border-white/10 text-[10px] font-bold">
@@ -40,28 +56,28 @@
 
             {{-- Auth / Account options with icons --}}
             @auth
-                <div class="flex items-center gap-3.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase">
-                    <a href="{{ route('shop.account.index') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1">
+                <div class="flex items-center gap-3.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase whitespace-nowrap">
+                    <a href="{{ route('shop.account.index') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1 whitespace-nowrap">
                         <i class="ph-bold ph-user-circle text-sm text-brand-light"></i>
                         {{ __('My Account') }}
                     </a>
                     <span class="w-1 h-1 rounded-full bg-white/20"></span>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
-                        <button class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1">
+                        <button class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1 whitespace-nowrap">
                             <i class="ph-bold ph-sign-out text-sm text-white/40"></i>
                             {{ __('Logout') }}
                         </button>
                     </form>
                 </div>
             @else
-                <div class="flex items-center gap-3.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase">
-                    <a href="{{ route('login') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                <div class="flex items-center gap-3.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase whitespace-nowrap">
+                    <a href="{{ route('login') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1.5 whitespace-nowrap">
                         <i class="ph-bold ph-sign-in text-sm text-brand-light"></i>
                         {{ __('Sign In') }}
                     </a>
                     <span class="w-1 h-1 rounded-full bg-white/20"></span>
-                    <a href="{{ route('register') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <a href="{{ route('register') }}" class="text-white/80 hover:text-brand-light transition-colors flex items-center gap-1.5 whitespace-nowrap">
                         <i class="ph-bold ph-user-plus text-sm text-brand-light"></i>
                         {{ __('Sign Up') }}
                     </a>
@@ -77,11 +93,6 @@
 
         {{-- Logo + mobile toggle --}}
         <div class="flex items-center gap-3 shrink-0">
-            <button data-menu-toggle
-                class="lg:hidden w-9 h-9 rounded-md flex items-center justify-center text-ink hover:bg-canvas transition-colors"
-                aria-label="Toggle menu">
-                <i class="ph ph-list text-2xl"></i>
-            </button>
             <a href="{{ route('home') }}"
                class="flex items-center shrink-0 group">
                 <img src="{{ asset(config('application_info.logo_favicon.logo_light', 'assets/logo.png')) }}"
@@ -179,68 +190,4 @@
         </div>
     </div>
 
-    {{-- ── Mobile drawer menu ───────────────────────────────── --}}
-    <nav data-mobile-menu
-        class="hidden lg:hidden bg-white border-t border-line max-h-[80vh] overflow-y-auto">
-
-        {{-- Search --}}
-        <div class="p-4 border-b border-line-soft">
-            <form action="{{ route('shop.index') }}" method="GET">
-                <div class="relative">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="{{ __('Search products…') }}"
-                        class="w-full border border-line rounded-full py-2.5 pl-5 pr-12 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 bg-canvas">
-                    <button type="submit"
-                        class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center transition-colors">
-                        <i class="ph-bold ph-magnifying-glass text-sm"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {{-- Nav links --}}
-        <div class="px-4 py-3 flex flex-col gap-0.5 text-sm font-semibold">
-            <a href="{{ route('home') }}"
-               class="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-brand-soft hover:text-brand transition-colors">
-               <i class="ph ph-house text-base text-brand/60"></i>{{ __('Home') }}
-            </a>
-            <a href="{{ route('shop.index') }}"
-               class="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-brand-soft hover:text-brand transition-colors">
-               <i class="ph ph-storefront text-base text-brand/60"></i>{{ __('Shop') }}
-            </a>
-            <a href="{{ route('shop.wishlist.index') }}"
-               class="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-brand-soft hover:text-brand transition-colors">
-               <i class="ph ph-heart text-base text-brand/60"></i>{{ __('Wishlist') }}
-               <span data-wishlist-count class="{{ $wishlistCount ? '' : 'hidden' }} ml-auto bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                   {{ $wishlistCount }}
-               </span>
-            </a>
-            <a href="{{ route('shop.track') }}"
-               class="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-brand-soft hover:text-brand transition-colors">
-               <i class="ph ph-hash text-base text-brand/60"></i>{{ __('Track Order') }}
-            </a>
-
-            @if ($navCategories->isNotEmpty())
-                <div class="mt-1 mb-0.5 px-3">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-subtle">{{ __('Categories') }}</span>
-                </div>
-                @foreach ($navCategories as $cat)
-                    <a href="{{ route('shop.index', ['category' => $cat->slug]) }}"
-                       class="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-brand-soft hover:text-brand transition-colors text-body">
-                       <i class="ph ph-tag text-base text-brand/40"></i>{{ $cat->name }}
-                    </a>
-                @endforeach
-            @endif
-
-            {{-- Language --}}
-            <div class="mt-2 pt-3 border-t border-line-soft flex items-center gap-3 px-3 pb-1">
-                <i class="ph ph-globe text-brand/60"></i>
-                <a href="{{ route('shop.language', 'en') }}"
-                   class="text-sm {{ app()->getLocale() === 'en' ? 'text-brand font-semibold' : 'text-muted' }} hover:text-brand transition-colors">EN</a>
-                <span class="text-subtle">|</span>
-                <a href="{{ route('shop.language', 'bn') }}"
-                   class="text-sm {{ app()->getLocale() === 'bn' ? 'text-brand font-semibold' : 'text-muted' }} hover:text-brand transition-colors">বাংলা</a>
-            </div>
-        </div>
-    </nav>
 </header>
