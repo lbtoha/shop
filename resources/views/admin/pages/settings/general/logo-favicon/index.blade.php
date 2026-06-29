@@ -15,11 +15,11 @@
                 <div
                     class="relative border border-neutral-30 dark:border-neutral-500 rounded-lg p-8 xl:py-12 flex justify-center mb-7">
                     <div id="logo_light_preview">
-                        <img src="{{ config('application_info.logo_favicon.logo_light') ?? '/assets/admin/images/logo-light.png' }}"
+                        <img src="{{ config('application_info.logo_favicon.logo_light') ?? '/assets/logo.png' }}"
                             alt="logo light" />
                     </div>
                     <input type="text" class="sr-only" id="logo_light_input" name="logo_light"
-                        value="{{ config('application_info.logo_favicon.logo_light') ?? '/assets/admin/images/logo-light.png' }}" />
+                        value="{{ config('application_info.logo_favicon.logo_light') ?? '/assets/logo.png' }}" />
                     <label for="logo_light" id="logo_light" data-input="logo_light_input"
                         data-preview="logo_light_preview"
                         class="absolute cursor-pointer size-10 xl:size-12 right-5 bottom-0 translate-y-1/2 bg-primary rounded-full text-neutral-0 text-2xl f-center">
@@ -36,11 +36,11 @@
                 <div
                     class="relative border bg-neutral-904 border-neutral-30 dark:border-neutral-500 rounded-lg p-8 xl:py-12 flex justify-center mb-7">
                     <div id="logo_dark_preview">
-                        <img src="{{ config('application_info.logo_favicon.logo_dark') ?? '/assets/admin/images/logo-dark.png' }}"
+                        <img src="{{ config('application_info.logo_favicon.logo_dark') ?? '/assets/logo.png' }}"
                             alt="logo dark" />
                     </div>
                     <input type="text" class="sr-only" id="logo_dark_input" name="logo_dark"
-                        value="{{ config('application_info.logo_favicon.logo_dark') ?? '/assets/admin/images/logo-dark.png' }}" />
+                        value="{{ config('application_info.logo_favicon.logo_dark') ?? '/assets/logo.png' }}" />
                     <label for="logo_dark" id="logo_dark" data-input="logo_dark_input" data-preview="logo_dark_preview"
                         class="absolute cursor-pointer size-10 xl:size-12 right-5 bottom-0 translate-y-1/2 bg-primary rounded-full text-neutral-0 text-2xl f-center">
                         <i class="ph ph-cloud-arrow-up"></i>
@@ -56,11 +56,11 @@
                 <div
                     class="relative border border-neutral-30 dark:border-neutral-500 rounded-lg p-8 xl:py-12 flex justify-center mb-7">
                     <div id="favicon_preview">
-                        <img src="{{ config('application_info.logo_favicon.favicon') ?? '/assets/admin/images/icon.png' }}"
+                        <img src="{{ config('application_info.logo_favicon.favicon') ?? '/favicon.ico' }}"
                             alt="favicon_preview" />
                     </div>
                     <input type="text" class="sr-only" id="favicon_input" name="favicon"
-                        value="{{ config('application_info.logo_favicon.favicon') ?? '/assets/admin/images/icon.png' }}" />
+                        value="{{ config('application_info.logo_favicon.favicon') ?? '/favicon.ico' }}" />
                     <label for="logo" id="favicon" data-input="favicon_input" data-preview="favicon_preview"
                         class="absolute cursor-pointer size-10 xl:size-12 right-5 bottom-0 translate-y-1/2 bg-primary rounded-full text-neutral-0 text-2xl f-center">
                         <i class="ph ph-cloud-arrow-up"></i>

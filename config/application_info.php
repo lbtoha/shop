@@ -119,7 +119,7 @@ return [
     ],
 
     'footer_text' => 'All rights reserved.',
-    'auth_left_sidebar_image' => '/assets/client/sign-in-img.webp',
+    'auth_left_sidebar_image' => '',
     'mobile_app' => [
         'android' => [
             'link' => 'https://play.google.com/store/apps',

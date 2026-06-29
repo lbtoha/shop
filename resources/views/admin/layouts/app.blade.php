@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('application_info.company_info.name', config('app.name', 'Laravel')) }}</title>
-    <link rel="icon" href="{{ asset(config('application_info.logo_favicon.favicon', '/assets/client/logo.svg')) }}">
+    <link rel="icon" href="{{ asset(config('application_info.logo_favicon.favicon', '/favicon.ico')) }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

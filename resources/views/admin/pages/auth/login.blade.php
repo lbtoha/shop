@@ -1,7 +1,7 @@
 <x-admin-guest-layout>
     @php
         $appName = config('application_info.company_info.name', config('app.name'));
-        $logo = config('application_info.logo_favicon.logo_light') ?? '/assets/admin/images/logo-light.png';
+        $logo = config('application_info.logo_favicon.logo_light') ?? '/assets/logo.png';
     @endphp
 
     <main class="relative min-h-screen overflow-hidden f-center bg-neutral-10 dark:bg-neutral-904 p-4 sm:p-6">
