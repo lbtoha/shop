@@ -53,6 +53,7 @@ class AppController extends Controller
             'primary_color' => 'nullable|string',
             'secondary_color' => 'nullable|string',
             'referral_joining_fee' => 'required|numeric|min:0',
+            'footer_text' => 'nullable|string',
             'auth_left_sidebar_image' => 'nullable|string',
             'android_link' => 'nullable|url',
             'ios_link' => 'nullable|url',
@@ -62,8 +63,6 @@ class AppController extends Controller
         ]);
 
         $validated['frontend_url'] = rtrim($validated['frontend_url'], '/');
-
-        $app_info = getOptionWithJsonDecode('company_info', config('application_info'));
 
         storeOption([
             'company_info' => [
@@ -86,8 +85,7 @@ class AppController extends Controller
                 'referral' => [
                     'joining' => $validated['referral_joining_fee'],
                 ],
-                'footer_text' => $app_info['footer_text'] ?? '',
-                'footer_menu_id' => $app_info['footer_menu_id'] ?? null,
+                'footer_text' => $validated['footer_text'],
                 'auth_left_sidebar_image' => $validated['auth_left_sidebar_image'],
                 'mobile_app' => [
                     'android' => [

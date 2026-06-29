@@ -189,15 +189,12 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
                 /** -------------------------- END NOTIFICATION TEMPLATE -------------------------- */
             });
 
-             Route::prefix('theme')->group(function () {
+            Route::prefix('theme')->group(function () {
                 /** -------------------------- PWA CONFIG -------------------------- */
                 Route::resource('pwa', Admin\Settings\PwaConfigController::class);
 
                 /** -------------------------- LOGO & FAVICON -------------------------- */
                 Route::resource('logo-favicon', Admin\Settings\LogoFaviconController::class)->only(['index', 'store']);
-
-                /** -------------------------- FOOTER SETTING -------------------------- */
-                Route::resource('footer', Admin\Settings\FooterSettingController::class)->only(['index', 'store']);
             });
 
             Route::prefix('integration')->group(function () {

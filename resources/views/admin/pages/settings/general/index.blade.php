@@ -123,11 +123,15 @@
                     </div>
                 </div>
                 <div class="border border-neutral-30 dark:border-neutral-700 p-4 rounded">
-                    <h6 class="h6 mb-4">{{ __('Referral Settings') }}</h6>
+                    <h6 class="h6 mb-4">{{ __('Referral Settings & Footer') }}</h6>
                     <div class="grid grid-cols-2 gap-4 xl:gap-6">
                         <div class="col-span-2 md:col-span-1">
                             <x-admin::text-input-group name="referral_joining_fee"
                                 value="{{ $settings['referral']['joining'] }}" label="Joining Fee" />
+                        </div>
+                        <div class="col-span-2 md:col-span-1">
+                            <x-admin::text-input-group name="footer_text" value="{{ $settings['footer_text'] }}"
+                                label="Footer Text" />
                         </div>
                     </div>
                 </div>

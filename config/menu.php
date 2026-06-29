@@ -193,12 +193,6 @@ return [
                                 'text' => "Set up and manage the website's logo and favicon.",
                             ],
                             [
-                                'title' => 'Footer Setting',
-                                'link' => 'admin.settings.footer.index',
-                                'icon' => 'ph ph-layout',
-                                'text' => 'Set up and manage the website footer menu and footer text.',
-                            ],
-                            [
                                 'title' => 'PWA',
                                 'link' => 'admin.settings.pwa.index',
                                 'icon' => 'ph ph-intersect',

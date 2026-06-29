@@ -37,11 +37,11 @@
 
                                     {{-- Details --}}
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-medium text-ink text-sm sm:text-base hover:text-[color:var(--color-brand)] line-clamp-2 leading-tight">
+                                        <h4 class="font-normal text-ink text-sm sm:text-base hover:text-[color:var(--color-brand)] line-clamp-2 leading-tight">
                                             <a href="{{ route('shop.product', $product->slug) }}" target="_blank">{{ $product->name }}</a>
                                         </h4>
                                         @if ($line['variant'])
-                                            <div class="text-xs text-[color:var(--color-brand)] font-medium mt-0.5">Size : {{ $line['variant']->name }}</div>
+                                            <div class="text-xs text-[color:var(--color-brand)] font-normal mt-0.5">Size : {{ $line['variant']->name }}</div>
                                         @endif
                                         {{-- Price on Mobile --}}
                                         <div class="text-neutral-500 text-xs mt-1 sm:hidden">{{ amountWithSymbol($line['unit_price']) }}</div>
@@ -128,25 +128,25 @@
 
                 <div id="shipping-fields-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-1">
-                        <label class="block text-sm font-medium mb-1">{{ __('Full Name') }} <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-normal mb-1">{{ __('Full Name') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="customer_name" value="{{ old('customer_name', auth()->check() ? auth()->user()->full_name : '') }}" required
                             class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-1">
-                        <label class="block text-sm font-medium mb-1">{{ __('Phone') }} <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-normal mb-1">{{ __('Phone') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="customer_phone" value="{{ old('customer_phone', auth()->check() ? auth()->user()->phone : '') }}" required
                             class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium mb-1">{{ __('Email') }} <span class="text-neutral-400">({{ __('optional') }})</span></label>
+                        <label class="block text-sm font-normal mb-1">{{ __('Email') }} <span class="text-neutral-400">({{ __('optional') }})</span></label>
                         <input type="email" name="customer_email" value="{{ old('customer_email', auth()->check() ? auth()->user()->email : '') }}"
                             class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">
                         @error('customer_email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium mb-1">{{ __('Shipping Address') }} <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-normal mb-1">{{ __('Shipping Address') }} <span class="text-red-500">*</span></label>
                         <textarea name="shipping_address" rows="3" required
                             class="w-full border border-[color:var(--color-line)] rounded-md py-2.5 px-3.5 focus:outline-none focus:border-[color:var(--color-brand)]">{{ old('shipping_address', auth()->check() ? auth()->user()->address : '') }}</textarea>
                         @error('shipping_address')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
@@ -189,7 +189,7 @@
                         <label class="flex items-center gap-3 bg-[color:var(--color-brand-soft)] border border-[color:var(--color-line)] rounded-md p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="cash_on_delivery" checked class="accent-[color:var(--color-brand)] h-4 w-4">
                             <div>
-                                <div class="font-medium text-ink">{{ __('Cash on Delivery') }}</div>
+                                <div class="font-normal text-ink">{{ __('Cash on Delivery') }}</div>
                                 <div class="text-sm text-[color:var(--color-muted)]">{{ __('Pay with cash when your order is delivered.') }}</div>
                             </div>
                             <i class="ph ph-money text-2xl text-[color:var(--color-brand)] ml-auto"></i>
@@ -199,7 +199,7 @@
                             <label class="flex items-center gap-3 bg-white border border-[color:var(--color-line)] rounded-md p-4 cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
                                 <input type="radio" name="payment_method" value="sslcommerz" class="accent-[color:var(--color-brand)] h-4 w-4">
                                 <div>
-                                    <div class="font-medium text-ink">{{ __('Pay Online (SSLCommerz)') }}</div>
+                                    <div class="font-normal text-ink">{{ __('Pay Online (SSLCommerz)') }}</div>
                                     <div class="text-sm text-[color:var(--color-muted)]">{{ __('Card, Mobile Banking & Internet Banking. Secured by SSLCommerz.') }}</div>
                                 </div>
                                 <img src="{{ \App\Services\Payment\SslCommerzService::logo() }}" alt="SSLCommerz"
@@ -226,7 +226,7 @@
                                     @endif 
                                     <span class="text-xs font-semibold ml-1 text-ink">× <span class="summary-item-qty">{{ $line['quantity'] }}</span></span>
                                 </span>
-                                <span class="font-medium shrink-0 ml-2">{{ currencySymbol() }}<span class="summary-item-subtotal">{{ number_format($line['subtotal'], 0) }}</span></span>
+                                <span class="font-normal shrink-0 ml-2">{{ currencySymbol() }}<span class="summary-item-subtotal">{{ number_format($line['subtotal'], 0) }}</span></span>
                             </div>
                         @endforeach
                     </div>
@@ -238,7 +238,7 @@
                     
                     <div id="checkout-discount-container" class="flex justify-between text-sm mb-2 text-[color:var(--color-brand)] {{ $couponDiscount > 0 ? '' : 'hidden' }}">
                         <span>{{ __('Discount') }} <span class="text-xs">({{ $couponCode }})</span></span>
-                        <span class="font-medium">−{{ currencySymbol() }}<span id="checkout-discount-val">{{ number_format($couponDiscount, 0) }}</span></span>
+                        <span class="font-normal">−{{ currencySymbol() }}<span id="checkout-discount-val">{{ number_format($couponDiscount, 0) }}</span></span>
                     </div>
 
                     <div class="flex justify-between text-sm mb-2">
@@ -252,7 +252,7 @@
                     </div>
 
                     <button type="submit"
-                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-medium py-3.5 rounded-md transition-all duration-300 text-sm tracking-wider uppercase flex items-center justify-center gap-2">
+                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-normal py-3.5 rounded-md transition-all duration-300 text-sm tracking-wider uppercase flex items-center justify-center gap-2">
                         <i class="ph ph-shopping-bag text-base"></i>
                         <span>{{ __('Place Order') }}</span>
                     </button>
