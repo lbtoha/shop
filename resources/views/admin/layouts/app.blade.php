@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('application_info.company_info.name', config('app.name', 'Laravel')) }}</title>
+    <title>{{ config('application_info.company_info.name', config('app.name', 'Laravel')) }}</title> 
     <link rel="icon" href="{{ asset(config('application_info.logo_favicon.favicon', '/favicon.ico')) }}"> 
 
     <!-- Fonts -->
