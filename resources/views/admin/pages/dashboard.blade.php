@@ -10,7 +10,7 @@
                     <p class="text-white/70 text-xs font-semibold uppercase tracking-[0.18em] mb-1">
                         {{ __('Dashboard') }}
                     </p>
-                    <h1 class="text-xl xxl:text-2xl font-bold">
+                    <h1 class="text-xl xxl:text-2xl font-bold text-white">
                         {{ __('Welcome back') }}, {{ trim(auth('admin')->user()->full_name) ?: __('Admin') }} 👋
                     </h1>
                     <p class="text-white/75 text-sm mt-1">
@@ -21,15 +21,15 @@
                 <div class="grid grid-cols-3 gap-3 sm:gap-5 shrink-0">
                     <div class="text-center sm:text-left">
                         <p class="text-white/70 text-[11px] font-medium uppercase tracking-wider">{{ __('Revenue') }}</p>
-                        <p class="text-lg xxl:text-xl font-bold mt-0.5">{{ amountWithSymbol($orderStats['revenue']) }}</p>
+                        <p class="text-lg xxl:text-xl font-bold text-white mt-0.5">{{ amountWithSymbol($orderStats['revenue']) }}</p>
                     </div>
                     <div class="text-center sm:text-left border-x border-white/15 px-3 sm:px-5">
                         <p class="text-white/70 text-[11px] font-medium uppercase tracking-wider">{{ __('Profit') }}</p>
-                        <p class="text-lg xxl:text-xl font-bold mt-0.5">{{ amountWithSymbol($orderStats['profit']) }}</p>
+                        <p class="text-lg xxl:text-xl font-bold text-white mt-0.5">{{ amountWithSymbol($orderStats['profit']) }}</p>
                     </div>
                     <div class="text-center sm:text-left">
                         <p class="text-white/70 text-[11px] font-medium uppercase tracking-wider">{{ __('Orders') }}</p>
-                        <p class="text-lg xxl:text-xl font-bold mt-0.5">{{ number_format($orderStats['total']) }}</p>
+                        <p class="text-lg xxl:text-xl font-bold text-white mt-0.5">{{ number_format($orderStats['total']) }}</p>
                     </div>
                 </div>
             </div>

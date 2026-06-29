@@ -41,6 +41,7 @@ class FlyServiceProvider extends ServiceProvider
             config()->set('application_info.otp', $app_info['otp']);
             config()->set('application_info.referral', $app_info['referral']);
             config()->set('application_info.footer_text', $app_info['footer_text']);
+            config()->set('application_info.footer_menu_id', $app_info['footer_menu_id'] ?? null);
             config()->set('application_info.auth_left_sidebar_image', $app_info['auth_left_sidebar_image']);
             config()->set('application_info.mobile_app', $app_info['mobile_app'] ?? config('application_info.mobile_app'));
             config()->set('app.mobile_app_key', $app_info['mobile_app_key'] ?? config('app.mobile_app_key'));

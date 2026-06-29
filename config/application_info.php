@@ -119,6 +119,7 @@ return [
     ],
 
     'footer_text' => 'All rights reserved.',
+    'footer_menu_id' => null,
     'auth_left_sidebar_image' => '/assets/client/sign-in-img.webp',
     'mobile_app' => [
         'android' => [

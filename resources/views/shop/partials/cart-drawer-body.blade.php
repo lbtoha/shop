@@ -68,7 +68,7 @@
         <a href="{{ route('shop.checkout.index') }}" class="mt-4 flex items-center justify-center gap-2 bg-[color:var(--color-ink)] hover:bg-black text-white font-medium py-3 rounded-md">
             {{ __('Checkout') }}
         </a>
-        <a href="{{ route('shop.index') }}" data-cart-close class="mt-2 flex items-center justify-center bg-[color:var(--color-brand-soft)] hover:bg-[color:var(--color-brand-light)] text-[color:var(--color-brand-dark)] font-medium py-3 rounded-md">
+        <a href="{{ route('shop.index') }}" data-cart-close class="mt-2 flex items-center justify-center bg-brand-soft hover:bg-brand duration-300 text-brand hover:text-white font-medium py-3 rounded-md">
             {{ __('Continue Shopping') }}
         </a>
         <button type="button" data-cart-clear="{{ route('shop.cart.clear') }}" class="mt-2 w-full text-center text-sm text-red-500 hover:text-red-600 font-medium py-1.5">

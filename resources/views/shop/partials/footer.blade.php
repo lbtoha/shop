@@ -56,15 +56,34 @@
         <div class="lg:col-span-2 lg:col-start-6">
             <h5 class="foot-heading">{{ __('Quick Links') }}</h5>
             <ul class="space-y-3">
-                @foreach ([
-                    [route('home'),            __('Home')],
-                    [route('shop.index'),      __('All Products')],
-                    [route('shop.cart.index'), __('Shopping Cart')],
-                    [route('shop.checkout.index'),   __('Checkout')],
-                    [route('shop.track'),      __('Track Order')],
-                ] as [$url, $label])
-                    <li><a href="{{ $url }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ $label }}</a></li>
-                @endforeach
+                @php
+                    $footerMenuId = config('application_info.footer_menu_id');
+                    $quickLinksMenu = $footerMenuId 
+                        ? \App\Models\Menu::active()->find($footerMenuId)
+                        : \App\Models\Menu::active()->where('location', \App\Enums\MenuLocationEnum::QUICK_LINKS)->first();
+                    $quickLinksItems = $quickLinksMenu
+                        ? $quickLinksMenu->items()->parent()->orderBy('order')->get()
+                        : collect();
+                @endphp
+                @if ($quickLinksItems->isNotEmpty())
+                    @foreach ($quickLinksItems as $item)
+                        <li>
+                            <a href="{{ url($item->url) }}" target="{{ $item->target }}" class="foot-link">
+                                <i class="ph ph-caret-right"></i>{{ __($item->title) }}
+                            </a>
+                        </li>
+                    @endforeach
+                @else
+                    @foreach ([
+                        [route('home'),            __('Home')],
+                        [route('shop.index'),      __('All Products')],
+                        [route('shop.cart.index'), __('Shopping Cart')],
+                        [route('shop.checkout.index'),   __('Checkout')],
+                        [route('shop.track'),      __('Track Order')],
+                    ] as [$url, $label])
+                        <li><a href="{{ $url }}" class="foot-link"><i class="ph ph-caret-right"></i>{{ $label }}</a></li>
+                    @endforeach
+                @endif
             </ul>
         </div>
 
@@ -119,7 +138,7 @@
 
 {{-- ── Back to top ─────────────────────────────────────────── --}}
 <button type="button" id="back-to-top" class="back-to-top" aria-label="{{ __('Back to top') }}">
-    <i class="ph-bold ph-arrow-up text-xl"></i>
+    <i class="ph-bold ph-arrow-up text-lg"></i>
 </button>
 
 @push('scripts')

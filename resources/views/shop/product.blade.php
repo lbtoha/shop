@@ -67,7 +67,7 @@
 
     <div class="shop-container py-8">
         {{-- Breadcrumb --}}
-        <nav class="text-xs text-neutral-400 mb-6 font-bold tracking-wider uppercase">
+        <nav class="text-xs text-neutral-400 mb-6 font-medium tracking-wider uppercase">
             <a href="{{ route('home') }}" class="hover:text-brand transition">{{ __('Home') }}</a>
             <span class="mx-2">/</span>
             <a href="{{ route('shop.index') }}" class="hover:text-brand transition">{{ __('Shop') }}</a>
@@ -76,7 +76,7 @@
         </nav>
 
         {{-- Product Details Layout --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start">
             {{-- Image Gallery Column --}}
             <div class="lg:col-span-5 flex flex-col sm:flex-row gap-4 lg:sticky lg:top-24 relative">
                 {{-- Thumbnails (images + optional video) --}}
@@ -145,24 +145,24 @@
                 <div>
                     @if ($showCategory && $product->category)
                         <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}"
-                            class="inline-block text-[10px] font-black tracking-widest text-brand uppercase bg-brand/5 hover:bg-brand/10 px-2.5 py-1 rounded-full mb-2 transition">{{ $product->category->name }}</a>
+                            class="inline-block text-[10px] font-medium tracking-widest text-brand uppercase bg-brand/5 hover:bg-brand/10 px-2.5 py-1 rounded-full mb-2 transition">{{ $product->category->name }}</a>
                     @endif
                     
-                    <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight leading-tight">{{ $product->name }}</h1>
+                    <h1 class="text-2xl sm:text-3xl font-medium text-neutral-900 tracking-tight leading-tight">{{ $product->name }}</h1>
 
                     {{-- Price Row --}}
                     <div class="mt-2.5 flex items-center gap-3 flex-wrap">
-                        <span id="product-price" class="text-3xl font-black text-brand tracking-tight">{{ amountWithSymbol($product->displayPrice()) }}</span>
+                        <span id="product-price" class="text-3xl font-bold text-brand tracking-tight">{{ amountWithSymbol($product->displayPrice()) }}</span>
                         @if ($hasDiscount)
                             <span class="text-lg text-neutral-400 line-through font-semibold">{{ amountWithSymbol($product->compare_at_price) }}</span>
                             @php
                                 $percent = round((($product->compare_at_price - $product->price) / $product->compare_at_price) * 100);
                             @endphp
-                            <span class="bg-brand-soft text-brand border border-brand-mist text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
+                            <span class="bg-brand-soft text-brand border border-brand-mist text-xs font-medium uppercase tracking-widest px-2.5 py-0.5 rounded-md">{{ __('SAVE :percent%', ['percent' => $percent]) }}</span>
                         @endif
 
                         @if ($isFreeDelivery)
-                            <span class="bg-accent/10 text-accent-dark border border-accent/20 text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                            <span class="bg-accent/10 text-accent-dark border border-accent/20 text-xs font-medium uppercase tracking-widest px-2.5 py-0.5 rounded-md flex items-center gap-1">
                                 <i class="ph ph-truck text-sm"></i>
                                 <span>{{ __('Free Delivery') }}</span>
                             </span>
@@ -171,14 +171,14 @@
                         {{-- Availability aligned to right --}}
                         <div class="ml-auto" id="variant-status">
                             @if ($hasVariants)
-                                <span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>
+                                <span class="inline-flex items-center gap-1 text-sm font-medium text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>
                             @elseif ($product->isInStock())
-                                <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 uppercase tracking-wider">
+                                <span class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 uppercase tracking-wider">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     {{ __('In Stock') }} ({{ $product->effectiveStock() }})
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider">
+                                <span class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 uppercase tracking-wider">
                                     <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                                     {{ __('Out of Stock') }}
                                 </span>
@@ -192,13 +192,13 @@
                             data-variant-map='@json($variantMap)' data-option-groups='@json($optionGroups)'>
                             @foreach ($optionGroups as $groupName => $values)
                                 <div class="flex items-center gap-4">
-                                    <div class="text-xs font-black text-neutral-500 uppercase tracking-widest w-20 shrink-0">
+                                    <div class="text-xs font-semibold text-neutral-500 uppercase tracking-widest w-20 shrink-0">
                                         {{ __($groupName) }}
                                     </div>
                                     <div class="flex items-center gap-2 flex-wrap" data-option-group="{{ $groupName }}">
                                         @foreach ($values as $val)
                                             <button type="button" data-option-value="{{ $val }}"
-                                                class="h-10 min-w-[40px] px-3 rounded-md border border-neutral-200 text-sm font-bold text-neutral-800 flex items-center justify-center bg-white hover:border-neutral-800 transition-all duration-200 focus:outline-none">
+                                                class="h-10 min-w-[40px] px-3 rounded-md border border-neutral-200 text-sm font-medium text-neutral-800 flex items-center justify-center bg-white hover:border-neutral-800 transition-all duration-200 focus:outline-none">
                                                 {{ $val }}
                                             </button>
                                         @endforeach
@@ -218,16 +218,16 @@
 
                             {{-- Quantity Stepper --}}
                             <div data-qty-wrap class="flex items-center justify-between border border-neutral-200 rounded-md px-1.5 shrink-0 bg-neutral-50/50">
-                                <button type="button" data-step="-1" class="w-8 h-10 text-lg font-bold text-neutral-500 hover:text-brand transition">−</button>
+                                <button type="button" data-step="-1" class="w-8 h-10 text-lg font-medium text-neutral-500 hover:text-brand transition">−</button>
                                 <input type="number" data-quantity-input value="1" min="1" max="{{ $hasVariants ? 99 : $product->effectiveStock() }}"
-                                    class="w-8 text-center py-2 text-sm font-black text-neutral-800 focus:outline-none bg-transparent select-none">
-                                <button type="button" data-step="1" class="w-8 h-10 text-lg font-bold text-neutral-500 hover:text-brand transition">+</button>
+                                    class="w-8 text-center py-2 text-sm font-semibold text-neutral-800 focus:outline-none bg-transparent select-none">
+                                <button type="button" data-step="1" class="w-8 h-10 text-lg font-medium text-neutral-500 hover:text-brand transition">+</button>
                             </div>
 
                             {{-- Add to Cart --}}
                             <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
                                 @if ($hasVariants) disabled @endif
-                                class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-semibold py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-shopping-cart-simple text-base"></i>
                                 <span>{{ __('ADD TO CART') }}</span>
                             </button>
@@ -235,7 +235,7 @@
                             {{-- Order Now --}}
                             <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
                                 @if ($hasVariants) disabled @endif
-                                class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-semibold py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-lightning text-base"></i>
                                 <span>{{ __('ORDER NOW') }}</span>
                             </button>
@@ -250,7 +250,7 @@
                         </div>
                     @else
                         <div class="mt-5 pt-4 border-t border-neutral-100 flex items-center gap-3">
-                            <button disabled class="flex-1 bg-neutral-100 text-neutral-400 font-bold py-2.5 px-5 rounded-md text-xs tracking-wider uppercase cursor-not-allowed">
+                            <button disabled class="flex-1 bg-neutral-100 text-neutral-400 font-medium py-2.5 px-5 rounded-md text-xs tracking-wider uppercase cursor-not-allowed">
                                 {{ __('OUT OF STOCK') }}
                             </button>
 
@@ -267,7 +267,7 @@
                     {{-- AI Virtual Try-On --}}
                     @if ($tryOnEnabled)
                         <button type="button" id="btn-try-on"
-                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-black py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase shadow-sm">
+                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-semibold py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase shadow-sm">
                             <i class="ph ph-sparkle text-base"></i>
                             <span>{{ __('Try it On with AI') }}</span>
                         </button>
@@ -277,15 +277,15 @@
                     <div class="mt-4 bg-neutral-50/50 rounded-md p-2.5 grid grid-cols-3 gap-2 text-center text-neutral-500">
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5">
                             <i class="ph ph-truck text-lg text-neutral-700"></i>
-                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Fast Delivery') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-medium tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Fast Delivery') }}</span>
                         </div>
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-x border-neutral-200">
                             <i class="ph ph-shield-check text-lg text-neutral-700"></i>
-                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Secure Checkout') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-medium tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Secure Checkout') }}</span>
                         </div>
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5">
                             <i class="ph ph-arrow-counter-clockwise text-lg text-neutral-700"></i>
-                            <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Easy Returns') }}</span>
+                            <span class="text-[10px] sm:text-[11px] font-medium tracking-wider uppercase text-neutral-600 leading-tight">{{ __('Easy Returns') }}</span>
                         </div>
                     </div>
                 </div>
@@ -293,13 +293,13 @@
                 <div>
                     {{-- Support & WhatsApp Bar --}}
                     <div class="mt-4 bg-neutral-50 rounded-md p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-                        <span class="text-neutral-500 font-extrabold uppercase tracking-wider text-xs">{{ __('Need Help?') }}</span>
+                        <span class="text-neutral-500 font-medium uppercase tracking-wider text-xs">{{ __('Need Help?') }}</span>
                         <div class="flex flex-col xs:flex-row items-start xs:items-center gap-2.5 xs:gap-4 flex-wrap">
-                            <a href="tel:{{ $phone }}" class="font-extrabold text-brand hover:underline flex items-center gap-1">
+                            <a href="tel:{{ $phone }}" class="font-medium text-brand hover:underline flex items-center gap-1">
                                 <i class="ph ph-phone text-base"></i> {{ $phone }}
                             </a>
                             @if ($whatsappEnabled)
-                                <a href="{{ $whatsappLink }}" target="_blank" rel="noopener" class="font-extrabold text-emerald-600 hover:underline flex items-center gap-1">
+                                <a href="{{ $whatsappLink }}" target="_blank" rel="noopener" class="font-medium text-emerald-600 hover:underline flex items-center gap-1">
                                     <i class="ph ph-whatsapp-logo text-base"></i> {{ $whatsappNumber }}
                                 </a>
                             @endif
@@ -308,18 +308,18 @@
 
                     {{-- Product Metadata and Share Row --}}
                     <div class="mt-3 flex items-center justify-between text-xs border-t border-neutral-100 pt-3 flex-wrap gap-2">
-                        <div class="flex items-center gap-4 text-neutral-400 font-bold">
+                        <div class="flex items-center gap-4 text-neutral-400 font-medium">
                             @if ($product->sku)
-                                <div>SKU: <span class="text-neutral-800 font-extrabold uppercase">{{ $product->sku }}</span></div>
+                                <div>SKU: <span class="text-neutral-800 font-medium uppercase">{{ $product->sku }}</span></div>
                             @endif
                             @if ($showCategory && $product->category)
-                                <div>CATEGORY: <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="text-brand hover:underline uppercase font-extrabold">{{ $product->category->name }}</a></div>
+                                <div>CATEGORY: <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" class="text-brand hover:underline uppercase font-medium">{{ $product->category->name }}</a></div>
                             @endif
                         </div>
                         
                         {{-- Share inline --}}
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest mr-1">{{ __('SHARE') }}</span>
+                            <span class="text-xs font-medium text-neutral-400 uppercase tracking-widest mr-1">{{ __('SHARE') }}</span>
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener"
                                 class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1877f2] hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-facebook-logo text-base"></i></a>
                             <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}" target="_blank" rel="noopener"
@@ -336,7 +336,7 @@
         @if ($product->description)
             <section class="mt-12 border-t border-neutral-200 pt-8 max-w-4xl">
                 <div class="border-b border-neutral-200 pb-2 mb-6">
-                    <h2 class="text-xs sm:text-sm font-bold text-brand uppercase tracking-widest relative inline-block pb-2">
+                    <h2 class="text-xs sm:text-sm font-medium text-brand uppercase tracking-widest relative inline-block pb-2">
                         {{ __('PRODUCT DESCRIPTION') }}
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
@@ -351,12 +351,12 @@
         @if ($showCategory && $related->isNotEmpty())
             <section class="mt-12 border-t border-neutral-200 pt-8">
                 <div class="border-b border-neutral-200 pb-2 mb-6 flex justify-between items-end">
-                    <h2 class="text-xs sm:text-sm font-bold text-brand uppercase tracking-widest relative inline-block pb-2">
+                    <h2 class="text-xs sm:text-sm font-medium text-brand uppercase tracking-widest relative inline-block pb-2">
                         {{ __('RELATED PRODUCTS') }}
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
                     <a href="{{ route('shop.index', ['category' => $product->category?->slug]) }}"
-                        class="text-[10px] font-bold text-neutral-400 hover:text-brand transition uppercase tracking-wider mb-2">
+                        class="text-[10px] font-medium text-neutral-400 hover:text-brand transition uppercase tracking-wider mb-2">
                         {{ __('SEE ALL') }}
                     </a>
                 </div>
@@ -372,7 +372,7 @@
         @if (isset($recommended) && $recommended->isNotEmpty())
             <section class="mt-12 border-t border-neutral-200 pt-8">
                 <div class="border-b border-neutral-200 pb-2 mb-6">
-                    <h2 class="text-xs sm:text-sm font-bold text-brand uppercase tracking-widest relative inline-block pb-2">
+                    <h2 class="text-xs sm:text-sm font-medium text-brand uppercase tracking-widest relative inline-block pb-2">
                         {{ __('YOU MIGHT ALSO LIKE') }}
                         <span class="absolute bottom-0 left-0 w-full h-[2px] bg-brand"></span>
                     </h2>
@@ -483,10 +483,31 @@
                     container.style.cursor = 'crosshair';
 
                     var rect = mainImg.getBoundingClientRect();
+                    
+                    // Since mainImg has object-cover, calculate the actual rendered size and offsets
+                    var naturalWidth = mainImg.naturalWidth;
+                    var naturalHeight = mainImg.naturalHeight;
+                    
+                    var renderedWidth = rect.width;
+                    var renderedHeight = rect.height;
+                    var offsetX = 0;
+                    var offsetY = 0;
+                    
+                    if (naturalWidth && naturalHeight) {
+                        var scaleX = rect.width / naturalWidth;
+                        var scaleY = rect.height / naturalHeight;
+                        var coverScale = Math.max(scaleX, scaleY);
+                        
+                        renderedWidth = naturalWidth * coverScale;
+                        renderedHeight = naturalHeight * coverScale;
+                        offsetX = (rect.width - renderedWidth) / 2;
+                        offsetY = (rect.height - renderedHeight) / 2;
+                    }
+
                     var x = e.clientX - rect.left;
                     var y = e.clientY - rect.top;
 
-                    // Clamp lens so it stays inside the image
+                    // Clamp lens so it stays inside the image container
                     var lensX = x - lens.offsetWidth  / 2;
                     var lensY = y - lens.offsetHeight / 2;
                     if (lensX < 0) lensX = 0;
@@ -497,10 +518,14 @@
                     lens.style.left = lensX + 'px';
                     lens.style.top  = lensY + 'px';
 
+                    // Top-left of lens relative to the actual rendered image content (accounting for object-cover centering)
+                    var lensImgX = lensX - offsetX;
+                    var lensImgY = lensY - offsetY;
+
                     // Drive the result via background-image — the main image is never modified
                     result.style.backgroundImage    = 'url(' + mainImg.src + ')';
-                    result.style.backgroundSize     = (rect.width * SCALE) + 'px ' + (rect.height * SCALE) + 'px';
-                    result.style.backgroundPosition = '-' + (lensX * SCALE) + 'px -' + (lensY * SCALE) + 'px';
+                    result.style.backgroundSize     = (renderedWidth * SCALE) + 'px ' + (renderedHeight * SCALE) + 'px';
+                    result.style.backgroundPosition = '-' + (lensImgX * SCALE) + 'px -' + (lensImgY * SCALE) + 'px';
                 });
 
                 container.addEventListener('mouseleave', function () {
@@ -537,7 +562,7 @@
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
                         if (variantIdEl) variantIdEl.value = '';
-                        setStatus('<span class="inline-flex items-center gap-1 text-sm font-bold text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1 text-sm font-medium text-neutral-400 uppercase tracking-wider">{{ __('Select options') }}</span>');
                         return;
                     }
                     var key = groupNames.map(function (g) { return selected[g]; }).join('|');
@@ -546,7 +571,7 @@
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
                         if (variantIdEl) variantIdEl.value = '';
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Unavailable combination') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Unavailable combination') }}</span>');
                         return;
                     }
                     if (priceEl) priceEl.textContent = v.price_label;
@@ -555,11 +580,11 @@
                     if (v.stock > 0) {
                         if (addBtn) addBtn.disabled = false;
                         if (buyBtn) buyBtn.disabled = false;
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{{ __('In stock') }} (' + v.stock + ')</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{{ __('In stock') }} (' + v.stock + ')</span>');
                     } else {
                         if (addBtn) addBtn.disabled = true;
                         if (buyBtn) buyBtn.disabled = true;
-                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Out of stock') }}</span>');
+                        setStatus('<span class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ __('Out of stock') }}</span>');
                     }
                 }
 
@@ -654,7 +679,7 @@
         <div id="tryon-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <div class="bg-white rounded-md w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="flex items-center justify-between p-5 border-b border-neutral-100 sticky top-0 bg-white">
-                    <h3 class="font-bold text-ink flex items-center gap-2">
+                    <h3 class="font-medium text-ink flex items-center gap-2">
                         <i class="ph ph-sparkle text-purple-600"></i> {{ __('AI Virtual Try-On') }}
                     </h3>
                     <button type="button" id="tryon-close" class="w-8 h-8 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500">
@@ -679,7 +704,7 @@
                         </label>
                         <div id="tryon-preview-wrap" class="hidden mt-3 relative">
                             <img id="tryon-preview" class="w-full max-h-64 object-contain rounded-md border border-neutral-100" alt="preview">
-                            <button type="button" id="tryon-change" class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded shadow">{{ __('Change') }}</button>
+                            <button type="button" id="tryon-change" class="absolute top-2 right-2 bg-white/90 text-xs font-medium px-2 py-1 rounded shadow">{{ __('Change') }}</button>
                         </div>
                     </div>
 
@@ -688,7 +713,7 @@
                     @endif
 
                     <button type="button" id="tryon-generate" disabled
-                        class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-3 rounded-md text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                        class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-md text-sm uppercase tracking-wider flex items-center justify-center gap-2">
                         <i class="ph ph-magic-wand"></i>
                         <span id="tryon-generate-text">{{ __('Generate Try-On') }}</span>
                     </button>
@@ -696,9 +721,9 @@
                     {{-- Result --}}
                     <div id="tryon-result" class="hidden">
                         <div class="border-t border-neutral-100 pt-4">
-                            <p class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">{{ __('Your Try-On') }}</p>
+                            <p class="text-xs font-medium uppercase tracking-widest text-neutral-400 mb-2">{{ __('Your Try-On') }}</p>
                             <img id="tryon-result-img" class="w-full rounded-md border border-neutral-100" alt="try-on result">
-                            <a id="tryon-download" download class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-purple-600 hover:underline">
+                            <a id="tryon-download" download class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:underline">
                                 <i class="ph ph-download-simple"></i> {{ __('Download') }}
                             </a>
                         </div>
@@ -858,12 +883,12 @@
                     <img src="{{ $mainImage ?? '' }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 </div>
                 <div class="min-w-0 leading-tight">
-                    <div class="text-xs font-bold text-neutral-800 truncate">{{ $product->name }}</div>
-                    <div id="sticky-price" class="text-sm font-black text-brand mt-0.5">{{ amountWithSymbol($product->displayPrice()) }}</div>
+                    <div class="text-xs font-medium text-neutral-800 truncate">{{ $product->name }}</div>
+                    <div id="sticky-price" class="text-sm font-bold text-brand mt-0.5">{{ amountWithSymbol($product->displayPrice()) }}</div>
                 </div>
             </div>
             <button type="button" id="btn-sticky-buy"
-                class="bg-neutral-900 hover:bg-black text-white font-black py-3 px-6 rounded-md transition duration-200 text-xs tracking-wider uppercase shadow-md shrink-0 flex items-center gap-2">
+                class="bg-neutral-900 hover:bg-black text-white font-semibold py-3 px-6 rounded-md transition duration-200 text-xs tracking-wider uppercase shadow-md shrink-0 flex items-center gap-2">
                 <i class="ph ph-lightning text-base"></i>
                 <span id="sticky-btn-text">{{ $hasVariants ? __('SELECT OPTIONS') : __('ORDER NOW') }}</span>
             </button>

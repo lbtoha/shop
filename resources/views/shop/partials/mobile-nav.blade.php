@@ -35,7 +35,7 @@
             <div class="relative">
                 <i class="ph-bold ph-heart text-[21px]"></i>
                 <span data-wishlist-count 
-                      class="{{ $wishlistCount ? '' : 'hidden' }} absolute -top-1.5 -right-2 bg-brand text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-sm">
+                      class="{{ $wishlistCount ? '' : 'hidden' }} absolute -top-1.5 -right-2 bg-brand text-white text-[9px] font-medium w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-sm">
                     {{ $wishlistCount }}
                 </span>
             </div>

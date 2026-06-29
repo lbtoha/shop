@@ -172,7 +172,7 @@
                title="{{ __('Wishlist') }}">
                 <i class="ph-bold ph-heart text-lg sm:text-xl"></i>
                 <span data-wishlist-count
-                    class="{{ $wishlistCount ? '' : 'hidden' }} absolute -top-1 -right-1 bg-brand text-white text-[9px] font-black w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-300">
+                    class="{{ $wishlistCount ? '' : 'hidden' }} absolute -top-1 -right-1 bg-brand text-white text-[9px] font-medium w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-300">
                     {{ $wishlistCount }}
                 </span>
             </a>

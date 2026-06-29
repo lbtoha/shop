@@ -7,7 +7,7 @@
         <h1 class="text-2xl font-bold text-[color:var(--color-ink)] mb-6">{{ __('Shopping Cart') }}</h1>
 
         @if ($items->isEmpty())
-            <div class="bg-white border border-[color:var(--color-line)] rounded-md p-14 text-center">
+            <div class="bg-white border border-[color:var(--color-line)] rounded-md p-8 sm:p-14 text-center">
                 <i class="ph ph-shopping-cart text-6xl text-neutral-300 block mb-4"></i>
                 <p class="text-[color:var(--color-muted)] mb-5">{{ __('Your cart is empty.') }}</p>
                 <a href="{{ route('shop.index') }}"
@@ -66,7 +66,7 @@
 
                 {{-- Summary --}}
                 <div class="lg:col-span-1">
-                    <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6 sticky top-28">
+                    <div class="bg-white border border-[color:var(--color-line)] rounded-md p-4 sm:p-6 sticky top-28">
                         <h3 class="font-bold text-[color:var(--color-ink)] mb-4">{{ __('Order Summary') }}</h3>
 
                         {{-- Coupon --}}

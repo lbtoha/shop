@@ -41,10 +41,17 @@
 
         <!-- levels for each state -->
         @foreach ($types as $key => $type)
-            <span class="{{ $key == 0 ? 'text flex opacity-100 peer-checked:opacity-0 left-0' : 'text opacity-0 peer-checked:opacity-100 flex right-0' }}">
-                <i class="{{ $key == 0 ? 'ph ph-x-circle' : 'ph ph-check-circle' }}"></i>
-                {{ $types[$key]['label'] }}
-            </span>
+            @if ($key == 0)
+                <span class="text flex left-0 text-neutral-0 peer-checked:text-neutral-500 dark:peer-checked:text-neutral-400">
+                    <i class="ph ph-x-circle"></i>
+                    {{ $type['label'] }}
+                </span>
+            @else
+                <span class="text flex right-0 text-neutral-500 dark:text-neutral-400 peer-checked:text-neutral-0">
+                    <i class="ph ph-check-circle"></i>
+                    {{ $type['label'] }}
+                </span>
+            @endif
         @endforeach
     </label>
 </div>

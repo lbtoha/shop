@@ -22,6 +22,19 @@ class UniqueCodeGenerator
             throw new InvalidArgumentException('Model and column are required');
         }
 
+        // If it's the Order model, generate a random unique order number
+        if ($model === \App\Models\Order::class || is_a($model, \App\Models\Order::class, true)) {
+            do {
+                // Generate a random numeric code of minLength digits
+                $min = pow(10, $minLength - 1);
+                $max = pow(10, $minLength) - 1;
+                $randomNumber = rand($min, $max);
+                $code = ($defaultPrefix ?: 'ORD') . $randomNumber;
+            } while ($model::query()->where($column, $code)->exists());
+
+            return $code;
+        }
+
         // Get the latest record
         $latest = $model::query()->where($column, 'like', $defaultPrefix.'%')->latest($orderBy)->first();
 

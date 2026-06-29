@@ -12,7 +12,7 @@
             {{-- Shipping / customer details & Items list --}}
             <div class="lg:col-span-2 space-y-6">
                 {{-- Review Items Card --}}
-                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-4 sm:p-6">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Review Your Items') }}</h3>
                     <div class="divide-y divide-[color:var(--color-line)]">
                         @foreach ($items as $line)
@@ -37,7 +37,7 @@
 
                                     {{-- Details --}}
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-semibold text-ink text-sm sm:text-base hover:text-[color:var(--color-brand)] line-clamp-2 leading-tight">
+                                        <h4 class="font-medium text-ink text-sm sm:text-base hover:text-[color:var(--color-brand)] line-clamp-2 leading-tight">
                                             <a href="{{ route('shop.product', $product->slug) }}" target="_blank">{{ $product->name }}</a>
                                         </h4>
                                         @if ($line['variant'])
@@ -80,7 +80,7 @@
                 </div>
 
                 {{-- Shipping Details Card --}}
-                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-4 sm:p-6">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Shipping Details') }}</h3>
 
                 {{-- Previous Ordered Address Block (Concept Image Mockup) --}}
@@ -153,7 +153,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
+                <div class="mt-4" id="shipping-area-section">
                     <label class="block text-sm font-semibold text-neutral-700 mb-2">{{ __('Delivery Area / ডেলিভারি এলাকা') }} <span class="text-red-500">*</span></label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <label class="relative flex items-center justify-between p-4 border border-[color:var(--color-line)] rounded-md cursor-pointer hover:bg-neutral-50/50 transition-all duration-200">
@@ -214,7 +214,7 @@
 
             {{-- Order summary --}}
             <div class="lg:col-span-1">
-                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-6 sticky top-24">
+                <div class="bg-white border border-[color:var(--color-line)] rounded-md p-4 sm:p-6 sticky top-24">
                     <h3 class="font-semibold text-ink mb-4">{{ __('Your Order') }}</h3>
                     <div class="space-y-3 max-h-64 overflow-y-auto" id="checkout-summary-items">
                         @foreach ($items as $line)
@@ -252,7 +252,7 @@
                     </div>
 
                     <button type="submit"
-                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-black py-3.5 rounded-md transition-all duration-300 text-sm tracking-wider uppercase flex items-center justify-center gap-2">
+                        class="mt-5 w-full bg-brand hover:bg-brand-dark text-white font-medium py-3.5 rounded-md transition-all duration-300 text-sm tracking-wider uppercase flex items-center justify-center gap-2">
                         <i class="ph ph-shopping-bag text-base"></i>
                         <span>{{ __('Place Order') }}</span>
                     </button>
@@ -371,6 +371,16 @@
                     maxOutside = outside;
                 }
             });
+            
+            // If both shipping costs are 0 (free delivery for all areas), we hide the shipping area selector
+            const shippingAreaSection = document.getElementById('shipping-area-section');
+            if (shippingAreaSection) {
+                if (maxDhaka === 0 && maxOutside === 0) {
+                    shippingAreaSection.classList.add('hidden');
+                } else {
+                    shippingAreaSection.classList.remove('hidden');
+                }
+            }
             
             const currency = "{{ currencySymbol() }}";
             const insidePreview = document.getElementById('shipping-inside-preview');

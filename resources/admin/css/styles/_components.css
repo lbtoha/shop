@@ -473,7 +473,7 @@ table.responsive {
 
 /* toggle */
 .toggle-label {
-    @apply relative inline-flex justify-between items-center cursor-pointer w-full max-w-[180px];
+    @apply relative inline-flex justify-between items-center cursor-pointer w-[140px];
 
     .bg {
         @apply w-full h-9 bg-error/10 rounded-full;
@@ -484,7 +484,7 @@ table.responsive {
     }
 
     .text {
-        @apply absolute w-1/2 text-center items-center gap-1 justify-center text-xs font-medium text-neutral-0 duration-500;
+        @apply absolute w-1/2 text-center items-center gap-1 justify-center text-xs font-medium duration-500;
     }
 }
 

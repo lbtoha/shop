@@ -16,6 +16,17 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
 
+    <!-- Dynamic Theme Colors -->
+    @php
+        $appInfo = array_merge(config('application_info'));
+        $primaryColor = $appInfo['theme']['primary_color'] ?? '#6366f1';
+    @endphp
+    <style>
+        :root {
+            --primary-color: {{ $primaryColor }};
+        }
+    </style>
+
     <!-- Styles / Scripts -->
     @vite(['resources/admin/css/app.css'])
 </head>
