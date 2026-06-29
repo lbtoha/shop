@@ -490,7 +490,7 @@
     "src": "node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2"
   },
   "resources/admin/css/app.css": {
-    "file": "assets/app-CrGEjBNq.css",
+    "file": "assets/app-DTOjrVYM.css",
     "src": "resources/admin/css/app.css",
     "isEntry": true
   },
@@ -976,7 +976,7 @@
     ]
   },
   "resources/shop/css/app.css": {
-    "file": "assets/app-Dm0ZvRnL.css",
+    "file": "assets/app-DRORq6Bb.css",
     "src": "resources/shop/css/app.css",
     "isEntry": true
   },

@@ -91,5 +91,28 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // Dynamically override phone & social links from database options
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('options')) {
+                $phone = getOption('company_phone');
+                if (!empty($phone)) {
+                    config(['application_info.company_info.phone' => $phone]);
+                }
+
+                $socials = config('application_info.social_medias', []);
+                $updatedSocials = [];
+                foreach ($socials as $social) {
+                    $key = strtolower($social['name']) . '_link';
+                    $dbLink = getOption($key);
+                    if (!empty($dbLink)) {
+                        $social['link'] = $dbLink;
+                    }
+                    $updatedSocials[] = $social;
+                }
+                config(['application_info.social_medias' => $updatedSocials]);
+            }
+        } catch (\Throwable $e) {
+            // Ignore database connection exceptions during setup/migrations
+        }
     }
 }

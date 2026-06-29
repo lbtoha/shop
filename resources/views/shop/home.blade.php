@@ -124,18 +124,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         </style>
 
-        <section class="mt-14 sm:mt-16 relative group/cat">
-            <div class="section-heading mb-8">
-                <span class="eyebrow">{{ __('Browse') }}</span>
-                <h2>{{ __('Shop by Category') }}</h2>
+        <section class="shop-section-gap relative group/cat">
+            <div class="relative w-full flex flex-col items-center mb-4">
+                <div class="section-heading mb-0">
+                    <span class="eyebrow">{{ __('Browse') }}</span>
+                    <h2>{{ __('Shop by Category') }}</h2>
+                </div>
             </div>
             
             <div class="relative px-0">
                 {{-- Prev arrow --}}
                 <button type="button" id="cat-swiper-prev"
-                    class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20
-                           w-8 h-8 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white
-                           items-center justify-start pl-2 border-4 border-l-0 border-white
+                    class="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20
+                           w-8 h-8 rounded-full bg-brand-soft text-brand hover:bg-brand hover:text-white
+                           items-center justify-center border-4 border-white
                            transition-all duration-200 lg:opacity-0 lg:group-hover/cat:opacity-100 shadow-md hover:shadow-lg cursor-pointer
                            disabled:opacity-20 disabled:pointer-events-none">
                     <i class="ph-bold ph-caret-left text-base"></i>
@@ -143,9 +145,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 {{-- Next arrow --}}
                 <button type="button" id="cat-swiper-next"
-                    class="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20
-                           w-8 h-8 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white
-                           items-center justify-end pr-2 border-4 border-r-0 border-white
+                    class="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20
+                           w-8 h-8 rounded-full bg-brand-soft text-brand hover:bg-brand hover:text-white
+                           items-center justify-center border-4 border-white
                            transition-all duration-200 lg:opacity-0 lg:group-hover/cat:opacity-100 shadow-md hover:shadow-lg cursor-pointer
                            disabled:opacity-20 disabled:pointer-events-none">
                     <i class="ph-bold ph-caret-right text-base"></i>
@@ -154,9 +156,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="swiper category-swiper overflow-hidden pb-10">
                     <div class="swiper-wrapper">
                         @foreach ($categories as $category)
-                            <div class="swiper-slide flex justify-center py-2">
+                             <div class="swiper-slide flex justify-center py-2 px-1.5 min-[400px]:px-2 sm:px-2.5 lg:px-3">
                                 <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
-                                   class=" flex flex-col items-center bg-brand/5 hover:bg-brand/10   rounded-xl p-4 sm:p-5 w-full max-w-[300px]    transition-all duration-300">
+                                   class="mx-auto flex flex-col items-center bg-brand/5 hover:bg-brand/10   rounded-xl p-4 sm:p-5 w-full max-w-[300px]     transition-all duration-300">
                                     <div class="size-28 sm:size-32 md:size-40  rounded-full overflow-hidden bg-neutral-50 mb-3 transition-all duration-500 flex items-center justify-center">
                                         <img src="{{ $category->image }}" alt="{{ $category->name }}"
                                              class="w-full h-full object-cover transition-transform duration-500 ">
@@ -181,9 +183,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('DOMContentLoaded', function () {
             new Swiper('.category-swiper', {
                 slidesPerView: 1,
-                spaceBetween: 12,
+                spaceBetween: 0,
+                centeredSlides: true,
                 centerInsufficientSlides: true,
-                loop: true,
+                loop: {{ $categories->count() > 1 ? 'true' : 'false' }},
                 autoplay: {
                     delay: 3500,
                     disableOnInteraction: false,
@@ -194,10 +197,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     prevEl: '#cat-swiper-prev',
                 },
                 breakpoints: {
-                    400:  { slidesPerView: 2, spaceBetween: 16 },
-                    768:  { slidesPerView: 3, spaceBetween: 18 },
-                    1024: { slidesPerView: 4, spaceBetween: 20 },
-                    1280: { slidesPerView: 5, spaceBetween: 24 },
+                    400:  { slidesPerView: 2, spaceBetween: 0, centeredSlides: false },
+                    768:  { slidesPerView: 3, spaceBetween: 0, centeredSlides: false },
+                    1024: { slidesPerView: 4, spaceBetween: 0, centeredSlides: false },
+                    1280: { slidesPerView: 5, spaceBetween: 0, centeredSlides: false },
                 },
             });
         });

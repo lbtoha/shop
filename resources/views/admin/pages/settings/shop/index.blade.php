@@ -31,6 +31,28 @@
                     <x-admin::label for="show_product_category">{{ __('Show Category on Product Page') }}</x-admin::label>
                     <x-admin::switch name="show_product_category" id="show_product_category" :value="isset($settings['show_product_category']) ? $settings['show_product_category'] : 1" :types="[['label' => __('Disabled'), 'value' => 0], ['label' => __('Enabled'), 'value' => 1]]" />
                 </div>
+
+                <div class="md:col-span-2 my-2 border-t border-gray-100 pt-4">
+                    <h3 class="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-2">{{ __('Company & Social Information') }}</h3>
+                </div>
+
+                <x-admin::text-input-group name="company_phone" :value="$settings['company_phone']"
+                    label="Company Phone" placeholder="+123 456 789" />
+
+                <x-admin::text-input-group name="facebook_link" :value="$settings['facebook_link']"
+                    label="Facebook Page URL" placeholder="https://facebook.com/page" />
+
+                <x-admin::text-input-group name="instagram_link" :value="$settings['instagram_link']"
+                    label="Instagram URL" placeholder="https://instagram.com/profile" />
+
+                <x-admin::text-input-group name="youtube_link" :value="$settings['youtube_link']"
+                    label="YouTube Channel URL" placeholder="https://youtube.com/channel" />
+
+                <x-admin::text-input-group name="tiktok_link" :value="$settings['tiktok_link']"
+                    label="TikTok URL" placeholder="https://tiktok.com/@username" />
+
+                <x-admin::text-input-group name="twitter_link" :value="$settings['twitter_link']"
+                    label="Twitter (X) URL" placeholder="https://twitter.com/username" />
             </div>
 
             <p class="text-sm text-neutral-500 mt-3">

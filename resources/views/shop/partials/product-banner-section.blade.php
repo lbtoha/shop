@@ -1,10 +1,10 @@
 {{-- Tinted promotional band wrapping a product grid: $title, $eyebrow, $products, $viewAll --}}
 @if ($products->isNotEmpty())
-<section class="mt-14 mb-14 bg-brand/5 border-y border-line py-12 sm:py-16">
+<section class="shop-section-gap bg-brand/5 border-y border-line py-12 sm:py-16">
     <div class="shop-container">
 
         {{-- Heading --}}
-        <div class="relative w-full flex flex-col items-center mb-8 text-center">
+        <div class="relative w-full flex flex-col items-center mb-6 text-center">
             <div class="section-heading mb-0">
                 <span class="eyebrow">{{ $eyebrow ?? __('Featured') }}</span>
                 <h2>{{ $title }}</h2>

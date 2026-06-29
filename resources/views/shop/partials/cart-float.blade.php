@@ -3,13 +3,11 @@
 @endphp
 
 <button id="floating-cart" data-cart-open
-    class="fixed right-4 bottom-[144px] lg:bottom-22 z-50 w-12 h-12 rounded-full bg-brand hover:bg-brand-dark text-white flex flex-col items-center justify-center shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
+    class="fixed right-4 bottom-[144px] lg:bottom-22 z-50 w-12 h-12 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
     aria-label="{{ __('My Cart') }}">
-    <div class="relative">
-        <i class="ph-bold ph-shopping-cart-simple text-xl"></i>
-        <span data-cart-count
-            class="{{ $cartCount ? '' : 'hidden' }} absolute -top-1.5 -right-1.5 bg-accent text-white text-[9px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-md">
-            {{ $cartCount }}
-        </span>
-    </div>
+    <i class="ph-bold ph-shopping-cart-simple text-xl"></i>
+    <span data-cart-count
+        class="{{ $cartCount ? '' : 'hidden' }} absolute top-1 right-1 bg-accent text-white text-[9px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-md">
+        {{ $cartCount }}
+    </span>
 </button>

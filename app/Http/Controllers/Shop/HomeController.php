@@ -14,16 +14,7 @@ class HomeController extends Controller
         $banners = Banner::with('category')->active()->orderBy('sort_order')->get();
 
         $categories = Category::active()
-            ->whereNull('parent_id')
-            ->where(function ($query) {
-                // 1 = Always Show
-                $query->where('show_in_slider', 1)
-                      // 2 = Auto (Show if it has active products, hide if empty)
-                      ->orWhere(function ($q) {
-                          $q->where('show_in_slider', 2)
-                            ->whereHas('products', fn ($sub) => $sub->active());
-                      });
-            })
+            ->where('show_in_slider', '>', 0)
             ->orderBy('sort_order')
             ->get();
 

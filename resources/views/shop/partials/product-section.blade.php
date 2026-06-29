@@ -1,6 +1,6 @@
 {{-- Reusable grid product section: $title, $products (collection), $viewAll (url) --}}
 @if ($products->isNotEmpty())
-<section class="shop-container mt-14 mb-14 ">
+<section class="shop-container shop-section-gap">
 
     {{-- Heading --}}
     <div class="relative w-full flex flex-col items-center mb-6">
