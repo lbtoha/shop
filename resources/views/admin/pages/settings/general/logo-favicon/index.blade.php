@@ -14,7 +14,7 @@
                 <p class="m-text mb-4">{{ __('Logo For Light Mode') }}</p>
                 <div
                     class="relative border border-neutral-30 dark:border-neutral-500 rounded-lg p-8 xl:py-12 flex justify-center mb-7">
-                    <div id="logo_light_preview">
+                    <div id="logo_light_preview"> 
                         <img src="{{ config('application_info.logo_favicon.logo_light') ?? '/assets/logo.png' }}"
                             alt="logo light" />
                     </div>
