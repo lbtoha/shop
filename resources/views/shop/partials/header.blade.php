@@ -102,7 +102,7 @@
         </div>
 
         {{-- Desktop navigation --}}
-        <nav class="hidden lg:flex items-center gap-1 text-sm font-semibold flex-1 justify-center">
+        <nav class="hidden lg:flex items-center gap-1 text-md font-medium flex-1 justify-center">
             <a href="{{ route('home') }}"
                class="px-3 py-2 rounded-md hover:bg-brand-soft hover:text-brand transition-all duration-150 whitespace-nowrap">
                {{ __('Home') }}

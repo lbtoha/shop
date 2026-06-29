@@ -23,25 +23,29 @@ class BannerController extends Controller
             ],
         ];
 
-        $banners = ModalIndexQuey::get(Banner::query()->orderBy('sort_order'));
+        $banners = ModalIndexQuey::get(Banner::with('category')->orderBy('sort_order'));
 
         $columns = [
             [
                 'label' => __('Image'),
                 'render' => function ($banner) {
                     if ($banner->image) {
-                        return '<img src="'.$banner->image.'" width="80" height="40" class="rounded object-cover w-20 h-10" alt="'.e($banner->title).'" />';
+                        return '<img src="'.$banner->image.'" width="80" height="40" class="rounded object-cover w-20 h-10" alt="" />';
                     }
 
                     return '<span class="text-gray-400">—</span>';
                 },
             ],
             [
-                'label' => __('Title'),
-                'key' => 'title',
+                'label' => __('Destination'),
                 'render' => function ($banner) {
-                    return '<p class="s-text font-medium">'.e($banner->title ?? '—').'</p>'
-                        .($banner->subtitle ? '<span class="text-xs text-gray-400">'.e($banner->subtitle).'</span>' : '');
+                    if ($banner->category) {
+                        return '<span class="text-sm font-semibold text-brand">Category: '.e($banner->category->name).'</span>';
+                    }
+                    if ($banner->link) {
+                        return '<span class="text-sm text-gray-500">Link: '.e($banner->link).'</span>';
+                    }
+                    return '<span class="text-gray-400">—</span>';
                 },
             ],
             [
@@ -99,7 +103,9 @@ class BannerController extends Controller
             ],
         ];
 
-        return view('admin.pages.banners.create', compact('buttons'));
+        $categories = \App\Models\Category::active()->orderBy('name')->get();
+
+        return view('admin.pages.banners.create', compact('buttons', 'categories'));
     }
 
     public function store(BannerRequest $request)
@@ -137,7 +143,9 @@ class BannerController extends Controller
             ],
         ];
 
-        return view('admin.pages.banners.edit', compact('buttons', 'banner'));
+        $categories = \App\Models\Category::active()->orderBy('name')->get();
+
+        return view('admin.pages.banners.edit', compact('buttons', 'banner', 'categories'));
     }
 
     public function update(BannerRequest $request, Banner $banner)

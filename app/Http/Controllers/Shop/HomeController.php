@@ -11,12 +11,20 @@ class HomeController extends Controller
 {
     public function index(HomeSectionRepository $homeSections)
     {
-        $banners = Banner::active()->orderBy('sort_order')->get();
+        $banners = Banner::with('category')->active()->orderBy('sort_order')->get();
 
         $categories = Category::active()
             ->whereNull('parent_id')
+            ->where(function ($query) {
+                // 1 = Always Show
+                $query->where('show_in_slider', 1)
+                      // 2 = Auto (Show if it has active products, hide if empty)
+                      ->orWhere(function ($q) {
+                          $q->where('show_in_slider', 2)
+                            ->whereHas('products', fn ($sub) => $sub->active());
+                      });
+            })
             ->orderBy('sort_order')
-            ->withCount(['products' => fn ($q) => $q->active()])
             ->get();
 
         // Fully resolved, cached home sections configured in admin → Home Sections.

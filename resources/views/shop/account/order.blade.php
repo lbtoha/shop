@@ -17,23 +17,23 @@
                 <h1 class="text-2xl font-bold text-ink">{{ __('Order') }} <span class="text-[color:var(--color-brand)]">#{{ $order->order_number }}</span></h1>
             </div>
             
-            <div class="flex items-center gap-3 self-start sm:self-auto">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 self-start sm:self-auto w-full sm:w-auto">
                 @if ($order->isOnlinePayable() && \App\Services\Payment\SslCommerzService::isEnabled())
                     <a href="{{ route('shop.payment.sslcommerz.retry', $order->order_number) }}"
-                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all shrink-0">
                         <i class="ph ph-credit-card text-sm"></i> {{ __('Pay Now') }}
                     </a>
                 @endif
                 <a href="{{ route('shop.track', ['order_number' => $order->order_number, 'phone' => $order->customer_phone]) }}"
-                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all shrink-0">
                     <i class="ph ph-map-pin text-sm"></i> {{ __('Track Order') }}
                 </a>
                 <a href="{{ route('shop.account.orders.invoice', $order->order_number) }}"
-                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all">
+                    class="inline-flex items-center gap-2 bg-[color:var(--color-brand)] hover:bg-[color:var(--color-brand-dark)] text-white text-xs font-bold py-2.5 px-4 rounded-md transition-all shrink-0">
                     <i class="ph ph-file-pdf text-sm"></i> {{ __('Download Invoice') }}
                 </a>
                 <a href="{{ route('shop.account.orders') }}" 
-                    class="inline-flex items-center gap-2 border border-neutral-200/80 hover:bg-neutral-50 text-neutral-700 text-xs font-bold py-2.5 px-4 rounded-md transition-all">
+                    class="inline-flex items-center gap-2 border border-neutral-200/80 hover:bg-neutral-50 text-neutral-700 text-xs font-bold py-2.5 px-4 rounded-md transition-all shrink-0">
                     <i class="ph ph-arrow-left"></i> {{ __('Back to Orders') }}
                 </a>
             </div>

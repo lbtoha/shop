@@ -205,9 +205,9 @@ h5 {
     transition: transform 9s cubic-bezier(0.16, 1, 0.3, 1);
     transform: scale(1);
 }
-[data-slide].active img {
+/* [data-slide].active img {
     transform: scale(1.08);
-}
+} */
 .content-anim {
     transform: translateY(2.5rem);
     opacity: 0;

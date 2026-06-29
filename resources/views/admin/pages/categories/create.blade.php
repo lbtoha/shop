@@ -29,6 +29,15 @@
                     <x-admin::label for="is_active">{{ __('Active') }}</x-admin::label>
                     <x-admin::switch name="is_active" id="is_active" :value="1" :types="[['label' => __('Inactive'), 'value' => 0], ['label' => __('Active'), 'value' => 1]]" />
                 </div>
+
+                <div class="input-group">
+                    <x-admin::label for="show_in_slider">{{ __('Show in Homepage Slider') }}</x-admin::label>
+                    <x-admin::select-option id="show_in_slider" name="show_in_slider">
+                        <option value="2" selected>{{ __('Auto (Show only when it has products)') }}</option>
+                        <option value="1">{{ __('Always Show (Show even if empty)') }}</option>
+                        <option value="0">{{ __('Always Hide') }}</option>
+                    </x-admin::select-option>
+                </div>
             </div>
 
             <div class="flex items-center justify-end mt-4">

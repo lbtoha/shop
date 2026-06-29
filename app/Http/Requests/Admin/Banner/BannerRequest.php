@@ -22,6 +22,7 @@ class BannerRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'category_id' => ['nullable', 'exists:categories,id'],
             'title' => ['nullable', 'string', 'max:255'],
             'subtitle' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'string'],

@@ -27,6 +27,7 @@ class CategoryRequest extends FormRequest
             'image' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
+            'show_in_slider' => ['integer', 'in:0,1,2'],
             'sort_order' => ['nullable', 'integer'],
         ];
     }

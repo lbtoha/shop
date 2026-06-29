@@ -18,48 +18,62 @@
                         @foreach ($items as $line)
                             @php($product = $line['product'])
                             @php($maxQty = $line['variant'] ? $line['variant']->stock : $product->stock)
-                            <div class="py-4 flex items-center gap-4 checkout-item-row" 
+                            <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 checkout-item-row" 
                                 data-line-key="{{ $line['key'] }}" 
                                 data-unit-price="{{ $line['unit_price'] }}"
                                 data-shipping-dhaka="{{ $product->shipping_cost_dhaka }}"
                                 data-shipping-outside="{{ $product->shipping_cost_outside }}">
-                                {{-- Image --}}
-                                <a href="{{ route('shop.product', $product->slug) }}" target="_blank" class="w-16 h-20 shrink-0 rounded-md bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center border border-neutral-100">
-                                    @if ($product->thumbnail)
-                                        <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                                    @else
-                                        <i class="ph ph-image text-xl text-neutral-300"></i>
-                                    @endif
-                                </a>
+                                
+                                {{-- Left Block: Image & Details --}}
+                                <div class="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                                    {{-- Image --}}
+                                    <a href="{{ route('shop.product', $product->slug) }}" target="_blank" class="w-16 h-20 shrink-0 rounded-md bg-[color:var(--color-image)] overflow-hidden flex items-center justify-center border border-neutral-100">
+                                        @if ($product->thumbnail)
+                                            <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                        @else
+                                            <i class="ph ph-image text-xl text-neutral-300"></i>
+                                        @endif
+                                    </a>
 
-                                {{-- Details --}}
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-ink text-sm sm:text-base truncate hover:text-[color:var(--color-brand)]">
-                                        <a href="{{ route('shop.product', $product->slug) }}" target="_blank">{{ $product->name }}</a>
-                                    </h4>
-                                    @if ($line['variant'])
-                                        <div class="text-xs text-[color:var(--color-brand)] font-medium mt-0.5">Size : {{ $line['variant']->name }}</div>
-                                    @endif
+                                    {{-- Details --}}
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-semibold text-ink text-sm sm:text-base hover:text-[color:var(--color-brand)] line-clamp-2 leading-tight">
+                                            <a href="{{ route('shop.product', $product->slug) }}" target="_blank">{{ $product->name }}</a>
+                                        </h4>
+                                        @if ($line['variant'])
+                                            <div class="text-xs text-[color:var(--color-brand)] font-medium mt-0.5">Size : {{ $line['variant']->name }}</div>
+                                        @endif
+                                        {{-- Price on Mobile --}}
+                                        <div class="text-neutral-500 text-xs mt-1 sm:hidden">{{ amountWithSymbol($line['unit_price']) }}</div>
+                                    </div>
+
+                                    {{-- Delete (Mobile only) --}}
+                                    <button type="button" class="sm:hidden text-red-500 hover:text-red-700 transition-colors p-1 self-start shrink-0" onclick="removeCheckoutItem('{{ $line['key'] }}')">
+                                        <i class="ph ph-trash text-xl"></i>
+                                    </button>
                                 </div>
 
-                                {{-- Price --}}
-                                <div class="text-neutral-500 text-sm hidden sm:block">{{ currencySymbol() }}<span class="unit-price-text">{{ number_format($line['unit_price'], 0) }}</span></div>
+                                {{-- Right Block: Controls & Subtotal --}}
+                                <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                                    {{-- Price on Desktop --}}
+                                    <div class="text-neutral-500 text-sm hidden sm:block">{{ currencySymbol() }}<span class="unit-price-text">{{ number_format($line['unit_price'], 0) }}</span></div>
 
-                                {{-- Quantity Controls (Red minus, input, Green plus matching layout) --}}
-                                <div class="flex items-center gap-1">
-                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#d93c4a] hover:bg-[#c32f3c] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', -1)">−</button>
-                                    <input type="number" readonly value="{{ $line['quantity'] }}" min="1" max="{{ $maxQty }}"
-                                        class="w-12 h-8 text-center border border-neutral-200 rounded-md text-sm font-semibold focus:outline-none qty-input bg-white" id="qty-input-{{ $line['key'] }}">
-                                    <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#28a745] hover:bg-[#218838] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', 1)">+</button>
+                                    {{-- Quantity Controls --}}
+                                    <div class="flex items-center gap-1">
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#d93c4a] hover:bg-[#c32f3c] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', -1)">−</button>
+                                        <input type="number" readonly value="{{ $line['quantity'] }}" min="1" max="{{ $maxQty }}"
+                                            class="w-12 h-8 text-center border border-neutral-200 rounded-md text-sm font-semibold focus:outline-none qty-input bg-white" id="qty-input-{{ $line['key'] }}">
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center bg-[#28a745] hover:bg-[#218838] text-white font-bold rounded-md transition-colors shadow-sm select-none" onclick="changeCheckoutQty('{{ $line['key'] }}', 1)">+</button>
+                                    </div>
+
+                                    {{-- Subtotal --}}
+                                    <div class="text-right font-bold text-ink sm:w-20 text-sm sm:text-base min-w-[65px]">{{ currencySymbol() }}<span class="item-subtotal-text font-bold" id="subtotal-{{ $line['key'] }}">{{ number_format($line['subtotal'], 0) }}</span></div>
+
+                                    {{-- Delete (Desktop only) --}}
+                                    <button type="button" class="hidden sm:block text-red-500 hover:text-red-700 transition-colors p-1" onclick="removeCheckoutItem('{{ $line['key'] }}')">
+                                        <i class="ph ph-trash text-xl"></i>
+                                    </button>
                                 </div>
-
-                                {{-- Subtotal --}}
-                                <div class="text-right font-bold text-ink sm:w-20 text-sm sm:text-base">{{ currencySymbol() }}<span class="item-subtotal-text font-bold" id="subtotal-{{ $line['key'] }}">{{ number_format($line['subtotal'], 0) }}</span></div>
-
-                                {{-- Delete --}}
-                                <button type="button" class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="removeCheckoutItem('{{ $line['key'] }}')">
-                                    <i class="ph ph-trash text-xl"></i>
-                                </button>
                             </div>
                         @endforeach
                     </div>

@@ -5,18 +5,22 @@
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 gap-4 xl:gap-6">
-                <x-admin::text-input-group name="title" label="Title" :value="$banner->title" placeholder="{{ __('e.g. New Collection 2026') }}" />
-
-                <x-admin::text-input-group name="subtitle" label="Subtitle" :value="$banner->subtitle" placeholder="{{ __('e.g. Discover the latest arrivals') }}" />
-
                 <div class="input-group">
                     <x-admin::label for="image">{{ __('Banner Image') }}</x-admin::label>
                     <x-admin::file-uploader name="image" id="image" :value="$banner->image" />
                 </div>
 
-                <x-admin::text-input-group name="button_text" label="Button Text" :value="$banner->button_text" placeholder="{{ __('e.g. Shop Now') }}" />
+                <div class="input-group">
+                    <x-admin::label for="category_id">{{ __('Link to Category') }}</x-admin::label>
+                    <x-admin::select-option id="category_id" name="category_id" placeholder="{{ __('Select a Category') }}">
+                        <option value="">{{ __('None (Use Custom Link URL below)') }}</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}" @selected($cat->id == $banner->category_id)>{{ $cat->name }}</option>
+                        @endforeach
+                    </x-admin::select-option>
+                </div>
 
-                <x-admin::text-input-group name="link" label="Link URL" :value="$banner->link" placeholder="{{ __('e.g. /shop') }}" />
+                <x-admin::text-input-group name="link" label="Custom Link URL" :value="$banner->link" placeholder="{{ __('e.g. /shop') }}" />
 
                 <x-admin::number-input-group name="sort_order" label="Sort Order" :value="$banner->sort_order" placeholder="0" :with_currencySymbol="false" />
 

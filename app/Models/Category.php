@@ -16,6 +16,7 @@ class Category extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'show_in_slider' => 'integer',
     ];
 
     public function sluggable(): array

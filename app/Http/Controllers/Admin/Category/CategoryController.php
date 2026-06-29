@@ -70,6 +70,20 @@ class CategoryController extends Controller
                 },
             ],
             [
+                'label' => __('Homepage Slider'),
+                'key' => 'show_in_slider',
+                'is_sortable' => true,
+                'render' => function ($category) {
+                    if ($category->show_in_slider === 1) {
+                        return '<span class="status success capitalize">'.__('Show').'</span>';
+                    } elseif ($category->show_in_slider === 0) {
+                        return '<span class="status danger capitalize">'.__('Hide').'</span>';
+                    } else {
+                        return '<span class="status warning capitalize">'.__('Auto').'</span>';
+                    }
+                },
+            ],
+            [
                 'label' => __('Action'),
                 'header_class' => 'flex justify-end',
                 'render' => function ($category) {

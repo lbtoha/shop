@@ -6,109 +6,202 @@
 
 {{-- ── Hero Carousel ─────────────────────────────────────────── --}}
 @if ($banners->isNotEmpty())
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<style>
+.hero-swiper-pagination .swiper-pagination-bullet {
+    width: 16px;
+    height: 12px;
+    background: #f59caf;
+    opacity: 1;
+    border-radius: 9999px;
+    border: 2px solid #fff;
+    transition: all 0.3s ease;
+    margin: 0 3px !important;
+}
+.hero-swiper-pagination .swiper-pagination-bullet-active {
+    width: 32px;
+    background: #e11d48 !important;
+}
+</style>
+
 <div class="shop-container mt-5 sm:mt-6">
-    <div class="relative w-full h-[320px] xs:h-[380px] sm:h-[440px] lg:h-[520px]  overflow-hidden group/hero bg-ink"
-         data-hero>
-
-        {{-- Slides --}}
-        @foreach ($banners as $i => $banner)
-            <div data-slide
-                 class="{{ $i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 hidden' }} absolute inset-0 transition-all duration-1000 ease-in-out">
-                <div class="absolute inset-0 overflow-hidden">
-                    <img src="{{ $banner->image }}" alt="{{ $banner->title }}"
-                         class="w-full h-full object-cover">
-                </div>
-                {{-- Layered gradient for readability --}}
-                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent lg:from-black/85 lg:via-black/40 lg:to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-
-                {{-- Slide content --}}
-                <div class="absolute inset-0 flex items-center">
-                    <div class="px-6 sm:px-12 lg:px-16 space-y-2.5 xs:space-y-4 sm:space-y-5 max-w-[85%] sm:max-w-xl content-anim">
-                        {{-- Eyebrow badge --}}
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 xs:px-3 xs:py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white">
-                            <span class="w-1.5 h-1.5 rounded-full bg-brand-light animate-pulse"></span>
-                            <span class="text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em]">{{ __('Special Offer') }}</span>
-                        </span>
-
-                        {{-- Title --}}
-                        <h1 class="text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight leading-[1.1] text-white">
-                            {!! str_replace(' & ', ' <span class="text-brand-light">&</span> ', e(__($banner->title))) !!}
-                        </h1>
-
-                        {{-- Subtitle --}}
-                        <p class="text-xs xs:text-sm sm:text-base text-white/80 font-medium max-w-xs sm:max-w-md leading-relaxed">
-                            {{ __($banner->subtitle) }}
-                        </p>
-
-                        {{-- CTA --}}
-                        <div class="flex items-center gap-4 pt-1 sm:pt-2">
-                            <a href="{{ $banner->link ?: route('shop.index') }}"
-                               class="btn-brand text-xs py-2.5 px-5 xs:text-sm xs:py-3 xs:px-7 group/btn">
-                                <span>{{ __($banner->button_text ?: 'Shop Now') }}</span>
-                                <i class="ph ph-arrow-right transition-transform duration-200 group-hover/btn:translate-x-1"></i>
-                            </a>
-                            <a href="{{ route('shop.index') }}"
-                               class="text-xs xs:text-sm text-white/75 hover:text-white font-semibold underline underline-offset-4 transition-colors">
-                               {{ __('Browse All') }}
-                            </a>
+    <div class="swiper hero-swiper relative w-full h-[240px] sm:h-[320px] lg:h-[350px] xl:h-[450px] rounded-2xl group/hero bg-neutral-100 shadow-sm overflow-hidden">
+        <div class="swiper-wrapper">
+            @foreach ($banners as $banner)
+                @php
+                    $targetLink = null;
+                    if ($banner->category) {
+                        $targetLink = route('shop.index', ['category' => $banner->category->slug]);
+                    } elseif ($banner->link) {
+                        $targetLink = $banner->link;
+                    }
+                @endphp
+                <div class="swiper-slide w-full h-full">
+                    @if ($targetLink)
+                        <a href="{{ $targetLink }}" class="block w-full h-full overflow-hidden">
+                    @else
+                        <div class="block w-full h-full overflow-hidden">
+                    @endif
+                        <img src="{{ $banner->image }}" alt="Banner"
+                             class="w-full h-full object-cover">
+                    @if ($targetLink)
+                        </a>
+                    @else
                         </div>
-                    </div>
+                    @endif
                 </div>
-            </div>
-        @endforeach
-
-        {{-- Controls (always visible on touch, fade-in on desktop hover) --}}
-        <button type="button" data-hero-prev
-            class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-12 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-start pl-2 border border-l-0 border-brand-mist hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer">
-            <i class="ph-bold ph-caret-left text-base"></i>
-        </button>
-        <button type="button" data-hero-next
-            class="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-12 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-end pr-2 border border-r-0 border-brand-mist hover:border-brand transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer">
-            <i class="ph-bold ph-caret-right text-base"></i>
-        </button>
-
-        {{-- Dots --}}
-        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
-            @foreach ($banners as $i => $banner)
-                <button type="button" data-hero-dot="{{ $i }}"
-                    class="{{ $i === 0 ? 'bg-brand w-8' : 'bg-white/35 w-3' }} h-1.5 rounded-full hover:bg-white/60 transition-all duration-300 cursor-pointer"
-                    aria-label="Slide {{ $i + 1 }}"></button>
             @endforeach
         </div>
+
+        @if ($banners->count() > 1)
+            {{-- Controls --}}
+            <button type="button" class="hero-swiper-prev hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8  rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-start pl-2 border-4 border-l-0 border-white  transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer"> 
+                <i class="ph-bold ph-caret-left text-base"></i>
+            </button>
+            <button type="button" class="hero-swiper-next hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8  rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-end pr-2 border-4 border-r-0 border-white  transition-all duration-200 lg:opacity-0 lg:group-hover/hero:opacity-100 shadow-md hover:shadow-lg cursor-pointer">
+                <i class="ph-bold ph-caret-right text-base"></i>
+            </button>
+
+            {{-- Dots --}}
+            <div class="hero-swiper-pagination absolute bottom-5 -left-1/2! translate-x-1/2 z-20 flex gap-1.5 justify-center items-center"></div>
+        @endif
     </div>
 </div>
+
+<!-- Swiper JS & Init -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    new Swiper('.hero-swiper', {
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        navigation: {
+            nextEl: '.hero-swiper-next',
+            prevEl: '.hero-swiper-prev',
+        },
+        pagination: {
+            el: '.hero-swiper-pagination',
+            clickable: true,
+        },
+        speed: 800,
+    });
+});
+</script>
 @endif
 
 <div class="shop-container">
 
-
-
     {{-- ── Shop By Category ──────────────────────────────────── --}}
     @if ($categories->isNotEmpty())
-        <section class="mt-14 sm:mt-16">
-            <div class="section-heading">
+        <style>
+        .category-swiper-pagination {
+            position: absolute;
+            bottom: 0px !important;
+            left: 50% !important;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .category-swiper-pagination .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            margin: 0 4px !important;
+            cursor: pointer;
+        }
+        .category-swiper-pagination .swiper-pagination-bullet-active {
+            width: 20px;
+            background: #e11d48 !important;
+        }
+        </style>
+
+        <section class="mt-14 sm:mt-16 relative group/cat">
+            <div class="section-heading mb-8">
                 <span class="eyebrow">{{ __('Browse') }}</span>
                 <h2>{{ __('Shop by Category') }}</h2>
             </div>
-            <div class="flex flex-wrap items-start justify-center gap-6 sm:gap-10 md:gap-12 mt-3 sm:mt-6">
-                @foreach ($categories as $category)
-                    <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
-                       class="category-pill group">
-                        <div class="cp-img">
-                            <img src="{{ $category->image }}" alt="{{ $category->name }}"
-                                 class="transition-transform duration-500 group-hover:scale-110">
-                        </div>
-                        <div class="text-center">
-                            <span class="block text-xs sm:text-[13px] font-bold text-ink uppercase tracking-wider group-hover:text-brand transition-colors duration-200 line-clamp-2 leading-snug max-w-[100px] sm:max-w-[120px]">
-                                {{ $category->name }}
-                            </span>
-                            <span class="block text-[11px] text-muted mt-0.5">{{ $category->products_count ?? 0 }} {{ __('products') }}</span>
-                        </div>
-                    </a>
-                @endforeach
+            
+            <div class="relative px-0">
+                {{-- Prev arrow --}}
+                <button type="button" id="cat-swiper-prev"
+                    class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20
+                           w-8 h-8 rounded-r-full bg-brand-soft text-brand hover:bg-brand hover:text-white
+                           items-center justify-start pl-2 border-4 border-l-0 border-white
+                           transition-all duration-200 lg:opacity-0 lg:group-hover/cat:opacity-100 shadow-md hover:shadow-lg cursor-pointer
+                           disabled:opacity-20 disabled:pointer-events-none">
+                    <i class="ph-bold ph-caret-left text-base"></i>
+                </button>
+
+                {{-- Next arrow --}}
+                <button type="button" id="cat-swiper-next"
+                    class="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20
+                           w-8 h-8 rounded-l-full bg-brand-soft text-brand hover:bg-brand hover:text-white
+                           items-center justify-end pr-2 border-4 border-r-0 border-white
+                           transition-all duration-200 lg:opacity-0 lg:group-hover/cat:opacity-100 shadow-md hover:shadow-lg cursor-pointer
+                           disabled:opacity-20 disabled:pointer-events-none">
+                    <i class="ph-bold ph-caret-right text-base"></i>
+                </button>
+
+                <div class="swiper category-swiper overflow-hidden pb-10">
+                    <div class="swiper-wrapper">
+                        @foreach ($categories as $category)
+                            <div class="swiper-slide flex justify-center py-2">
+                                <a href="{{ route('shop.index', ['category' => $category->slug]) }}"
+                                   class=" flex flex-col items-center bg-brand/5 hover:bg-brand/10   rounded-xl p-4 sm:p-5 w-full max-w-[300px]    transition-all duration-300">
+                                    <div class="size-28 sm:size-32 md:size-40  rounded-full overflow-hidden bg-neutral-50 mb-3 transition-all duration-500 flex items-center justify-center">
+                                        <img src="{{ $category->image }}" alt="{{ $category->name }}"
+                                             class="w-full h-full object-cover transition-transform duration-500 ">
+                                    </div>
+                                    <div class="text-center w-full">
+                                        <span class="block text-sm sm:text-md font-semibold text-ink uppercase tracking-wide group-hover:text-brand transition-colors duration-200 line-clamp-2 leading-snug">
+                                            {{ $category->name }}
+                                        </span>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    {{-- Pagination dots --}}
+                    <div class="category-swiper-pagination"></div>
+                </div>
             </div>
         </section>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new Swiper('.category-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 12,
+                centerInsufficientSlides: true,
+                loop: true,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false,
+                   
+                },
+                navigation: {
+                    nextEl: '#cat-swiper-next',
+                    prevEl: '#cat-swiper-prev',
+                },
+                breakpoints: {
+                    400:  { slidesPerView: 2, spaceBetween: 16 },
+                    768:  { slidesPerView: 3, spaceBetween: 18 },
+                    1024: { slidesPerView: 4, spaceBetween: 20 },
+                    1280: { slidesPerView: 5, spaceBetween: 24 },
+                },
+            });
+        });
+        </script>
     @endif
 
 </div>
