@@ -23,7 +23,14 @@ jobs:
         script: |
           cd ${{ secrets.SSH_TARGET_DIR }}
           
-          # Pull the latest changes from GitHub
+          # Prevent users from seeing broken states during deployment
+          php artisan down || true
+          
+          # Revert local changes and clean public/build to prevent conflicts
+          git checkout -- .
+          git clean -fd public/build || true
+          
+          # Pull latest code
           git pull origin main
           
           # Install composer dependencies
@@ -32,7 +39,10 @@ jobs:
           # Run database migrations
           php artisan migrate --force
           
-          # Rebuild configuration and route caches
+          # Rebuild caches
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
+          
+          # Bring site back online
+          php artisan up

@@ -26,7 +26,7 @@
 </style>
 
 <div class="shop-container mt-5 sm:mt-6">
-    <div class="swiper hero-swiper relative w-full h-[240px] sm:h-[320px] lg:h-[350px] xl:h-[450px] rounded-2xl group/hero bg-neutral-100 shadow-sm overflow-hidden">
+    <div class="swiper hero-swiper relative w-full h-auto aspect-[2.7/1] sm:aspect-[3/1] lg:aspect-[3.2/1] xl:aspect-[3.5/1] rounded-2xl group/hero bg-neutral-100 shadow-sm overflow-hidden">
         <div class="swiper-wrapper">
             @foreach ($banners as $banner)
                 @php
