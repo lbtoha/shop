@@ -30,10 +30,43 @@ class AdminAuthMiddleware
         }
 
         if ($this->isDeniedForCurrentUrl()) {
-            return redirect()->route('admin.dashboard');
+            $fallback = $this->getFirstAuthorizedMenuLink();
+            if ($fallback) {
+                return redirect()->route($fallback);
+            }
+            abort(403, 'Unauthorized.');
         }
 
         return $next($request);
+    }
+
+    /**
+     * Get the first authorized route name for the logged-in admin.
+     */
+    private function getFirstAuthorizedMenuLink(): ?string
+    {
+        $admin = auth()->guard('admin')->user();
+        if (! $admin) {
+            return null;
+        }
+
+        if (! $admin->admin_role_id) {
+            return 'admin.dashboard';
+        }
+
+        $authorized_menus = $admin->role->module_caps ?? [];
+        foreach ($authorized_menus as $link) {
+            if (\Route::has($link)) {
+                return $link;
+            }
+            
+            $cleanLink = str_replace('*', '', $link);
+            if (\Route::has($cleanLink)) {
+                return $cleanLink;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -55,7 +88,7 @@ class AdminAuthMiddleware
         $menus = array_map(fn ($menu) => $menu['link'], getMenuCaps(config('menu.admin.menu')));
 
         foreach ($menus as $link) {
-            $url = route($link);
+            $url = \Route::has($link) ? route($link) : url(str_replace('.', '/', str_replace('*', '', $link)));
             if (isCurrentUrlMatched($url) && ! in_array($link, $authorized_menus)) {
                 return true; // Current URL is a menu this admin isn't authorized for.
             }
