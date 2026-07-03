@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/shop/css/app.css', 'resources/shop/js/app.js'])
+    @include('shop.partials.tracking-pixels')
 </head>
 
 <body class="min-h-screen flex flex-col overflow-x-hidden pb-[60px] lg:pb-0">

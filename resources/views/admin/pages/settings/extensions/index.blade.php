@@ -27,6 +27,28 @@
                 </div>
             </form>
         </x-admin::modal>
+        <x-admin::modal modalId="facebook_pixel" title="Edit Facebook Pixel Credentials">
+            <form class="form-submit-edit" method="POST">
+                @csrf
+                <x-admin::text-input-group name="pixel_id" label="Pixel Id" />
+                <div class="flex items-center justify-end mt-4">
+                    <x-admin::primary-button>
+                        {{ __('Save') }}
+                    </x-admin::primary-button>
+                </div>
+            </form>
+        </x-admin::modal>
+        <x-admin::modal modalId="tiktok_pixel" title="Edit TikTok Pixel Credentials">
+            <form class="form-submit-edit" method="POST">
+                @csrf
+                <x-admin::text-input-group name="pixel_id" label="Pixel Id" />
+                <div class="flex items-center justify-end mt-4">
+                    <x-admin::primary-button>
+                        {{ __('Save') }}
+                    </x-admin::primary-button>
+                </div>
+            </form>
+        </x-admin::modal>
         <x-admin::modal modalId="tawk_to" title="{{ __('Edit Tawk.to Credentials') }}">
             <form class="form-submit-edit" method="POST">
                 @csrf

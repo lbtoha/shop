@@ -87,6 +87,36 @@ class ExtensionController extends Controller
             ]);
         }
 
+        if ($slug == 'facebook_pixel') {
+
+            $validated = $request->validate([
+                'pixel_id' => 'required',
+            ]);
+
+            $extension = config('extension.facebook_pixel');
+
+            $extension['pixel_id'] = $validated['pixel_id'];
+
+            storeOption([
+                'extension_'.$slug => $extension,
+            ]);
+        }
+
+        if ($slug == 'tiktok_pixel') {
+
+            $validated = $request->validate([
+                'pixel_id' => 'required',
+            ]);
+
+            $extension = config('extension.tiktok_pixel');
+
+            $extension['pixel_id'] = $validated['pixel_id'];
+
+            storeOption([
+                'extension_'.$slug => $extension,
+            ]);
+        }
+
         if ($slug == 'recaptcha') {
 
             $validated = $request->validate([

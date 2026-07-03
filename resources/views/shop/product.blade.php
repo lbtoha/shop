@@ -226,6 +226,9 @@
 
                             {{-- Add to Cart --}}
                             <button type="button" id="btn-add-to-cart" data-add-to-cart="{{ route('shop.cart.add', $product->id) }}"
+                                data-product-id="{{ $product->id }}"
+                                data-name="{{ addslashes($product->name) }}"
+                                data-price="{{ $product->price }}"
                                 @if ($hasVariants) disabled @endif
                                 class="flex-1 bg-brand hover:bg-brand-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-semibold py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-shopping-cart-simple text-base"></i>
@@ -234,6 +237,9 @@
 
                             {{-- Order Now --}}
                             <button type="button" id="btn-order-now" data-buy-now="{{ route('shop.cart.add', $product->id) }}"
+                                data-product-id="{{ $product->id }}"
+                                data-name="{{ addslashes($product->name) }}"
+                                data-price="{{ $product->price }}"
                                 @if ($hasVariants) disabled @endif
                                 class="flex-1 bg-neutral-900 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] text-white font-semibold py-2.5 px-5 rounded-md transition-all duration-200 text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 <i class="ph ph-lightning text-base"></i>

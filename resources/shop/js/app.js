@@ -129,6 +129,15 @@ document.addEventListener("click", async (e) => {
         if (res.ok && data.success) {
             renderDrawer(data.drawer, data.count);
             openCart();
+            document.dispatchEvent(new CustomEvent("cart:added", {
+                detail: {
+                    productId: btn.getAttribute("data-product-id") || null,
+                    name: btn.getAttribute("data-name") || null,
+                    price: btn.getAttribute("data-price") || null,
+                    quantity: quantity,
+                    variantId: variantId
+                }
+            }));
         } else {
             showToast(data.message || "Could not add to cart.", "error");
         }
@@ -160,7 +169,19 @@ document.addEventListener("click", async (e) => {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-            window.location.href = "/checkout";
+            document.dispatchEvent(new CustomEvent("cart:added", {
+                detail: {
+                    productId: btn.getAttribute("data-product-id") || null,
+                    name: btn.getAttribute("data-name") || null,
+                    price: btn.getAttribute("data-price") || null,
+                    quantity: quantity,
+                    variantId: variantId
+                }
+            }));
+            // Short delay to allow tracking pixel to capture before redirect
+            setTimeout(() => {
+                window.location.href = "/checkout";
+            }, 150);
         } else {
             showToast(data.message || "Could not add to cart.", "error");
             btn.style.pointerEvents = "";

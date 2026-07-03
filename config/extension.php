@@ -14,4 +14,17 @@ return [
         'is_enabled' => true,
         'measurement_id' => 'G-48X1YR9QHP',
     ],
+    'facebook_pixel' => [
+        'name' => 'Facebook Pixel',
+        'icon' => 'ph ph-facebook-logo',
+        'is_enabled' => false,
+        'pixel_id' => '',
+    ],
+    'tiktok_pixel' => [
+        'name' => 'TikTok Pixel',
+        'icon' => 'ph ph-tiktok-logo',
+        'is_enabled' => false,
+        'pixel_id' => '',
+    ],
 ];
+
