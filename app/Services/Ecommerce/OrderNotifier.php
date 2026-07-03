@@ -20,6 +20,25 @@ class OrderNotifier
 {
     public static function orderPlaced(Order $order): void
     {
+        // Meta Conversions API (CAPI) Server-Side Purchase Event
+        if (\App\Services\Tracking\FacebookCapiService::isEnabled()) {
+            $cacheKey = 'capi_sent_purchase_' . $order->id;
+            if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addDays(7));
+                try {
+                    \App\Jobs\SendFacebookCapiPurchaseJob::dispatch(
+                        $order,
+                        request()->ip(),
+                        request()->userAgent(),
+                        request()->cookie('_fbp'),
+                        request()->cookie('_fbc')
+                    );
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+        }
+
         self::email($order, NotificationType::ORDER_PLACED, [
             'full_name' => $order->customer_name,
             'email' => $order->customer_email,

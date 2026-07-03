@@ -16,7 +16,54 @@
         t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{{ config("extension.facebook_pixel.pixel_id") }}');
+        
+        @php
+            $fbUserData = [];
+            if (request()->routeIs('shop.checkout.confirmation') && isset($order)) {
+                if ($order->customer_email) {
+                    $fbUserData['em'] = strtolower(trim($order->customer_email));
+                }
+                if ($order->customer_phone) {
+                    $phoneClean = preg_replace('/[^0-9]/', '', $order->customer_phone);
+                    if (strlen($phoneClean) === 11 && str_starts_with($phoneClean, '01')) {
+                        $phoneClean = '88' . $phoneClean;
+                    }
+                    $fbUserData['ph'] = $phoneClean;
+                }
+                if ($order->customer_name) {
+                    $parts = explode(' ', trim($order->customer_name));
+                    $fbUserData['fn'] = strtolower(trim($parts[0]));
+                    if (isset($parts[1])) {
+                        $fbUserData['ln'] = strtolower(trim(end($parts)));
+                    }
+                }
+            } elseif (auth()->check()) {
+                $authUser = auth()->user();
+                if ($authUser->email) {
+                    $fbUserData['em'] = strtolower(trim($authUser->email));
+                }
+                if (!empty($authUser->phone)) {
+                    $phoneClean = preg_replace('/[^0-9]/', '', $authUser->phone);
+                    if (strlen($phoneClean) === 11 && str_starts_with($phoneClean, '01')) {
+                        $phoneClean = '88' . $phoneClean;
+                    }
+                    $fbUserData['ph'] = $phoneClean;
+                }
+                if (!empty($authUser->name)) {
+                    $parts = explode(' ', trim($authUser->name));
+                    $fbUserData['fn'] = strtolower(trim($parts[0]));
+                    if (isset($parts[1])) {
+                        $fbUserData['ln'] = strtolower(trim(end($parts)));
+                    }
+                }
+            }
+        @endphp
+
+        @if (!empty($fbUserData))
+            fbq('init', '{{ config("extension.facebook_pixel.pixel_id") }}', {!! json_encode($fbUserData) !!});
+        @else
+            fbq('init', '{{ config("extension.facebook_pixel.pixel_id") }}');
+        @endif
         fbq('track', 'PageView');
     </script>
     <noscript>
@@ -184,6 +231,8 @@
                     value: purchaseTotal,
                     currency: purchaseCurrency,
                     num_items: purchaseItems.reduce(function(acc, item) { return acc + item.quantity; }, 0)
+                }, {
+                    eventID: orderId
                 });
             }
 

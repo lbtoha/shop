@@ -27,10 +27,14 @@
                 </div>
             </form>
         </x-admin::modal>
-        <x-admin::modal modalId="facebook_pixel" title="Edit Facebook Pixel Credentials">
+        <x-admin::modal modalId="facebook_pixel" title="Edit Facebook Pixel & Conversions API Credentials">
             <form class="form-submit-edit" method="POST">
                 @csrf
-                <x-admin::text-input-group name="pixel_id" label="Pixel Id" />
+                <div class="space-y-4">
+                    <x-admin::text-input-group name="pixel_id" label="Pixel Id" />
+                    <x-admin::textarea-group name="access_token" label="Conversions API Access Token" placeholder="Enter Meta System User Access Token" />
+                    <x-admin::text-input-group name="test_event_code" label="Test Event Code (Optional)" placeholder="e.g. TEST12345 (used to verify CAPI events in real time)" />
+                </div>
                 <div class="flex items-center justify-end mt-4">
                     <x-admin::primary-button>
                         {{ __('Save') }}

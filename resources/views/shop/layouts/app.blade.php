@@ -5,7 +5,55 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('application_info.company_info.name', config('app.name')))</title>
+    
+    <!-- SEO Metadata -->
+    <title>@yield('title', config('seo.title', config('application_info.company_info.name', config('app.name'))))</title>
+    <meta name="description" content="@yield('meta_description', config('seo.description', ''))">
+    <meta name="keywords" content="{{ config('seo.keywords', '') }}">
+    @if(config('seo.author'))
+        <meta name="author" content="{{ config('seo.author') }}">
+    @endif
+    @if(config('seo.robots'))
+        <meta name="robots" content="{{ config('seo.robots') }}">
+    @endif
+    @if(config('seo.canonical_link'))
+        <link rel="canonical" href="{{ config('seo.canonical_link') }}">
+    @endif
+
+    <!-- Custom Meta Tags (e.g. Facebook Domain Verification, search console keys) -->
+    @foreach (config('seo.meta', []) as $meta)
+        @if (!empty($meta['name']))
+            <meta name="{{ $meta['name'] }}" content="{{ $meta['content'] }}">
+        @elseif (!empty($meta['property']))
+            <meta property="{{ $meta['property'] }}" content="{{ $meta['content'] }}">
+        @endif
+    @endforeach
+
+    <!-- OpenGraph Metadata -->
+    @if (config('seo.openGraph'))
+        @foreach (config('seo.openGraph', []) as $key => $value)
+            @if ($value)
+                <meta property="og:{{ $key }}" content="{{ $value }}">
+            @endif
+        @endforeach
+    @endif
+
+    <!-- Twitter Metadata -->
+    @if (config('seo.twitter'))
+        @foreach (config('seo.twitter', []) as $key => $value)
+            @if ($value)
+                <meta name="twitter:{{ $key }}" content="{{ $value }}">
+            @endif
+        @endforeach
+    @endif
+
+    <!-- Structured Data (JSON-LD) -->
+    @if (config('seo.structured_data.script.content'))
+        <script type="application/ld+json">
+            {!! config('seo.structured_data.script.content') !!}
+        </script>
+    @endif
+
     <link rel="icon" href="{{ asset(config('application_info.logo_favicon.favicon', '/favicon.ico')) }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

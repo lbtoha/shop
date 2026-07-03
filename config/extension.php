@@ -19,6 +19,8 @@ return [
         'icon' => 'ph ph-facebook-logo',
         'is_enabled' => false,
         'pixel_id' => '',
+        'access_token' => '',
+        'test_event_code' => '',
     ],
     'tiktok_pixel' => [
         'name' => 'TikTok Pixel',
