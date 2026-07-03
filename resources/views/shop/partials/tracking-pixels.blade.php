@@ -161,7 +161,7 @@
                         item_id: '{{ $line["product"]->id }}',
                         item_name: '{{ addslashes($line["product"]->name) }}',
                         item_category: '{{ $line["product"]->category ? addslashes($line["product"]->category->name) : "" }}',
-                        price: {{ (float) $line["price"] }},
+                        price: {{ (float) $line["unit_price"] }},
                         quantity: {{ (int) $line["quantity"] }}
                     },
                 @endforeach
