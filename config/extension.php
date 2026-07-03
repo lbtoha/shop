@@ -28,5 +28,11 @@ return [
         'is_enabled' => false,
         'pixel_id' => '',
     ],
+    'clarity' => [
+        'name' => 'Microsoft Clarity',
+        'icon' => 'ph ph-chart-bar',
+        'is_enabled' => false,
+        'project_id' => '',
+    ],
 ];
 

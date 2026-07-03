@@ -3,6 +3,7 @@
     $fbPixelEnabled = (bool) config('extension.facebook_pixel.is_enabled') && !empty(config('extension.facebook_pixel.pixel_id'));
     $ga4Enabled = (bool) config('extension.google_analytics.is_enabled') && !empty(config('extension.google_analytics.measurement_id'));
     $tiktokPixelEnabled = (bool) config('extension.tiktok_pixel.is_enabled') && !empty(config('extension.tiktok_pixel.pixel_id'));
+    $clarityEnabled = (bool) config('extension.clarity.is_enabled') && !empty(config('extension.clarity.project_id'));
 @endphp
 
 @if ($fbPixelEnabled)
@@ -96,6 +97,17 @@
         }(window, document, 'ttq');
     </script>
     <!-- End TikTok Pixel Code -->
+@endif
+
+@if ($clarityEnabled)
+    <!-- Microsoft Clarity Code -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window,document,"clarity","script","{{ config('extension.clarity.project_id') }}");
+    </script>
 @endif
 
 <script>

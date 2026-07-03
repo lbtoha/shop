@@ -121,6 +121,21 @@ class ExtensionController extends Controller
             ]);
         }
 
+        if ($slug == 'clarity') {
+
+            $validated = $request->validate([
+                'project_id' => 'required',
+            ]);
+
+            $extension = config('extension.clarity');
+
+            $extension['project_id'] = $validated['project_id'];
+
+            storeOption([
+                'extension_'.$slug => $extension,
+            ]);
+        }
+
         if ($slug == 'recaptcha') {
 
             $validated = $request->validate([
