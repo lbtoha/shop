@@ -34,5 +34,12 @@ return [
         'is_enabled' => false,
         'project_id' => '',
     ],
+    'google_ads' => [
+        'name' => 'Google Ads Pixel',
+        'icon' => 'ph ph-google-logo',
+        'is_enabled' => false,
+        'conversion_id' => '',
+        'purchase_label' => '',
+    ],
 ];
 

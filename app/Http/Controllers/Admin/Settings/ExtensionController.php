@@ -136,6 +136,23 @@ class ExtensionController extends Controller
             ]);
         }
 
+        if ($slug == 'google_ads') {
+
+            $validated = $request->validate([
+                'conversion_id' => 'required',
+                'purchase_label' => 'nullable|string',
+            ]);
+
+            $extension = config('extension.google_ads');
+
+            $extension['conversion_id'] = $validated['conversion_id'];
+            $extension['purchase_label'] = $validated['purchase_label'] ?? '';
+
+            storeOption([
+                'extension_'.$slug => $extension,
+            ]);
+        }
+
         if ($slug == 'recaptcha') {
 
             $validated = $request->validate([

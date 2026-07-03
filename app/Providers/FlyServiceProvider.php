@@ -55,6 +55,7 @@ class FlyServiceProvider extends ServiceProvider
             config()->set('extension.facebook_pixel', getOptionWithJsonDecode(key: 'extension_facebook_pixel', default: config('extension.facebook_pixel')));
             config()->set('extension.tiktok_pixel', getOptionWithJsonDecode(key: 'extension_tiktok_pixel', default: config('extension.tiktok_pixel')));
             config()->set('extension.clarity', getOptionWithJsonDecode(key: 'extension_clarity', default: config('extension.clarity')));
+            config()->set('extension.google_ads', getOptionWithJsonDecode(key: 'extension_google_ads', default: config('extension.google_ads')));
             config()->set('extension.recaptcha', getOptionWithJsonDecode(key: 'extension_recaptcha', default: config('extension.recaptcha')));
             config()->set('extra_service.system_config', getOptionWithJsonDecode(key: 'extra_service_system_config', default: config('extra_service.system_config')));
             config()->set('extra_service.site_pagination_config', getOptionWithJsonDecode(key: 'extra_service_pagination', default: config('extra_service.pagination')));

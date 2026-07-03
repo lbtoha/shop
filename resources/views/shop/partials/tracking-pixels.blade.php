@@ -4,6 +4,7 @@
     $ga4Enabled = (bool) config('extension.google_analytics.is_enabled') && !empty(config('extension.google_analytics.measurement_id'));
     $tiktokPixelEnabled = (bool) config('extension.tiktok_pixel.is_enabled') && !empty(config('extension.tiktok_pixel.pixel_id'));
     $clarityEnabled = (bool) config('extension.clarity.is_enabled') && !empty(config('extension.clarity.project_id'));
+    $googleAdsEnabled = (bool) config('extension.google_ads.is_enabled') && !empty(config('extension.google_ads.conversion_id'));
 @endphp
 
 @if ($fbPixelEnabled)
@@ -75,14 +76,22 @@
     <!-- End Meta Pixel Code -->
 @endif
 
-@if ($ga4Enabled)
+@if ($ga4Enabled || $googleAdsEnabled)
     <!-- Google Tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('extension.google_analytics.measurement_id') }}"></script>
+    @php
+        $primaryGoogleId = $ga4Enabled ? config('extension.google_analytics.measurement_id') : config('extension.google_ads.conversion_id');
+    @endphp
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $primaryGoogleId }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '{{ config("extension.google_analytics.measurement_id") }}');
+        @if ($ga4Enabled)
+            gtag('config', '{{ config("extension.google_analytics.measurement_id") }}');
+        @endif
+        @if ($googleAdsEnabled)
+            gtag('config', '{{ config("extension.google_ads.conversion_id") }}');
+        @endif
     </script>
     <!-- End Google Tag -->
 @endif
@@ -257,6 +266,18 @@
                     items: purchaseItems
                 });
             }
+
+            // Google Ads Conversion
+            @if ($googleAdsEnabled && !empty(config('extension.google_ads.purchase_label')))
+                if (window.gtag) {
+                    gtag('event', 'conversion', {
+                        'send_to': '{{ config("extension.google_ads.conversion_id") }}/{{ config("extension.google_ads.purchase_label") }}',
+                        'value': purchaseTotal,
+                        'currency': purchaseCurrency,
+                        'transaction_id': orderId
+                    });
+                }
+            @endif
 
             // TikTok
             if (window.ttq) {

@@ -64,6 +64,20 @@
                 </div>
             </form>
         </x-admin::modal>
+        <x-admin::modal modalId="google_ads" title="Edit Google Ads Credentials">
+            <form class="form-submit-edit" method="POST">
+                @csrf
+                <div class="space-y-4">
+                    <x-admin::text-input-group name="conversion_id" label="Conversion ID" placeholder="e.g. AW-123456789" />
+                    <x-admin::text-input-group name="purchase_label" label="Purchase Conversion Label" placeholder="e.g. AbCdEfGhIjKlMnOpQrS" />
+                </div>
+                <div class="flex items-center justify-end mt-4">
+                    <x-admin::primary-button>
+                        {{ __('Save') }}
+                    </x-admin::primary-button>
+                </div>
+            </form>
+        </x-admin::modal>
         <x-admin::modal modalId="tawk_to" title="{{ __('Edit Tawk.to Credentials') }}">
             <form class="form-submit-edit" method="POST">
                 @csrf
