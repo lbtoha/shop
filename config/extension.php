@@ -27,6 +27,8 @@ return [
         'icon' => 'ph ph-tiktok-logo',
         'is_enabled' => false,
         'pixel_id' => '',
+        'access_token' => '',
+        'test_event_code' => '',
     ],
     'clarity' => [
         'name' => 'Microsoft Clarity',

@@ -39,6 +39,19 @@ class OrderNotifier
             }
         }
 
+        // TikTok Conversions API (Events API) Server-Side Purchase Event
+        if (\App\Services\Tracking\TikTokCapiService::isEnabled()) {
+            $ttCacheKey = 'tiktok_capi_sent_purchase_' . $order->id;
+            if (!\Illuminate\Support\Facades\Cache::has($ttCacheKey)) {
+                \Illuminate\Support\Facades\Cache::put($ttCacheKey, true, now()->addDays(7));
+                try {
+                    \App\Services\Tracking\TikTokCapiService::sendCompletePayment($order);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+        }
+
         self::email($order, NotificationType::ORDER_PLACED, [
             'full_name' => $order->customer_name,
             'email' => $order->customer_email,

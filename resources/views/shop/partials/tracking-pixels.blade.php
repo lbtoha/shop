@@ -292,6 +292,8 @@
                     }),
                     value: purchaseTotal,
                     currency: purchaseCurrency
+                }, {
+                    event_id: orderId
                 });
             }
         @endif

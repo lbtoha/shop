@@ -110,11 +110,15 @@ class ExtensionController extends Controller
 
             $validated = $request->validate([
                 'pixel_id' => 'required',
+                'access_token' => 'nullable|string',
+                'test_event_code' => 'nullable|string',
             ]);
 
             $extension = config('extension.tiktok_pixel');
 
             $extension['pixel_id'] = $validated['pixel_id'];
+            $extension['access_token'] = $validated['access_token'] ?? '';
+            $extension['test_event_code'] = $validated['test_event_code'] ?? '';
 
             storeOption([
                 'extension_'.$slug => $extension,
