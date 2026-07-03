@@ -22,7 +22,7 @@
         </button>
         <button type="button" id="{{ $sliderId }}-next"
             class="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-center border-4 border-white transition-all duration-200 lg:opacity-0 lg:group-hover/slider:opacity-100 shadow-md hover:shadow-lg cursor-pointer disabled:opacity-20 disabled:pointer-events-none">
-            <i class="ph-bold ph-caret-right text-base"></i>
+            <i class="ph-bold ph-caret-right text-base"></i>  
         </button>
 
         <div class="swiper {{ $sliderId }} overflow-hidden pb-1">
