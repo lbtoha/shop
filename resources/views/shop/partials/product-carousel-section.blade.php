@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    @if (!empty($viewAll))
+    @if (!empty($viewAll)) 
         <div class="flex justify-center mt-8">
             <a href="{{ $viewAll }}" class="btn-outline">
                 {{ __('View All') }}
