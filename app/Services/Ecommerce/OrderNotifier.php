@@ -26,7 +26,7 @@ class OrderNotifier
             if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
                 \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addDays(7));
                 try {
-                    \App\Jobs\SendFacebookCapiPurchaseJob::dispatch(
+                    \App\Jobs\SendFacebookCapiPurchaseJob::dispatchSync(
                         $order,
                         request()->ip(),
                         request()->userAgent(),

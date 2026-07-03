@@ -121,7 +121,7 @@ class FacebookCapiService
         }
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::timeout(3)->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post("https://graph.facebook.com/v19.0/{$pixelId}/events", $payload);
