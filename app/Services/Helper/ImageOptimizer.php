@@ -17,7 +17,7 @@ class ImageOptimizer extends Command
             $tmpPath = $file->getPathname();
             $extension = strtolower($file->getClientOriginalExtension());
 
-            if (! in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
                 return $file;
             }
 

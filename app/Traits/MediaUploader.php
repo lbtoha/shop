@@ -41,7 +41,7 @@ trait MediaUploader
     public function upload(mixed $file, string $path = 'others'): string
     {
         // optimize image if file is image
-        if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png'])) {
+        if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png', 'webp'])) {
             $file = ImageOptimizer::optimize($file);
         }
 
@@ -62,7 +62,7 @@ trait MediaUploader
         }
 
         // Store the file in the specified path
-        if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png'])) {
+        if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png', 'webp'])) {
             $storage->putFileAs(
                 $full_path,
                 $file,
