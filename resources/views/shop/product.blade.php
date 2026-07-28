@@ -53,7 +53,8 @@
         $showCategory = (int) getOption('show_product_category', 1) === 1;
         $tryOnEnabled = \App\Services\Ai\GeminiTryOnService::isEnabled();
         $tryOnCaptcha = $tryOnEnabled && \App\Services\Ai\TryOnAbuseGuard::captchaEnabled();
-        $shareUrl = urlencode(request()->fullUrl());
+        $shortCode = 123456 + ($product->id * 97);
+        $shareUrl = urlencode(route('shop.product.short', $shortCode));
         $isFreeDelivery = ((float) ($product->shipping_cost_dhaka ?? 0)) == 0 && ((float) ($product->shipping_cost_outside ?? 0)) == 0;
 
         // Variant option groups (e.g. Color => [Red, Blue], Size => [S, M, L])
@@ -357,7 +358,7 @@
                             <a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener"
                                 class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-emerald-500 hover:text-white text-neutral-600 flex items-center justify-center transition" title="{{ __('Share on WhatsApp') }}"><i class="ph ph-whatsapp-logo text-base"></i></a>
                             <button type="button" 
-                                onclick="(function(btn){ navigator.clipboard.writeText('{{ request()->fullUrl() }}').then(() => { let icon = btn.querySelector('i'); icon.className = 'ph ph-check text-emerald-500'; setTimeout(() => { icon.className = 'ph ph-copy'; }, 2000); }) })(this)"
+                                onclick="(function(btn){ navigator.clipboard.writeText('{{ route('shop.product.short', 123456 + ($product->id * 97)) }}').then(() => { let icon = btn.querySelector('i'); icon.className = 'ph ph-check text-emerald-500'; setTimeout(() => { icon.className = 'ph ph-copy'; }, 2000); }) })(this)"
                                 title="{{ __('Copy Link') }}"
                                 class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center transition cursor-pointer">
                                 <i class="ph ph-copy text-base"></i>

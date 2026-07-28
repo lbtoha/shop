@@ -95,3 +95,24 @@ Route::middleware('auth')->prefix('account')->as('shop.account.')->group(functio
     Route::get('profile', [AccountController::class, 'profile'])->name('profile');
     Route::post('profile', [AccountController::class, 'updateProfile'])->name('profile.update');
 });
+
+Route::get('/{code}', function ($code) {
+    if (!is_numeric($code) || strlen($code) < 6) {
+        abort(404);
+    }
+    
+    $codeVal = intval($code);
+    if ($codeVal <= 123456) {
+        abort(404);
+    }
+    
+    $diff = $codeVal - 123456;
+    if ($diff % 97 !== 0) {
+        abort(404);
+    }
+    
+    $id = $diff / 97;
+    $product = \App\Models\Product::active()->where('id', $id)->firstOrFail();
+    
+    return redirect()->route('shop.product', $product->slug);
+})->name('shop.product.short');
