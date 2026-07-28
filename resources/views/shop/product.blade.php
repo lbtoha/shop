@@ -2,6 +2,30 @@
 
 @section('title', $product->name . ' — ' . config('application_info.company_info.name'))
 
+@section('meta_description', strip_tags($product->short_description ?: Str::limit($product->description, 150)))
+
+@section('og_meta')
+    <meta property="og:title" content="{{ $product->name }} — {{ config('application_info.company_info.name') }}">
+    <meta property="og:description" content="{{ strip_tags($product->short_description ?: Str::limit($product->description, 150)) }}">
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="{{ request()->fullUrl() }}">
+    <meta property="og:site_name" content="{{ config('application_info.company_info.name') }}">
+    @if($product->thumbnail)
+        <meta property="og:image" content="{{ asset($product->thumbnail) }}">
+    @endif
+    <meta property="product:price:amount" content="{{ $product->price }}">
+    <meta property="product:price:currency" content="BDT">
+@endsection
+
+@section('twitter_meta')
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $product->name }} — {{ config('application_info.company_info.name') }}">
+    <meta name="twitter:description" content="{{ strip_tags($product->short_description ?: Str::limit($product->description, 150)) }}">
+    @if($product->thumbnail)
+        <meta name="twitter:image" content="{{ asset($product->thumbnail) }}">
+    @endif
+@endsection
+
 @section('content')
     @php
         $hasDiscount = $product->compare_at_price && $product->compare_at_price > $product->price;
@@ -327,11 +351,17 @@
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-medium text-neutral-400 uppercase tracking-widest mr-1">{{ __('SHARE') }}</span>
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener"
-                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1877f2] hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-facebook-logo text-base"></i></a>
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1877f2] hover:text-white text-neutral-600 flex items-center justify-center transition" title="{{ __('Share on Facebook') }}"><i class="ph ph-facebook-logo text-base"></i></a>
                             <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}" target="_blank" rel="noopener"
-                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1da1f2] hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-twitter-logo text-base"></i></a>
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-[#1da1f2] hover:text-white text-neutral-600 flex items-center justify-center transition" title="{{ __('Share on Twitter') }}"><i class="ph ph-twitter-logo text-base"></i></a>
                             <a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener"
-                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-emerald-500 hover:text-white text-neutral-600 flex items-center justify-center transition"><i class="ph ph-whatsapp-logo text-base"></i></a>
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-emerald-500 hover:text-white text-neutral-600 flex items-center justify-center transition" title="{{ __('Share on WhatsApp') }}"><i class="ph ph-whatsapp-logo text-base"></i></a>
+                            <button type="button" 
+                                onclick="(function(btn){ navigator.clipboard.writeText('{{ request()->fullUrl() }}').then(() => { let icon = btn.querySelector('i'); icon.className = 'ph ph-check text-emerald-500'; setTimeout(() => { icon.className = 'ph ph-copy'; }, 2000); }) })(this)"
+                                title="{{ __('Copy Link') }}"
+                                class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center transition cursor-pointer">
+                                <i class="ph ph-copy text-base"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

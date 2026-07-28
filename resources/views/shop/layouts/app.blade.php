@@ -30,21 +30,29 @@
     @endforeach
 
     <!-- OpenGraph Metadata -->
-    @if (config('seo.openGraph'))
-        @foreach (config('seo.openGraph', []) as $key => $value)
-            @if ($value)
-                <meta property="og:{{ $key }}" content="{{ $value }}">
-            @endif
-        @endforeach
+    @hasSection('og_meta')
+        @yield('og_meta')
+    @else
+        @if (config('seo.openGraph'))
+            @foreach (config('seo.openGraph', []) as $key => $value)
+                @if ($value)
+                    <meta property="og:{{ $key }}" content="{{ $value }}">
+                @endif
+            @endforeach
+        @endif
     @endif
 
     <!-- Twitter Metadata -->
-    @if (config('seo.twitter'))
-        @foreach (config('seo.twitter', []) as $key => $value)
-            @if ($value)
-                <meta name="twitter:{{ $key }}" content="{{ $value }}">
-            @endif
-        @endforeach
+    @hasSection('twitter_meta')
+        @yield('twitter_meta')
+    @else
+        @if (config('seo.twitter'))
+            @foreach (config('seo.twitter', []) as $key => $value)
+                @if ($value)
+                    <meta name="twitter:{{ $key }}" content="{{ $value }}">
+                @endif
+            @endforeach
+        @endif
     @endif
 
     <!-- Structured Data (JSON-LD) -->
