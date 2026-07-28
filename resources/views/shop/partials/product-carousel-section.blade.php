@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <div class="relative px-0">
+    <div class="relative px-0"> 
         <button type="button" id="{{ $sliderId }}-prev"
             class="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-brand-soft text-brand hover:bg-brand hover:text-white items-center justify-center border-4 border-white transition-all duration-200 lg:opacity-0 lg:group-hover/slider:opacity-100 shadow-md hover:shadow-lg cursor-pointer disabled:opacity-20 disabled:pointer-events-none">
             <i class="ph-bold ph-caret-left text-base"></i>
