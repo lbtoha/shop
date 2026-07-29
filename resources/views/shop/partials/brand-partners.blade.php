@@ -8,7 +8,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <section class="shop-container pt-16 sm:pt-24 mb-12">
+    <style>
+        .brand-partners-section {
+            padding-top: 2.5rem !important; /* 40px */
+        }
+        @media (min-width: 640px) {
+            .brand-partners-section {
+                padding-top: 5rem !important; /* 80px */
+            }
+        }
+    </style>
+
+    <section class="shop-container brand-partners-section mb-12">
         <div class="border-t border-line pt-12">
             <div class="section-heading mb-10">
                 <span class="eyebrow">{{ __('Partners') }}</span>
