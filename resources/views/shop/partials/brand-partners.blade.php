@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <section class="shop-container mt-16 mb-12">
+    <section class="shop-container pt-16 sm:pt-24 mb-12">
         <div class="border-t border-line pt-12">
             <div class="section-heading mb-10">
                 <span class="eyebrow">{{ __('Partners') }}</span>
