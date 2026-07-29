@@ -2,6 +2,8 @@
 
 import { fileManagerInit } from "@/shared/js/primary-dashboard/file-manager";
 
+window.fileManagerInit = fileManagerInit;
+
 fileManagerInit("logo_light", "image");
 fileManagerInit("logo_dark", "image");
 fileManagerInit("favicon", "image");

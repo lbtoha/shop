@@ -94,6 +94,8 @@
         @yield('content')
     </main>
 
+    @include('shop.partials.brand-partners')
+
     @include('shop.partials.footer')
 
     @include('shop.partials.cart-drawer')

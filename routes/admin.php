@@ -195,6 +195,9 @@ Route::middleware([AdminAuthMiddleware::class])->group(function () {
 
                 /** -------------------------- LOGO & FAVICON -------------------------- */
                 Route::resource('logo-favicon', Admin\Settings\LogoFaviconController::class)->only(['index', 'store']);
+
+                /** -------------------------- BRAND PARTNERS -------------------------- */
+                Route::resource('brand-partners', Admin\Settings\BrandPartnersController::class)->only(['index', 'store']);
             });
 
             Route::prefix('integration')->group(function () {

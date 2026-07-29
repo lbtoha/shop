@@ -193,6 +193,12 @@ return [
                                 'text' => "Set up and manage the website's logo and favicon.",
                             ],
                             [
+                                'title' => 'Brand Partners',
+                                'link' => 'admin.settings.brand-partners.index',
+                                'icon' => 'ph ph-handshake',
+                                'text' => 'Set up and manage your Brand Partners list and logos.',
+                            ],
+                            [
                                 'title' => 'PWA',
                                 'link' => 'admin.settings.pwa.index',
                                 'icon' => 'ph ph-intersect',
