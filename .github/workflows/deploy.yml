@@ -26,12 +26,11 @@ jobs:
           # Prevent users from seeing broken states during deployment
           php artisan down || true
           
-          # Revert local changes and clean to prevent conflicts
+          # Revert local changes, fetch, and hard reset to match origin/main
+          git fetch origin
           git checkout -- .
           git clean -fd || true
-          
-          # Pull latest code
-          git pull origin main
+          git reset --hard origin/main
           
           # Install composer dependencies
           composer install --no-dev --optimize-autoloader --no-interaction
