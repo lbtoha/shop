@@ -26,9 +26,9 @@ jobs:
           # Prevent users from seeing broken states during deployment
           php artisan down || true
           
-          # Revert local changes and clean public/build to prevent conflicts
+          # Revert local changes and clean to prevent conflicts
           git checkout -- .
-          git clean -fd public/build || true
+          git clean -fd || true
           
           # Pull latest code
           git pull origin main
