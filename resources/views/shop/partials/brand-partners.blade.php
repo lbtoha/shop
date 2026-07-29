@@ -5,22 +5,22 @@
 
 @if ((int) getOption('show_brand_partners', 1) === 1)
     <!-- Swiper Asset Dependencies -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link class="swiper-css-link" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <style>
         .brand-partners-section {
-            padding-top: 2.5rem !important; /* 40px */
+            padding-top: 1rem !important; /* 16px */
         }
         @media (min-width: 640px) {
             .brand-partners-section {
-                padding-top: 5rem !important; /* 80px */
+                padding-top: 1.5rem !important; /* 24px */
             }
         }
     </style>
 
     <section class="shop-container brand-partners-section mb-12">
-        <div class="border-t border-line pt-12">
+        <div class="border-t border-line" style="padding-top: 0.75rem;">
             <div class="section-heading mb-10">
                 <span class="eyebrow">{{ __('Partners') }}</span>
                 <h2>{{ __('Our Brand Partners') }}</h2>
